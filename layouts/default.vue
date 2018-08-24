@@ -12,13 +12,11 @@
 
         <aside class="menu">
           <ul class="menu-list">
-            
-            <li>
-                <nuxt-link tag="a" :to="'/list/users?q=U2FsdGVkX19kIJqx00UhxeCbWVIfNxpnrG%2Bv6eGmtDYtRoooDrMoJheiM8yPXdKpO70sX8omJErnWVgo73mWPg%3D%3D'">
-                  Customers
-                </nuxt-link>
+            <li v-for="(link, i) in menuLinks" :key="i">
+              <nuxt-link tag="a" :to="`/${link.type}/${link.resource}?q=${link.query}`">
+                {{link.label}}
+              </nuxt-link>
             </li>
-            <li><a class="is-active">Users</a></li>
           </ul>
         </aside>
       </div>
@@ -29,6 +27,16 @@
   </div>
 </template>
 
+<script>
+
+export default {
+  computed: {
+    menuLinks () {
+      return this.$store.state.resources.list
+    }
+  }
+}
+</script>
 <style lang="scss">
 @import '@/assets/css/vars.scss';
 .columns {
