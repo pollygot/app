@@ -2,8 +2,8 @@
   <div>
     <NavBar>
       <a class="navbar-item">
-  Home
-</a>
+        Home
+      </a>
     </NavBar>
     <section class="section has-text-centered">
       <div>

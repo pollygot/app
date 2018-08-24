@@ -4,10 +4,10 @@
       <div class="sidebar">
 
         
-        <nav class="navbar">
-          <div class="navbar-brand">
-            <!-- navbar items, navbar burger... -->
-          </div>
+        <nav class="navbar has-text-centered">
+          <a class="navbar-item">
+            <span class="icon is-large">Home</span>
+          </a>
         </nav>
 
         <aside class="menu">
@@ -35,31 +35,40 @@
   transition: all 0.3s;
   
   .navbar {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid $light-grey;
     width: 100%;
+    .navbar-item {
+      margin-left: auto;
+      margin-right: auto;
+      &:hover {
+        background: none;
+      }
+    }
   }
 
   .menu {
     margin-top: 50px;
   }
   .menu a {
-    padding: 10px 20px;
+    margin: 5px 0;
+    padding: 15px 20px;
     text-transform: uppercase;
     font-size: 0.8em;
     border-radius: 0;
     &.is-active, &:hover {
-      background: $blue;
-      color: #fff;
+      background: rgba( $blue, 0.05 );
+      border-right: 2px solid $primary;
+      color: #000;
     } 
   }
 }
 #content {
-  background: #ededed;
-  border-left: 1px solid grey;
+  background: #F5F6FA;
+  border-left: 1px solid $light-grey;
   box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
 
   .navbar {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid $light-grey;
   }
 }
 </style>
