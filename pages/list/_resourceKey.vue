@@ -11,7 +11,7 @@
       <div class="level-right">
         <p class="m-r-none level-item">
           <router-link tag="a"
-            class="button is-primary is-rounded "
+            class="button is-primary is-rounded"
             :to="'/new/' + resourceKey">
             NEW
           </router-link>
