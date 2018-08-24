@@ -19,3 +19,8 @@ html {
 body, #__nuxt, #__layout {
   min-height: 100vh;
 }
+
+.navbar-item {
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}

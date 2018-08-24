@@ -5,15 +5,20 @@
 
         
         <nav class="navbar has-text-centered">
-          <a class="navbar-item">
+          <nuxt-link tag="a" class="navbar-item" :to="'/'">
             <span class="icon is-large">Home</span>
-          </a>
+          </nuxt-link>
         </nav>
 
         <aside class="menu">
           <ul class="menu-list">
-            <li><a>Dashboard</a></li>
-            <li><a class="is-active">Customers</a></li>
+            
+            <li>
+                <nuxt-link tag="a" :to="'/list/users?q=U2FsdGVkX19kIJqx00UhxeCbWVIfNxpnrG%2Bv6eGmtDYtRoooDrMoJheiM8yPXdKpO70sX8omJErnWVgo73mWPg%3D%3D'">
+                  Customers
+                </nuxt-link>
+            </li>
+            <li><a class="is-active">Users</a></li>
           </ul>
         </aside>
       </div>
@@ -47,7 +52,7 @@
   }
 
   .menu {
-    margin-top: 50px;
+    margin-top: 5px;
   }
   .menu a {
     margin: 5px 0;
