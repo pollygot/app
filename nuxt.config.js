@@ -10,6 +10,8 @@ module.exports = {
       { hid: 'description', name: 'description', content: 'PostgREST Admin Interface' }
     ],
     link: [
+      { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.2.0/css/all.css' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Poppins' },
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
@@ -17,14 +19,14 @@ module.exports = {
   ** Modules
   */
   modules: [
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
   ],
   /*
   ** Global CSS
   */
   css: [
     { src: '@/assets/css/main.scss', lang: 'scss' },
-    { src: 'font-awesome/scss/font-awesome.scss', lang: 'scss' }
+    // { src: '~/font-awesome/scss/font-awesome.scss', lang: 'scss' }
   ],
   /*
   ** Customize the progress bar color
