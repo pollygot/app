@@ -1,11 +1,17 @@
 @import '~bulma/sass/utilities/initial-variables';
 @import '~bulma/sass/utilities/functions';
-// customize styles
-$black: #343434;
 
+@import './vars.scss';
+
+//
+// Customize bulma
+//
+$black: #343434;
 @import '~bulma';
 
-
+//
+// Global styles
+//
 
 html {
   height: 100%;
