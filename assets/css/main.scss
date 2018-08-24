@@ -4,3 +4,12 @@
 $black: #343434;
 
 @import '~bulma';
+
+
+
+html {
+  height: 100%;
+}
+body, #__nuxt, #__layout {
+  min-height: 100vh;
+}
