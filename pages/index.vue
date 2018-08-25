@@ -4,9 +4,9 @@
         Home
     </NavBar>
     <section class="section has-text-centered">
-      <div>
+      <div class="box">
         <h1 class="title is-1">
-          HQ
+          Restiface
         </h1>
         <h2 class="">
           PostgREST Admin Interface

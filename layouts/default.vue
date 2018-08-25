@@ -6,11 +6,12 @@
         
         <nav class="navbar has-text-centered">
           <nuxt-link tag="a" class="navbar-item" :to="'/'">
-            <span class="icon is-large">Home</span>
+            <span class="icon is-large">Restiface</span>
           </nuxt-link>
         </nav>
 
         <aside class="menu">
+          <p class="menu-label">Team views</p>
           <ul class="menu-list">
             <li v-for="(link, i) in menuLinks" :key="i">
               <nuxt-link tag="a" :to="`/${link.type}/${link.resource}?q=${link.query}`">
@@ -66,7 +67,7 @@ export default {
     margin: 5px 0;
     padding: 15px 20px;
     text-transform: uppercase;
-    font-size: 0.8em;
+    font-size: 0.9rem;
     border-radius: 0;
     &.is-active, &:hover {
       background: rgba( $blue, 0.05 );
