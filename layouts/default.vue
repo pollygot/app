@@ -98,6 +98,7 @@ export default {
   border-left: 1px solid $light-grey;
   box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
   min-height: 100vh;
+  overflow: scroll;
   .navbar {
     border-bottom: 1px solid $light-grey;
   }
