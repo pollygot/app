@@ -35,7 +35,7 @@ export default {
   watchQuery: ['page'],
   asyncData ({ params }) {
     return {
-      pageTitle: params.resourceKey.replace('_', ''),
+      pageTitle: params.resourceKey.replace(/_/g, ' '),
       resourceKey: params.resourceKey
     }
   },

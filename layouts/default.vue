@@ -22,11 +22,11 @@
           </ul>
         </aside>
          -->
-        <aside class="menu">
+        <aside class="menu" v-show="tables.length">
           <p class="menu-label">Tables</p>
           <ul class="menu-list">
-            <li v-for="(link, i) in menuLinks" :key="i">
-              <nuxt-link tag="a" :to="`/${link.type}/${link.resource}?q=${link.query}`">
+            <li v-for="(link, i) in tables" :key="i">
+              <nuxt-link tag="a" :to="`/${link.type}/${link.resource}`">
                 {{link.label}}
               </nuxt-link>
             </li>
@@ -43,8 +43,12 @@
 <script>
 export default {
   computed: {
-    menuLinks () {
-      return this.$store.state.resources.list
+    tables () {
+      return this.$store.getters['resources/tables'].map(x => ({
+        type: 'list',
+        resource: x.key,
+        label: x.key.replace(/_/g, ' ')
+      }))
     }
   }
 }

@@ -20,6 +20,7 @@ module.exports = {
   */
   modules: [
     '@nuxtjs/axios',
+    '@nuxtjs/dotenv',
   ],
   /*
   ** Global CSS

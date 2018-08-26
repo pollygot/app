@@ -1,19 +1,30 @@
+const VIEW_SCOPES = {
+  personal: 'personal',
+  table: 'table',
+}
+const VIEWS = {
+  calendar: 'calendar',
+  kanban: 'kanban',
+  list: 'list',
+  record: 'record'
+}
+
 export const state = () => ({
-  list: [
-    {
-      label: 'Users',
-      resource: 'user',
-      type: 'list',
-      query: 'U2FsdGVkX19kIJqx00UhxeCbWVIfNxpnrG%2Bv6eGmtDYtRoooDrMoJheiM8yPXdKpO70sX8omJErnWVgo73mWPg%3D%3D'
-    },
-    {
-      label: 'Employees',
-      resource: 'user',
-      type: 'list',
-      query: 'U2FsdGVkX19kIJqx00UhxeCbWVIfNxpnrG%2Bv6eGmtDYtRoooDrMoJheiM8yPXdKpO70sX8omJErnWVgo73mWPg%3D%3D'
-    }
-  ]
+  swagger: {},
+  customViews: [ ] // custom views (pulled from Pollygot Core)
 })
 
 export const mutations = {
+  setCustomViews (state, list) {
+    state.customViews = list
+  },
+  setSwagger (state, swaggerDefinition) {
+    state.swagger = swaggerDefinition
+  }
+}
+
+export const getters = {
+  tables: state => (state.swagger.definitions) // returns a list of Database tables exposed to PostgREST
+    ? Object.entries(state.swagger.definitions).map(([k, v]) => (Object.assign({ ...v, key: k }, v))) // object to array
+    : []
 }
