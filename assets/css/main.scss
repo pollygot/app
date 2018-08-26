@@ -9,6 +9,57 @@
 $black: #343434;
 @import '~bulma';
 
+// 
+// Helpers 
+// 
+
+// SPACING CSS - see usage: https://github.com/jgthms/bulma/issues/451#issuecomment-331758839
+$sizeUnit: rem;
+$marginKey: 'm';
+$paddingKey: 'p';
+$separator: '-';
+$sizes: (
+    ('none', 0),
+    ('xxs', 0.125),
+    ('xs', 0.25),
+    ('sm', 0.5),
+    ('md', 1),
+    ('lg', 2),
+    ('xl', 4),
+    ('xxl', 8),
+);
+$positions: (
+    ('t', 'top'),
+    ('r', 'right'),
+    ('b', 'bottom'),
+    ('l', 'left')
+);
+
+@function sizeValue($key, $value) {
+    @return if($key == 'none', 0, $value + $sizeUnit);
+}
+
+@each $size in $sizes {
+    $sizeKey: nth($size, 1);
+    $sizeValue: nth($size, 2);
+    .#{$marginKey}#{$separator}#{$sizeKey} {
+        margin: sizeValue($sizeKey, $sizeValue) !important;
+    }
+    .#{$paddingKey}#{$separator}#{$sizeKey} {
+        padding: sizeValue($sizeKey, $sizeValue) !important;
+    }
+    @each $position in $positions {
+        $posKey: nth($position, 1);
+        $posValue: nth($position, 2);
+        .#{$marginKey}#{$separator}#{$posKey}#{$separator}#{$sizeKey} {
+            margin-#{$posValue}: sizeValue($sizeKey, $sizeValue) !important;
+        }
+        .#{$paddingKey}#{$separator}#{$posKey}#{$separator}#{$sizeKey} {
+            padding-#{$posValue}: sizeValue($sizeKey, $sizeValue) !important;
+        }
+    }
+}
+
 //
 // Global styles
 //
@@ -19,7 +70,30 @@ html {
 body, #__nuxt, #__layout {
   min-height: 100vh;
 }
-
 .navbar-item {
   text-transform: uppercase;
+}
+.super-button {
+  span {
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-right: 15px;
+  }
+  i {
+    font-size: 0.7em;
+    border-radius: 50%;
+    padding: 9px;
+    width: 30px;
+  }
+  &.is-primary{
+    box-shadow: 1px 3px 12px 3px rgba($blue, 0.30);
+    i { background: darken($blue, 15%); }
+  }
+  &.is-dark {
+    box-shadow: 1px 3px 12px 3px rgba(0,0,0,0.30);
+    i { background: darken($grey, 15%); }
+  }
+}
+.has-corners {
+  border-radius: 4px;
 }
