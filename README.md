@@ -1,4 +1,4 @@
-# grest-admin
+# Restiface by Pollygot
 
 > PostgREST Admin Interface
 
