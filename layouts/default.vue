@@ -43,6 +43,7 @@
 <script>
 export default {
   computed: {
+    // Get all database tables from the swagger definition and format them for the sidebar menu
     tables () {
       return this.$store.getters['resources/tables'].map(x => ({
         type: 'list',
