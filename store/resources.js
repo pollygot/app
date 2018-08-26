@@ -15,16 +15,14 @@ export const state = () => ({
 })
 
 export const mutations = {
-  setCustomViews (state, list) {
-    state.customViews = list
-  },
   setSwagger (state, swaggerDefinition) {
     state.swagger = swaggerDefinition
   }
 }
 
 export const getters = {
-  tables: state => (state.swagger.definitions) // returns a list of Database tables exposed to PostgREST
-    ? Object.entries(state.swagger.definitions).map(([k, v]) => (Object.assign({ ...v, key: k }, v))) // object to array
+  // Returns a list of Database tables exposed to PostgREST
+  tables: state => (state.swagger.definitions)
+    ? Object.entries(state.swagger.definitions).map(([k, v]) => (Object.assign({ ...v, key: k }, v))) // object of objects to array or objects, adding 'key' to each object
     : []
 }
