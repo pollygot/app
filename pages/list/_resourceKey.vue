@@ -5,6 +5,7 @@
   </NavBar>
 
   <div class="main">
+    
     <nav class="level is-mobile">
       <div class="level-left"></div>
 
@@ -23,7 +24,6 @@
     </nav>
 
     <div class="table-box box p-none">
-
       <table class="table is-responsive is-fullwidth is-hoverable is-small" >
         <thead>
           <tr>
@@ -59,40 +59,86 @@
           </tr>
         </tbody>
       </table>
-
     </div>
-  </div>  
+
+    <div class="section p-b-none">
+      <Pagination
+        :currentRangeStart="postgrestParams.offset || 0"
+        :currentRangeEnd="currentRangeEnd"
+        :paginationSize="postgrestParams.limit || currentRangeEnd"
+        :totalRecords="totalRecords"
+        @onNewRangeStart="paginate"
+      />
+    </div>
+
+  </div>
+
 </div>
 </template>
 
 <script>
+const DEFAULT_OFFSET = 0
+const DEFAULT_PAGINATION_SIZE = 20
 import NavBar from '~/components/NavBar.vue'
+import Pagination from '~/components/Pagination.vue'
+import { encrypt, decrypt, getRangeDataFromPostgrestHeaders } from '~/lib/helpers'
 export default {
-  components: {  NavBar },
-  watchQuery: ['page'],
-  async asyncData ({ app, params }) {
-    let fullUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
-    let records = await app.$axios.$get(fullUrl, {
-      'headers': {
-        'Range-Unit': 'items',
-        'Prefer': 'count=exact'
-      }
+  components: {  NavBar, Pagination },
+  watchQuery: ['q'],
+  async asyncData ({ app, params, query }) {
+    console.log('called')
+    let postgrestUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
+    let postgrestQueryString = (query.q) ? decrypt(query.q) : `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
+    let fullUrl = `${postgrestUrl}?${postgrestQueryString}`
+    console.log('fullUrl', fullUrl)
+    let { data:records, headers } = await app.$axios.get(fullUrl, {
+      'headers': { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
     })
+    let rangeData = getRangeDataFromPostgrestHeaders(headers)
     return {
+      DEFAULT_OFFSET: DEFAULT_OFFSET,
+      DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
+      currentRangeEnd: rangeData.rangeEnd,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
+      postgrestQueryString: postgrestQueryString,
       records: records,
-      resourceKey: params.resourceKey
+      resourceKey: params.resourceKey,
+      totalRecords: rangeData.totalRecords,
     }
   },
   computed: {
+    // returns the name of every field in the first record
     columns: function () {
       return Object.keys(this.records[0] || [])
-    }
+    },
+    //
+    postgrestParams: function () {
+      let result = {}
+      this.postgrestQueryString.split('&').forEach(part => {
+        let item = part.split('=')
+        result[item[0]] = decodeURIComponent(item[1])
+      })
+      if (result.limit) result.limit = parseInt(result.limit)
+      if (result.offset) result.offset = parseInt(result.offset)
+      return result
+    },
   },
   methods: {
     gridRecordClicked: () => {
       console.log('called')
-    }
+    },
+    paginate: function (start) {
+      this.pushParams({ ...this.postgrestParams, offset: start })
+    },
+    pushParams: function (newParams) {
+      let route = { path: this.$route.path, query: {} }
+      let q = ''
+      if (newParams.limit) q += `limit=${newParams.limit}&`
+      if (newParams.offset) q += `offset=${newParams.offset}&`
+      if (q !== '') route.query.q = encrypt(q.substring(0, q.length - 1)) // remove the trailing &
+      console.log('q', q)
+      this.$router.push(route)
+    },
   }
 }
 </script>
@@ -103,6 +149,7 @@ export default {
 }
 .table-box {
   overflow: scroll;
+  font-size: 0.9rem;
   td:hover {
     cursor: pointer;
   }
