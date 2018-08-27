@@ -34,7 +34,15 @@
               </div>
             </th>
             <th v-for="(column, i) in columns" :key="'col-h'+i">
-              <a class="" @click="sort(column)">{{column}}</a>
+              <a 
+                @click="sort(column)"
+                :class="{ 
+                  'sort-desc': (sortColumn === column && sortDirection === 'desc'),
+                  'sort-asc': (sortColumn === column && sortDirection === 'asc') 
+                }" 
+              >
+                {{column}}
+              </a>
             </th>
           </tr>
         </thead>
@@ -101,8 +109,6 @@ export default {
       postgrestQueryString: postgrestQueryString,
       records: records,
       resourceKey: params.resourceKey,
-      sortColumn: '',
-      sortDirection: 'desc',
       totalRecords: rangeData.totalRecords,
     }
   },
@@ -111,7 +117,10 @@ export default {
     columns: function () {
       return Object.keys(this.records[0] || [])
     },
-    //
+    isSorted: function () {
+      return !!this.postgrestParams.order
+    },
+    // parse the params from the query string
     postgrestParams: function () {
       let result = {}
       this.postgrestQueryString.split('&').forEach(part => {
@@ -122,6 +131,14 @@ export default {
       if (result.offset) result.offset = parseInt(result.offset)
       return result
     },
+    sortColumn: function () {
+      if (!this.isSorted) return null
+      return this.postgrestParams.order.split('.')[0]
+    },
+    sortDirection: function () {
+      if (!this.isSorted) return null
+      return this.postgrestParams.order.split('.')[1]
+    }
   },
   methods: {
     gridRecordClicked: function (record) {
@@ -151,9 +168,10 @@ export default {
       this.$router.push(route)
     },
     sort: function (columnName) {
-      this.sortDirection = (this.sortColumn === columnName) ? 'desc' : 'asc'
-      this.sortColumn = columnName
-      this.pushParams({ ...this.postgrestParams, order: `${this.sortColumn}.${this.sortDirection}` })
+      let sortDirection = (this.isSorted && this.sortColumn === columnName && this.sortDirection === 'asc') 
+        ? 'desc' 
+        : 'asc'
+      this.pushParams({ ...this.postgrestParams, order: `${columnName}.${sortDirection}` })
     },
   }
 }
@@ -165,6 +183,12 @@ export default {
   font-size: 0.9rem;
   td:hover {
     cursor: pointer;
+  }
+  a.sort-asc:after {
+   content: ' ▾';
+  }
+  a.sort-desc:after {
+   content: ' ▴';
   }
 }
 </style>
