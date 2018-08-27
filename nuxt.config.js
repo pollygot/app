@@ -21,6 +21,7 @@ module.exports = {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/dotenv',
+    '@nuxtjs/toast',
   ],
   /*
   ** Global CSS
@@ -61,5 +62,8 @@ module.exports = {
   */
   axios: {
     // proxyHeaders: false
+  },
+  toast: {
+    position: 'bottom-right'
   }
 }

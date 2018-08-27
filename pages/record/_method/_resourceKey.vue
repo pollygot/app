@@ -124,7 +124,6 @@ export default {
   async asyncData ({ app, params, query, route }) {
     let isCreated = false
     let selector = Helpers.decrypt(query.q)
-    console.log('selector', selector)
     let record = {}
     let resourceUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
     if (params.method === 'edit') {
@@ -158,9 +157,9 @@ export default {
       this.formattedFields
         .filter(x => x.value) // get fields that have been filled out
         .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
-      return Helpers
-        .createOrUpdateRecord(this.apiUrl, data)
-        .catch(e => { console.error(e) })
+      // return Helpers
+      //   .createOrUpdateRecord(this.apiUrl, data)
+      //   .catch(e => { console.error(e) })
     },
     getUniqueSelector: function () { // use this function rather than the props so that new records are covered
       let pkFilters = this.primaryKeys.map(x => (`${x}=eq.${this.record[x]}`))
@@ -170,7 +169,10 @@ export default {
     save: async function () {
       let response = null
       if (this.isCreated) { // update
-        let { data } = await this.updateRecord()
+        let { data } = await this.updateRecord().catch(e => {
+          let { details } = e.response.data
+          this.$toast.error(details, { duration: 4000 })
+        })
         if (data) response = data
       } else if (!this.isCreated) { // create
         let { data } = await this.createRecord()
@@ -180,7 +182,7 @@ export default {
       if (response) {
         this.record = response
         this.isCreated = true
-        console.log('Saved!')
+        this.$toast.success('Saved!', { duration: 1000 })
         let path = '/record/edit/' + this.resourceKey + '?q=' + Helpers.encrypt(this.getUniqueSelector())
         this.$router.replace({path: path})
       }
@@ -196,8 +198,7 @@ export default {
         let url = `${this.resourceUrl}?${selector}`
         return this.$axios.patch(url, data, {
           'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
-        }).catch(e => { console.log('e', e) })
-
+        })
       } else console.error('Can\'t find a Primary Key for this record', 'ERROR')
     },
   }
