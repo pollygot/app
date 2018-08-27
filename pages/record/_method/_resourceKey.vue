@@ -25,7 +25,7 @@
     <div class="box has-corners">
         <template v-for="field in formattedFields">
 
-          <div class="animated fadeIn field is-horizontal" v-if="field.type === 'enum'" :key="field.key">
+          <div class="field is-horizontal" v-if="field.type === 'enum'" :key="field.key">
             <div class="field-label is-normal">
               <label class="label">{{field.label}}</label>
             </div>
@@ -43,7 +43,7 @@
             </div>
           </div>
 
-          <div class="animated fadeIn field is-horizontal" v-else-if="field.type === 'integer'" :key="field.key">
+          <div class="field is-horizontal" v-else-if="field.type === 'integer'" :key="field.key">
             <div class="field-label is-normal">
               <label class="label is-capitalized">{{field.label}}</label>
             </div>
@@ -56,7 +56,7 @@
             </div>
           </div>
 
-          <div class="animated fadeIn field is-horizontal" v-else-if="field.type === 'boolean'" :key="field.key">
+          <div class="field is-horizontal" v-else-if="field.type === 'boolean'" :key="field.key">
             <div class="field-label is-normal">
               <label class="label is-capitalized">{{field.label}}</label>
             </div>
@@ -68,7 +68,7 @@
             </div>
           </div>
 
-          <div class="animated fadeIn field is-horizontal" v-else-if="field.type === 'timestamp'" :key="field.key">
+          <div class="field is-horizontal" v-else-if="field.type === 'timestamp'" :key="field.key">
             <div class="field-label is-normal">
               <label class="label is-capitalized">{{field.label}}</label>
             </div>
@@ -81,7 +81,7 @@
             </div>
           </div>
 
-          <div class="animated fadeIn field is-horizontal" v-else-if="field.type === 'json'" :key="field.key">
+          <div class="field is-horizontal" v-else-if="field.type === 'json'" :key="field.key">
             <div class="field-label is-normal">
               <label class="label is-capitalized">{{field.label}}</label>
             </div>
@@ -94,7 +94,7 @@
             </div>
           </div>
 
-          <div class="animated fadeIn field is-horizontal" v-else :key="field.key">
+          <div class="field is-horizontal" v-else :key="field.key">
             <div class="field-label is-normal">
               <label class="label is-capitalized">{{field.label}}</label>
             </div>
@@ -117,26 +117,28 @@
 
 <script>
 import NavBar from '~/components/NavBar.vue'
-import { calulateDisplayTypeFromSwaggerInfo, enrichSwaggerField } from '~/lib/helpers'
+import * as Helpers from '~/lib/helpers'
 export default {
   components: { NavBar },
+  watchQuery: ['q'],
   async asyncData ({ app, params, query, route }) {
     let isCreated = false
+    let selector = Helpers.decrypt(query.q)
+    console.log('selector', selector)
     let record = {}
+    let resourceUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
     if (params.method === 'edit') {
       isCreated = true
-      let postgrestUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
-      let selector = route.fullPath.split('?')[1]
-      let fullUrl = `${postgrestUrl}?${selector}`
+      let fullUrl = `${resourceUrl}?${selector}`
       record = await app.$axios.$get(fullUrl, {
         'headers': { 'Accept': 'application/vnd.pgrst.object+json' }
       })
     }
     let availableFields = app.store.getters['resources/columnsForResource'](params.resourceKey)
     let formattedFields = availableFields
-      .map(x => calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
+      .map(x => Helpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
       .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
-      .map(x => enrichSwaggerField(x)) // add useful data to each field. eg, add Date() to timestamp strings
+      .map(x => Helpers.enrichSwaggerField(x)) // add useful data to each field. eg, add Date() to timestamp strings
 
     return {
       availableFields: availableFields,
@@ -146,8 +148,59 @@ export default {
       primaryKeys: app.store.getters['resources/primaryKeysForResource'](params.resourceKey) || [],
       record: record,
       resourceKey: params.resourceKey,
+      resourceUrl: resourceUrl
     }
   },
+  methods: {
+    createRecord: function () {
+      let self = this
+      let data = {} // the object to be sent to the database
+      this.formattedFields
+        .filter(x => x.value) // get fields that have been filled out
+        .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
+      return Helpers
+        .createOrUpdateRecord(this.apiUrl, data)
+        .catch(e => { console.error(e) })
+    },
+    getUniqueSelector: function () { // use this function rather than the props so that new records are covered
+      let pkFilters = this.primaryKeys.map(x => (`${x}=eq.${this.record[x]}`))
+      if (!pkFilters.length) console.error('No PRIMARY KEY')
+      return pkFilters.join('&')
+    },
+    save: async function () {
+      let response = null
+      if (this.isCreated) { // update
+        let { data } = await this.updateRecord()
+        if (data) response = data
+      } else if (!this.isCreated) { // create
+        let { data } = await this.createRecord()
+        if (data) response = data
+      }
+
+      if (response) {
+        this.record = response
+        this.isCreated = true
+        console.log('Saved!')
+        let path = '/record/edit/' + this.resourceKey + '?q=' + Helpers.encrypt(this.getUniqueSelector())
+        this.$router.replace({path: path})
+      }
+    },
+    // update the database. This uses PATCH so only the data that is passed will be updated
+    updateRecord: function () {
+      let data = {} // the object to be sent to the database
+      let selector = this.getUniqueSelector()
+      if (selector !== null) {
+        this.formattedFields
+          .filter(x => Helpers.hasDataChanged(x)) // get only modified fields
+          .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
+        let url = `${this.resourceUrl}?${selector}`
+        return this.$axios.patch(url, data, {
+          'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
+        }).catch(e => { console.log('e', e) })
+
+      } else console.error('Can\'t find a Primary Key for this record', 'ERROR')
+    },
+  }
 }
 </script>
 

@@ -130,7 +130,7 @@ export default {
           if (!pk) throw new Error('Can\'t find a Primary Key for this record')
           return x + '=eq.' + pk
         })
-        let path = '/record/edit/' + this.resourceKey + '?' + selectors.join('&')
+        let path = '/record/edit/' + this.resourceKey + '?q=' + encrypt(selectors.join('&'))
         this.$router.push({ path: path })
       } catch (error) {
         console.log('error', error)
