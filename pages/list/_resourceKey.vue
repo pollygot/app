@@ -34,7 +34,7 @@
               </div>
             </th>
             <th v-for="(column, i) in columns" :key="'col-h'+i">
-              <a class="sort-down">{{column}}</a>
+              <a class="" @click="sort(column)">{{column}}</a>
             </th>
           </tr>
         </thead>
@@ -101,6 +101,8 @@ export default {
       postgrestQueryString: postgrestQueryString,
       records: records,
       resourceKey: params.resourceKey,
+      sortColumn: '',
+      sortDirection: 'desc',
       totalRecords: rangeData.totalRecords,
     }
   },
@@ -144,8 +146,14 @@ export default {
       let q = ''
       if (newParams.limit) q += `limit=${newParams.limit}&`
       if (newParams.offset) q += `offset=${newParams.offset}&`
+      if (newParams.order) q += `order=${newParams.order}&`
       if (q !== '') route.query.q = encrypt(q.substring(0, q.length - 1)) // remove the trailing &
       this.$router.push(route)
+    },
+    sort: function (columnName) {
+      this.sortDirection = (this.sortColumn === columnName) ? 'desc' : 'asc'
+      this.sortColumn = columnName
+      this.pushParams({ ...this.postgrestParams, order: `${this.sortColumn}.${this.sortDirection}` })
     },
   }
 }
