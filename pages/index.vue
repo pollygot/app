@@ -19,6 +19,7 @@
 <script>
 import NavBar from '~/components/NavBar.vue'
 export default {
+  auth: false,
   components: {  NavBar }
 }
 </script>

@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 module.exports = {
   /*
   ** Headers of the page
@@ -19,8 +21,10 @@ module.exports = {
   ** Modules
   */
   modules: [
+    '@nuxtjs/auth',
     '@nuxtjs/axios',
     '@nuxtjs/dotenv',
+    '@nuxtjs/proxy',
     '@nuxtjs/toast',
   ],
   /*
@@ -60,8 +64,26 @@ module.exports = {
   /*
   ** Module config
   */
+  auth: {
+    strategies: {
+      auth0: {
+        domain: process.env.AUTH0_DOMAIN,
+        client_id: process.env.AUTH0_CLIENT_ID
+      }
+    }
+  },
   axios: {
-    // proxyHeaders: false
+    proxy: true,
+    proxyHeaders: false
+  },
+  proxy: {
+    '/pg': {
+      target: process.env.POSTGREST_URL, 
+      pathRewrite: { '^/pg': '' },
+      headers: {
+        'Authorization': ''
+      }
+    },
   },
   toast: {
     position: 'bottom-right'

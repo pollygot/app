@@ -86,7 +86,7 @@ export default {
   components: {  NavBar, Pagination },
   watchQuery: ['q'],
   async asyncData ({ app, params, query }) {
-    let postgrestUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
+    let postgrestUrl = `pg/${params.resourceKey}`
     let postgrestQueryString = (query.q) ? decrypt(query.q) : `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
     let fullUrl = `${postgrestUrl}?${postgrestQueryString}`
     let { data:records, headers } = await app.$axios.get(fullUrl, {

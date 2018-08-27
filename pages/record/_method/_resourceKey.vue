@@ -125,7 +125,7 @@ export default {
     let isCreated = false
     let selector = Helpers.decrypt(query.q)
     let record = {}
-    let resourceUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
+    let resourceUrl = `pg/${params.resourceKey}`
     if (params.method === 'edit') {
       isCreated = true
       let fullUrl = `${resourceUrl}?${selector}`

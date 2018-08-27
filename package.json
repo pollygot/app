@@ -13,8 +13,10 @@
     "precommit": "npm run lint"
   },
   "dependencies": {
+    "@nuxtjs/auth": "^4.5.1",
     "@nuxtjs/axios": "^5.3.1",
     "@nuxtjs/dotenv": "^1.1.1",
+    "@nuxtjs/proxy": "^1.2.4",
     "@nuxtjs/toast": "^3.0.1",
     "bulma": "^0.7.1",
     "crypto-js": "^3.1.9-1",
