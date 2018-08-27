@@ -17,6 +17,10 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
+  serverMiddleware: ['./auth'],
+  router: {
+    middleware: ['auth']
+  },
   /*
   ** Modules
   */
@@ -66,6 +70,11 @@ module.exports = {
   */
   auth: {
     strategies: {
+      local: {
+        endpoints: {
+          login: { propertyName: 'token.accessToken' }
+        }
+      },
       auth0: {
         domain: process.env.AUTH0_DOMAIN,
         client_id: process.env.AUTH0_CLIENT_ID
@@ -77,6 +86,7 @@ module.exports = {
     proxyHeaders: false
   },
   proxy: {
+    '/api': process.env.SITE_URL,
     '/pg': {
       target: process.env.POSTGREST_URL, 
       pathRewrite: { '^/pg': '' },

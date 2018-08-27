@@ -1,19 +1,45 @@
 <template>
 <div>
-  <h2 class="text-center">Login</h2>
-  <hr>
   <div v-if="error">{{ error + '' }}</div>
   <div v-if="$auth.$state.redirect">
     You have to login before accessing to <strong>{{ $auth.$state.redirect }}</strong>
   </div>
   <div class="section columns is-centered">
-    <div md="4" class="column is-4 has-text-centered">
-        <b-card title="Social Login" bg-variant="light">
-          <div v-for="s in strategies" :key="s.key" class="mb-2">
-          <a @click="$auth.loginWith(s.key)" class="button">Login with {{ s.name }}</a>
+
+      <div class="column is-8">
+        <h4 class="title is-4">Login</h4>
+        <div class="box">
+          <div class="field">
+            <p class="control has-icons-left">
+              <input class="input" type="email" placeholder="Username" v-model="username">
+              <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+            </p>
           </div>
-        </b-card>
-    </div>
+          <div class="field">
+            <p class="control has-icons-left">
+              <input class="input" type="password" placeholder="Password" v-model="password">
+              <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+            </p>
+          </div>
+          <div class="field">
+            <p class="control">
+              <button class="button is-fullwidth is-primary"  @click="login">
+                LOGIN
+              </button>
+            </p>
+          </div>
+        </div>
+        
+        <div class="box" >
+          <div v-for="s in strategies" :key="s.key" class="mb-2">
+          <a @click="$auth.loginWith(s.key)" class="button is-fullwidth is-dark">Login with {{ s.name }}</a>
+          </div>
+        </div>
+
+      </div>
+
+        
+        
   </div>
 </div>
 </template>
@@ -24,6 +50,8 @@ export default {
   middleware: ['auth'],
   data() {
     return {
+      username: 'admin',
+      password: '',
       error: null
     }
   },
@@ -42,7 +70,19 @@ export default {
     }
   },
   methods: {
-    
+    async login() {
+      this.error = null
+      return this.$auth
+        .loginWith('local', {
+          data: {
+            username: this.username,
+            password: this.password
+          }
+        })
+        .catch(e => {
+          this.error = e + ''
+        })
+    }
   }
 }
 </script>
