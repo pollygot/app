@@ -26,7 +26,7 @@
           <p class="menu-label">Tables</p>
           <ul class="menu-list">
             <li v-for="(link, i) in tables" :key="i">
-              <nuxt-link tag="a" :to="`/${link.type}/${link.resource}`">
+              <nuxt-link tag="a" :to="`/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
                 {{link.label}}
               </nuxt-link>
             </li>
@@ -48,7 +48,8 @@ export default {
       return this.$store.getters['resources/tables'].map(x => ({
         type: 'list',
         resource: x.key,
-        label: x.key.replace(/_/g, ' ')
+        label: x.key.replace(/_/g, ' '),
+        isActive: (x.key === this.$route.params.resourceKey)
       }))
     }
   }
@@ -81,7 +82,8 @@ export default {
       padding: 20px 20px 0 20px;
     }
     a { //links
-      padding: 15px 20px;
+      padding: 12px 20px;
+      margin: 2px 0;
       text-transform: uppercase;
       font-size: 0.9rem;
       border-radius: 0;
