@@ -1,7 +1,7 @@
 <template>
 <div id="TablePagination" >
 
-  <div class="TablePaginator section container is-fullhd p-t-none">
+  <div class="TablePaginator p-t-none">
     <nav class="pagination is-rounded is-small" role="navigation" aria-label="pagination">
       <a class="pagination-previous" v-if="!isUserOnFirstPage" @click="previousPage()">Previous</a>
       <a class="pagination-next" v-if="!isUserOnLastPage" @click="nextPage()">Next page</a>
@@ -43,7 +43,7 @@ export default {
     },
     pages: function () {
       let pages = []
-      let totalPages = Math.ceil(this.totalRecords / (this.paginationSize + 1))
+      let totalPages = Math.ceil(this.totalRecords / (this.paginationSize))
       for (let i = 0; i < totalPages; i++) {
         let pageNumber = i + 1
         let rangeStart = i * this.paginationSize
