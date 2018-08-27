@@ -10,7 +10,31 @@
       <div class="level-left"></div>
 
       <div class="animated zoomInRight level-right">
-
+        <div class="level-item">
+          <div class="dropdown is-hoverable is-right" v-show="isCreated">
+            <div class="dropdown-trigger">
+              <button class="button is-dark is-small is-rounded is-outlined" aria-haspopup="true">
+                <span class="icon is-small "><i class="fas fa-cog" aria-hidden="true"></i></span>
+              </button>
+            </div>
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-content">
+                <a class="dropdown-item" @click="newRecord()">
+                  <p>
+                    <span>New</span>
+                    <span><code>CTRL+N</code></span>
+                  </p>
+                </a>
+                <a class="dropdown-item" @click="confirmDeleteModalVisible = true">
+                  <p>
+                    <span>Delete</span>
+                    <span><code>DEL</code></span>
+                  </p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="level-item m-r-none ">
           <a class="super-button button is-medium is-primary is-rounded" @click="save()">
             <span>Save</span>
@@ -111,15 +135,32 @@
     </div>
 
   </div>
+  <ModalConfirm
+    :icon="'fa-times'"
+    :isVisible="confirmDeleteModalVisible"
+    :message="'This action is permanent'"
+    :submessage="'Are you sure you want to delete this record?'"
+    :primaryButtonClass="'is-dark'"
+    :primaryButtonText="'Cancel'"
+    :secondaryButtonClass="'is-danger'"
+    :secondaryButtonText="'Delete'"
+    @onCancel="() => { confirmDeleteModalVisible = false }"
+    @onPrimaryClick="() => { confirmDeleteModalVisible = false }"
+    @onSecondaryClick="() => {
+      confirmDeleteModalVisible = false;
+      deleteRecord();
+    }"
+  />
 
 </div>
 </template>
 
 <script>
+import ModalConfirm from '~/components/ModalConfirm.vue'
 import NavBar from '~/components/NavBar.vue'
 import * as Helpers from '~/lib/helpers'
 export default {
-  components: { NavBar },
+  components: { ModalConfirm, NavBar },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, route }) {
     let isCreated = false
@@ -141,6 +182,7 @@ export default {
 
     return {
       availableFields: availableFields,
+      confirmDeleteModalVisible: false,
       formattedFields: formattedFields,
       isCreated: isCreated,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
