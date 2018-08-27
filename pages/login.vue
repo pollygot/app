@@ -30,7 +30,7 @@
           </div>
         </div>
         
-        <div class="box" >
+        <div class="box" v-if="strategies.length">
           <div v-for="s in strategies" :key="s.key" class="mb-2">
           <a @click="$auth.loginWith(s.key)" class="button is-fullwidth is-dark">Login with {{ s.name }}</a>
           </div>
@@ -56,9 +56,12 @@ export default {
     }
   },
   computed: {
-    strategies: () => ([
-      { key: 'auth0', name: 'Auth0', color: '#ec5425' },
-    ]),
+    strategies: () => {
+      let all = []
+      if (process.env.AUTH0_DOMAIN) all.push({ key: 'auth0', name: 'Auth0', color: '#ec5425' })
+      return all
+    }
+    ,
     redirect() {
       return (
         this.$route.query.redirect &&
