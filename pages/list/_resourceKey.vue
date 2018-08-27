@@ -86,11 +86,9 @@ export default {
   components: {  NavBar, Pagination },
   watchQuery: ['q'],
   async asyncData ({ app, params, query }) {
-    console.log('called')
     let postgrestUrl = `${process.env.POSTGREST_URL}/${params.resourceKey}`
     let postgrestQueryString = (query.q) ? decrypt(query.q) : `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
     let fullUrl = `${postgrestUrl}?${postgrestQueryString}`
-    console.log('fullUrl', fullUrl)
     let { data:records, headers } = await app.$axios.get(fullUrl, {
       'headers': { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
     })
@@ -124,8 +122,19 @@ export default {
     },
   },
   methods: {
-    gridRecordClicked: () => {
-      console.log('called')
+    gridRecordClicked: function (record) {
+      try {
+        let primaryKeys = this.$store.getters['resources/primaryKeysForResource'](this.resourceKey)
+        let selectors = primaryKeys.map(x => {
+          let pk = record[`${x}`].toString() || null
+          if (!pk) throw new Error('Can\'t find a Primary Key for this record')
+          return x + '=eq.' + pk
+        })
+        let path = '/record/edit/' + this.resourceKey + '?' + selectors.join('&')
+        this.$router.push({ path: path })
+      } catch (error) {
+        console.log('error', error)
+      }
     },
     paginate: function (start) {
       this.pushParams({ ...this.postgrestParams, offset: start })
@@ -136,7 +145,6 @@ export default {
       if (newParams.limit) q += `limit=${newParams.limit}&`
       if (newParams.offset) q += `offset=${newParams.offset}&`
       if (q !== '') route.query.q = encrypt(q.substring(0, q.length - 1)) // remove the trailing &
-      console.log('q', q)
       this.$router.push(route)
     },
   }
@@ -144,9 +152,6 @@ export default {
 </script>
 
 <style lang="scss">
-.main {
-  margin: 20px;
-}
 .table-box {
   overflow: scroll;
   font-size: 0.9rem;
