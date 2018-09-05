@@ -2,13 +2,12 @@
 
 > PostgREST Admin Interface
 
-## Usage 
+## Usage
 
 It's recommended that you fork this repo so that you can pull updates at any time
 
 ```bash
-# Clone the repo
-git clone https://github.com/pollygot/restiface
+# If you downloaded or cloned, you should create an upstream branch with the original repo
 git remote add upstream https://github.com/pollygot/restiface
 
 # Keep updated at any time
@@ -31,5 +30,3 @@ npm run dev # serve with hot reload at localhost:3000
 npm run build
 npm start
 ```
-
-
