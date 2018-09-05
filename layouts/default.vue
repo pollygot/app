@@ -1,9 +1,9 @@
 <template>
   <div class="columns is-gapless">
-    <div class="column is-narrow is-hidden-mobile">
+    <div class="column is-narrow is-hidden-mobile" v-show="sidebarVisible">
       <div class="sidebar">
 
-        
+
         <nav class="navbar has-text-centered">
           <nuxt-link tag="a" class="navbar-item" :to="'/'">
             <span class="icon is-large">Restiface</span>
@@ -35,6 +35,22 @@
       </div>
     </div>
     <div class="column" id="content">
+      <nav class="custom-nav">
+        <div class="navbar-brand">
+          <a class="navbar-item" @click="toggleSidebar()">
+            <span class="icon is-large"><i class="fas fa-bars"></i></span>
+          </a>
+        </div>
+
+        <div class="navbar-item navbar-title">
+          <span>
+
+          </span>
+        </div>
+        <a class="navbar-item">
+            <span class="icon is-large"><i class="far fa-bell"></i></span>
+          </a>
+      </nav>
       <nuxt/>
     </div>
   </div>
@@ -42,6 +58,11 @@
 
 <script>
 export default {
+  data () {
+    return {
+      sidebarVisible: true,
+    }
+  },
   computed: {
     // Get all database tables from the swagger definition and format them for the sidebar menu
     tables () {
@@ -52,12 +73,20 @@ export default {
         isActive: (x.key === this.$route.params.resourceKey)
       }))
     }
+  },
+  methods: {
+    toggleSidebar () {
+      this.sidebarVisible = !this.sidebarVisible
+    }
   }
 }
 </script>
 
 <style lang="scss">
 @import '@/assets/css/vars.scss';
+html, body {
+  overflow: hidden;
+}
 .columns {
   height: 100vh;
 }
@@ -65,7 +94,8 @@ export default {
   height: 100vh;
   width: 260px;
   transition: all 0.3s;
-  overflow: scroll;
+  overflow: auto;
+  overflow-x: hidden;
   .navbar {
     border-bottom: 1px solid $light-grey;
     width: 100%;
@@ -91,7 +121,41 @@ export default {
         background: rgba( $blue, 0.05 );
         border-right: 2px solid $primary;
         color: #000;
-      } 
+      }
+    }
+  }
+}
+.custom-nav {
+  background-color: white;
+  position: relative;
+  z-index: 30;
+  min-height: 3.25rem;
+  align-items: stretch;
+  display: flex;
+  border-bottom: 1px solid $light-grey;
+
+  .navbar-brand {
+    align-items: stretch;
+    display: flex;
+    flex-shrink: 0;
+    min-height: 3.25rem;
+  }
+
+  .navbar-item {
+    display: flex;
+    align-items: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+    color: #4a4a4a;
+    line-height: 1.5;
+    padding: 0.5rem 0.75rem;
+    position: relative;
+
+    &.navbar-title {
+      flex-grow: 1;
+      text-align: center;
+      font-weight: bold;
+      justify-content: center;
     }
   }
 }
@@ -100,10 +164,10 @@ export default {
   border-left: 1px solid $light-grey;
   box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
   min-height: 100vh;
-  overflow: scroll;
+  overflow: auto;
+  overflow-x: hidden;
   .navbar {
     border-bottom: 1px solid $light-grey;
   }
 }
 </style>
-

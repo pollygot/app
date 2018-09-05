@@ -1,11 +1,8 @@
 <template>
 <div>
-  <NavBar>
-    {{ pageTitle }}
-  </NavBar>
 
   <div class="main">
-    
+
     <nav class="level is-mobile">
       <div class="level-left"></div>
 
@@ -34,12 +31,12 @@
               </div>
             </th>
             <th v-for="(column, i) in columns" :key="'col-h'+i">
-              <a 
+              <a
                 @click="sort(column)"
-                :class="{ 
+                :class="{
                   'sort-desc': (sortColumn === column && sortDirection === 'desc'),
-                  'sort-asc': (sortColumn === column && sortDirection === 'asc') 
-                }" 
+                  'sort-asc': (sortColumn === column && sortDirection === 'asc')
+                }"
               >
                 {{column}}
               </a>
@@ -87,11 +84,10 @@
 <script>
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
-import NavBar from '~/components/NavBar.vue'
 import Pagination from '~/components/Pagination.vue'
 import { encrypt, decrypt, getRangeDataFromPostgrestHeaders } from '~/lib/helpers'
 export default {
-  components: {  NavBar, Pagination },
+  components: {  Pagination },
   watchQuery: ['q'],
   async asyncData ({ app, params, query }) {
     let postgrestUrl = `pg/${params.resourceKey}`
@@ -168,8 +164,8 @@ export default {
       this.$router.push(route)
     },
     sort: function (columnName) {
-      let sortDirection = (this.isSorted && this.sortColumn === columnName && this.sortDirection === 'asc') 
-        ? 'desc' 
+      let sortDirection = (this.isSorted && this.sortColumn === columnName && this.sortDirection === 'asc')
+        ? 'desc'
         : 'asc'
       this.pushParams({ ...this.postgrestParams, order: `${columnName}.${sortDirection}` })
     },
@@ -179,7 +175,8 @@ export default {
 
 <style lang="scss">
 .table-box {
-  overflow: scroll;
+  overflow: auto;
+  overflow-y: hidden;
   font-size: 0.9rem;
   td:hover {
     cursor: pointer;
@@ -192,4 +189,3 @@ export default {
   }
 }
 </style>
-

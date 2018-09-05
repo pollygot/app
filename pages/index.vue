@@ -1,8 +1,5 @@
 <template>
   <div>
-    <NavBar>
-        Home
-    </NavBar>
     <section class="section has-text-centered">
       <div class="box">
         <h1 class="title is-1">
@@ -17,10 +14,6 @@
 </template>
 
 <script>
-import NavBar from '~/components/NavBar.vue'
-export default {
-  components: {  NavBar }
-}
 </script>
 
 <style>
