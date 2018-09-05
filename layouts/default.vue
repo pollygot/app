@@ -5,7 +5,7 @@
 
         <nav class="navbar has-text-centered">
           <nuxt-link tag="a" class="navbar-item" :to="'/'">
-            <span class="icon is-large">Restiface</span>
+            <span class="icon is-large">Pollygot</span>
           </nuxt-link>
         </nav>
 
@@ -58,41 +58,6 @@ html, body {
 }
 .columns.full-height {
   height: 100vh;
-}
-.sidebar {
-  height: 100vh;
-  width: 260px;
-  transition: all 0.3s;
-  overflow: auto;
-  overflow-x: hidden;
-  .navbar {
-    border-bottom: 1px solid $light-grey;
-    width: 100%;
-    .navbar-item {
-      margin-left: auto;
-      margin-right: auto;
-      &:hover {
-        background: none;
-      }
-    }
-  }
-  .menu {
-    p { // headers
-      padding: 20px 20px 0 20px;
-    }
-    a { //links
-      padding: 12px 20px;
-      margin: 2px 0;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      border-radius: 0;
-      &.is-active, &:hover {
-        background: rgba( $blue, 0.05 );
-        border-right: 2px solid $primary;
-        color: #000;
-      }
-    }
-  }
 }
 .custom-nav {
   background-color: white;

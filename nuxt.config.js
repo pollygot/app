@@ -82,18 +82,8 @@ module.exports = {
     }
   },
   axios: {
-    proxy: true,
+    proxy: false,
     proxyHeaders: false
-  },
-  proxy: {
-    '/api': process.env.SITE_URL,
-    '/pg': {
-      target: process.env.POSTGREST_URL, 
-      pathRewrite: { '^/pg': '' },
-      headers: {
-        'Authorization': ''
-      }
-    },
   },
   toast: {
     position: 'bottom-right'
