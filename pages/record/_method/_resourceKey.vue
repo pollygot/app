@@ -1,10 +1,6 @@
 <template>
 <div>
 
-  <NavBar>
-    {{ pageTitle }}
-  </NavBar>
-
   <div class="main">
     <nav class="level is-mobile">
       <div class="level-left"></div>
@@ -45,7 +41,7 @@
         </div>
       </div>
     </nav>
-    
+
     <div class="box has-corners">
         <template v-for="field in formattedFields">
 
@@ -157,10 +153,9 @@
 
 <script>
 import ModalConfirm from '~/components/ModalConfirm.vue'
-import NavBar from '~/components/NavBar.vue'
 import * as Helpers from '~/lib/helpers'
 export default {
-  components: { ModalConfirm, NavBar },
+  components: { ModalConfirm },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, route }) {
     let isCreated = false
@@ -277,4 +272,3 @@ export default {
   padding-top: 15px;
 }
 </style>
-
