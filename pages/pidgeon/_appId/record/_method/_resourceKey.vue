@@ -155,6 +155,7 @@
 import ModalConfirm from '~/components/ModalConfirm.vue'
 import * as Helpers from '~/lib/helpers'
 export default {
+  layout: ['hummingbird'],
   components: { ModalConfirm },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, route }) {
@@ -169,7 +170,7 @@ export default {
         'headers': { 'Accept': 'application/vnd.pgrst.object+json' }
       })
     }
-    let availableFields = app.store.getters['resources/columnsForResource'](params.resourceKey)
+    let availableFields = app.store.getters['hummingbird/columnsForResource'](params.resourceKey)
     let formattedFields = availableFields
       .map(x => Helpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
       .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
@@ -181,7 +182,7 @@ export default {
       formattedFields: formattedFields,
       isCreated: isCreated,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
-      primaryKeys: app.store.getters['resources/primaryKeysForResource'](params.resourceKey) || [],
+      primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](params.resourceKey) || [],
       record: record,
       resourceKey: params.resourceKey,
       resourceUrl: resourceUrl

@@ -87,6 +87,7 @@ const DEFAULT_PAGINATION_SIZE = 20
 import Pagination from '~/components/Pagination.vue'
 import { encrypt, decrypt, getRangeDataFromPostgrestHeaders } from '~/lib/helpers'
 export default {
+  layout: ['hummingbird'],
   components: {  Pagination },
   watchQuery: ['q'],
   async asyncData ({ app, params, query }) {
@@ -139,7 +140,7 @@ export default {
   methods: {
     gridRecordClicked: function (record) {
       try {
-        let primaryKeys = this.$store.getters['resources/primaryKeysForResource'](this.resourceKey)
+        let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
         let selectors = primaryKeys.map(x => {
           let pk = record[`${x}`].toString() || null
           if (!pk) throw new Error('Can\'t find a Primary Key for this record')

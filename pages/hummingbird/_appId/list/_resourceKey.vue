@@ -1,11 +1,8 @@
 <template>
 <div>
-  <NavBar>
-    {{ pageTitle }}
-  </NavBar>
 
   <div class="main">
-    
+
     <nav class="level is-mobile">
       <div class="level-left"></div>
 
@@ -34,12 +31,12 @@
               </div>
             </th>
             <th v-for="(column, i) in columns" :key="'col-h'+i">
-              <a 
+              <a
                 @click="sort(column)"
-                :class="{ 
+                :class="{
                   'sort-desc': (sortColumn === column && sortDirection === 'desc'),
-                  'sort-asc': (sortColumn === column && sortDirection === 'asc') 
-                }" 
+                  'sort-asc': (sortColumn === column && sortDirection === 'asc')
+                }"
               >
                 {{column}}
               </a>
@@ -87,17 +84,23 @@
 <script>
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
-import NavBar from '~/components/NavBar.vue'
+import axios from 'axios'
 import Pagination from '~/components/Pagination.vue'
 import { encrypt, decrypt, getRangeDataFromPostgrestHeaders } from '~/lib/helpers'
 export default {
-  components: {  NavBar, Pagination },
+  layout: ['hummingbird'],
+  components: {  Pagination },
   watchQuery: ['q'],
-  async asyncData ({ app, params, query }) {
-    let postgrestUrl = `pg/${params.resourceKey}`
+  async asyncData ({ app, params, query, store }) {
+    let { appId } = params
+    let pollyApp = store.getters['app'](appId)
+    axios.get(pollyApp.config.url).then((res) => {
+      store.commit('hummingbird/setSwagger', res.data)
+    })
+    let postgrestUrl = `${pollyApp.config.url}/${params.resourceKey}`
     let postgrestQueryString = (query.q) ? decrypt(query.q) : `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
     let fullUrl = `${postgrestUrl}?${postgrestQueryString}`
-    let { data:records, headers } = await app.$axios.get(fullUrl, {
+    let { data:records, headers } = await axios.get(fullUrl, {
       'headers': { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
     })
     let rangeData = getRangeDataFromPostgrestHeaders(headers)
@@ -143,13 +146,13 @@ export default {
   methods: {
     gridRecordClicked: function (record) {
       try {
-        let primaryKeys = this.$store.getters['resources/primaryKeysForResource'](this.resourceKey)
+        let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
         let selectors = primaryKeys.map(x => {
           let pk = record[`${x}`].toString() || null
           if (!pk) throw new Error('Can\'t find a Primary Key for this record')
           return x + '=eq.' + pk
         })
-        let path = '/record/edit/' + this.resourceKey + '?q=' + encrypt(selectors.join('&'))
+        let path = `/hummingbird/${this.$route.params.appId}/record/edit/` + this.resourceKey + '?q=' + encrypt(selectors.join('&'))
         this.$router.push({ path: path })
       } catch (error) {
         console.log('error', error)
@@ -168,8 +171,8 @@ export default {
       this.$router.push(route)
     },
     sort: function (columnName) {
-      let sortDirection = (this.isSorted && this.sortColumn === columnName && this.sortDirection === 'asc') 
-        ? 'desc' 
+      let sortDirection = (this.isSorted && this.sortColumn === columnName && this.sortDirection === 'asc')
+        ? 'desc'
         : 'asc'
       this.pushParams({ ...this.postgrestParams, order: `${columnName}.${sortDirection}` })
     },
@@ -179,7 +182,8 @@ export default {
 
 <style lang="scss">
 .table-box {
-  overflow: scroll;
+  overflow: auto;
+  overflow-y: hidden;
   font-size: 0.9rem;
   td:hover {
     cursor: pointer;
@@ -192,4 +196,3 @@ export default {
   }
 }
 </style>
-

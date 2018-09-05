@@ -3,12 +3,23 @@
     <div class="column is-narrow is-hidden-mobile" v-show="sidebarVisible">
       <div class="sidebar">
 
+
         <nav class="navbar has-text-centered">
           <nuxt-link tag="a" class="navbar-item" :to="'/'">
-            <span class="icon is-large">Restiface</span>
+            <span class="icon is-large">Home</span>
           </nuxt-link>
         </nav>
 
+        <aside class="menu" v-show="tables.length">
+          <p class="menu-label">Tables</p>
+          <ul class="menu-list">
+            <li v-for="(link, i) in tables" :key="i">
+              <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
+                {{link.label}}
+              </nuxt-link>
+            </li>
+          </ul>
+        </aside>
       </div>
     </div>
     <div class="column" id="content">
@@ -41,7 +52,15 @@ export default {
     }
   },
   computed: {
-    
+    // Get all database tables from the swagger definition and format them for the sidebar menu
+    tables () {
+      return this.$store.getters['hummingbird/tables'].map(x => ({
+        type: 'list',
+        resource: x.key,
+        label: x.key.replace(/_/g, ' '),
+        isActive: (x.key === this.$route.params.resourceKey)
+      }))
+    }
   },
   methods: {
     toggleSidebar () {
