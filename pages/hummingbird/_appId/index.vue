@@ -15,7 +15,7 @@
 import axios from 'axios'
 import config from '@/config/default'
 export default {
-  layout: ['hummingbird'],
+  layout: 'hummingbird',
   fetch ({ store, params }) {
     let { appId } = params
     let app = store.getters['app'](appId)

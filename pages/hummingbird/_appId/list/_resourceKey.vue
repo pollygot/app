@@ -99,7 +99,7 @@ import Pagination from '~/components/Pagination.vue'
 import Table from '~/components/Table.vue'
 import { encrypt, decrypt, getRangeDataFromPostgrestHeaders } from '~/lib/helpers'
 export default {
-  layout: ['hummingbird'],
+  layout: 'hummingbird',
   components: {  Pagination, Table },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, store }) {

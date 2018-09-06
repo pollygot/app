@@ -156,7 +156,7 @@ import axios from 'axios'
 import ModalConfirm from '~/components/ModalConfirm.vue'
 import * as Helpers from '~/lib/helpers'
 export default {
-  layout: ['hummingbird'],
+  layout: 'hummingbird',
   components: { ModalConfirm },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, route, store }) {

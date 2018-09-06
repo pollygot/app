@@ -45,7 +45,7 @@ import config from '@/config/default'
 import * as S3Helpers from '@/lib/s3'
 var AWS = require('aws-sdk')
 export default {
-  layout: ['squirrel'],
+  layout: 'squirrel',
   async asyncData ({ store, params }) {
     let { appId } = params
     let pollyApp = store.getters['app'](appId)
