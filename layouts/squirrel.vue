@@ -25,7 +25,7 @@
     <div class="column" id="content">
       <nav class="navbar ">
         <nuxt-link tag="a" class="navbar-item" :to="'/'">
-          <span class="icon is-large">Home</span>
+          Home
         </nuxt-link>
       </nav>
       <nuxt/>

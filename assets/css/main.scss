@@ -103,9 +103,20 @@ body, #__nuxt, #__layout {
   transition: all 0.3s;
   overflow: auto;
   overflow-x: hidden;
+  box-shadow: 3px 0 5px 0px rgba(0,0,0,0.05);
+  z-index: 999;
   .navbar {
     border-bottom: 1px solid $light-grey;
     width: 100%;
+    .navbar-brand {
+      margin: auto;
+      .pollygot-logo {
+        img {
+          max-height: 3rem;
+          height: 3rem;
+        }
+      }
+    }
     .navbar-item {
       margin-left: auto;
       margin-right: auto;

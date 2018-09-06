@@ -1,12 +1,13 @@
 <template>
   <div class="columns is-gapless full-height">
-    <div class="column is-narrow is-hidden-mobile" v-show="sidebarVisible">
-      <div class="sidebar">
+    <div class="sidebar column is-narrow is-hidden-mobile" v-show="sidebarVisible">
 
         <nav class="navbar has-text-centered">
-          <nuxt-link tag="a" class="navbar-item" :to="'/'">
-            <span class="icon is-large">Pollygot</span>
-          </nuxt-link>
+          <div class="navbar-brand">
+            <nuxt-link tag="a" class="pollygot-logo navbar-item" :to="'/'">
+                <img src="/img/pollygot-logo.svg" alt="Pollygot"  />
+            </nuxt-link>
+          </div>
         </nav>
 
         <aside class="menu">
@@ -52,25 +53,8 @@
           </ul>
         </aside>
 
-      </div>
     </div>
     <div class="column" id="content">
-      <nav class="custom-nav">
-        <div class="navbar-brand">
-          <a class="navbar-item" @click="toggleSidebar()">
-            <span class="icon is-large"><i class="fas fa-bars"></i></span>
-          </a>
-        </div>
-
-        <div class="navbar-item navbar-title">
-          <span>
-
-          </span>
-        </div>
-        <a class="navbar-item">
-            <span class="icon is-large"><i class="far fa-bell"></i></span>
-          </a>
-      </nav>
       <nuxt/>
     </div>
   </div>

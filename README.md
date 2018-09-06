@@ -1,6 +1,10 @@
-# Restiface by Pollygot
+# Pollygot
 
-> PostgREST Admin Interface
+Philosophy: 
+
+- This frontend should connect only to services with RESTful APIs or Websockets. It should be as thin as possible. Most of the heavy lifting should be done by the apps that it connects to.
+- Each app should do a specific thing well. Preferably Pollygot should connect to existing Opensource applications.
+- Each app should be one instance. Eg: don't connect to S3 and GCP Cloud Storage in the same app (Squirrel). Instead, instantiate two Squirel Apps, one with the S3 config and one with the GCP config. 
 
 ## Usage
 
