@@ -21,7 +21,17 @@
     </nav>
 
     <div class="table-box box p-none">
-      <table class="table is-responsive is-fullwidth is-hoverable is-small" >
+      <Table
+        class=""
+        :columns="columns"
+        :records="records"
+        :sortColumn="sortColumn"
+        :sortDirection="sortDirection"
+        tableSize="LARGE"
+        @onSort="sort"
+        @onRecordClicked="gridRecordClicked"
+      />
+      <!-- <table class="table is-responsive is-fullwidth is-hoverable is-small" >
         <thead>
           <tr>
             <th width="20" class="p-r-none">
@@ -63,7 +73,7 @@
             </td>
           </tr>
         </tbody>
-      </table>
+      </table> -->
     </div>
 
     <div class="section p-b-none">
@@ -86,10 +96,11 @@ const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 import axios from 'axios'
 import Pagination from '~/components/Pagination.vue'
+import Table from '~/components/Table.vue'
 import { encrypt, decrypt, getRangeDataFromPostgrestHeaders } from '~/lib/helpers'
 export default {
   layout: ['hummingbird'],
-  components: {  Pagination },
+  components: {  Pagination, Table },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, store }) {
     let { appId } = params

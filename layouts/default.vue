@@ -9,6 +9,49 @@
           </nuxt-link>
         </nav>
 
+        <aside class="menu">
+          <p class="menu-label">Teams</p>
+          <ul class="menu-list">
+            <li>
+              <nuxt-link tag="a" :to="`/`" class="">
+                Nimbus For Work
+              </nuxt-link>
+            </li>
+            <li>
+              <nuxt-link tag="a" :to="`/`" class="">
+                BlockPunk
+              </nuxt-link>
+            </li>
+            <li>
+              <nuxt-link tag="a" :to="`/`" class="has-icon">
+                <span class="icon"><i class="fas fa-plus"></i></span>
+                New
+              </nuxt-link>
+            </li>
+          </ul>
+          <p class="menu-label">Account</p>
+          <ul class="menu-list">
+            <li>
+              <nuxt-link tag="a" :to="`/`" class="has-icon">
+                <span class="icon"><i class="fas fa-user"></i></span>
+                Profile
+              </nuxt-link>
+            </li>
+            <li>
+              <nuxt-link tag="a" :to="`/`" class="has-icon">
+                <span class="icon"><i class="fas fa-gift"></i></span>
+                Invites
+              </nuxt-link>
+            </li>
+            <li>
+              <nuxt-link tag="a" :to="`/`" class="has-icon">
+                <span class="icon"><i class="fas fa-cog"></i></span>
+                Settings 
+              </nuxt-link>
+            </li>
+          </ul>
+        </aside>
+
       </div>
     </div>
     <div class="column" id="content">
