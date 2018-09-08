@@ -14,15 +14,9 @@
 <script>
 import axios from 'axios'
 import config from '@/config/default'
+import { mapActions } from 'vuex'
 export default {
   layout: 'hummingbird',
-  fetch ({ store, params }) {
-    let { appId } = params
-    let app = store.getters['app'](appId)
-    return axios.get(app.config.url).then((res) => {
-      store.commit('hummingbird/setSwagger', res.data)
-    })
-  },
   computed: {
   },
   methods: {

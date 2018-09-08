@@ -24,13 +24,13 @@ import SideBar from '../components/SideBar.vue'
 import { mapGetters } from 'vuex'
 export default {
   components: { SideBar },
-  middleware: ['hummingbird'],
+  middleware: ['pidgeon'],
   data () {
     return { }
   },
   computed: {
     ...mapGetters({
-      tables: 'hummingbird/tables',
+      tables: 'pidgeon/tables',
     }),
     // Get all database tables from the swagger definition and format them for the sidebar menu
     tableList () {

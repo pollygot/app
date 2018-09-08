@@ -3,7 +3,7 @@
 
   <div class="main">
 
-    <nav class="level is-mobile">
+    <nav class="level is-mobile p-t-lg p-b-lg">
       <div class="level-left"></div>
 
       <div class="level-right">
@@ -31,49 +31,6 @@
         @onSort="sort"
         @onRecordClicked="gridRecordClicked"
       />
-      <!-- <table class="table is-responsive is-fullwidth is-hoverable is-small" >
-        <thead>
-          <tr>
-            <th width="20" class="p-r-none">
-              <div class="field">
-                <input class="is-checkradio is-small" id="exampleCheckbox" type="checkbox" name="exampleCheckbox">
-                <label for="exampleCheckbox" class="p-r-none"></label>
-              </div>
-            </th>
-            <th v-for="(column, i) in columns" :key="'col-h'+i">
-              <a
-                @click="sort(column)"
-                :class="{
-                  'sort-desc': (sortColumn === column && sortDirection === 'desc'),
-                  'sort-asc': (sortColumn === column && sortDirection === 'asc')
-                }"
-              >
-                {{column}}
-              </a>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(record, index) in records" :key="'record-'+index">
-            <td class="p-r-none">
-              <div class="field">
-                <input class="is-checkradio is-small" id="exampleCheckbox" type="checkbox" name="exampleCheckbox">
-                <label for="exampleCheckbox" class="p-r-none"></label>
-              </div>
-            </td>
-            <td v-for="(column, i) in columns" :key="'col-td'+i" @click="gridRecordClicked(record)" >
-              <span>
-                {{
-                  record[`${column}`] ||
-                  (record[`${column}`] !== null)
-                    ? record[`${column}`].toString()
-                    : '&nbsp;'
-                }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table> -->
     </div>
 
     <div class="section p-b-none">
@@ -105,9 +62,6 @@ export default {
   async asyncData ({ app, params, query, store }) {
     let { appId } = params
     let pollyApp = store.getters['app'](appId)
-    axios.get(pollyApp.config.url).then((res) => {
-      store.commit('hummingbird/setSwagger', res.data)
-    })
     let postgrestUrl = `${pollyApp.config.url}/${params.resourceKey}`
     let postgrestQueryString = (query.q) ? decrypt(query.q) : `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
     let fullUrl = `${postgrestUrl}?${postgrestQueryString}`

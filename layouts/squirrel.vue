@@ -1,27 +1,5 @@
 <template>
   <div class="columns is-gapless full-height">
-    <!-- <div class="column is-narrow is-hidden-mobile" v-show="sidebarVisible">
-      <div class="sidebar">
-
-
-        <nav class="navbar has-text-centered">
-          <nuxt-link tag="a" class="navbar-item" :to="'/'">
-            <span class="icon is-large">Home</span>
-          </nuxt-link>
-        </nav>
-
-        <aside class="menu" v-show="tables.length">
-          <p class="menu-label">Tables</p>
-          <ul class="menu-list">
-            <li v-for="(link, i) in tables" :key="i">
-              <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
-                {{link.label}}
-              </nuxt-link>
-            </li>
-          </ul>
-        </aside>
-      </div>
-    </div> -->
     <div class="column" id="content">
       <nav class="navbar ">
         <nuxt-link tag="a" class="navbar-item" :to="'/'">

@@ -1,16 +1,5 @@
 import axios from 'axios'
 
-const VIEW_SCOPES = {
-  personal: 'personal',
-  table: 'table',
-}
-const VIEWS = {
-  calendar: 'calendar',
-  kanban: 'kanban',
-  list: 'list',
-  record: 'record'
-}
-
 export const state = () => ({
   swagger: {},
   customViews: [ ] // custom views (pulled from Pollygot Core)

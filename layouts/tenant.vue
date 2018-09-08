@@ -2,24 +2,27 @@
   <div class="columns is-gapless full-height">
     <SideBar>
       <aside class="menu">
-        <p class="menu-label">Teams</p>
+        <p class="menu-label">Apps</p>
         <ul class="menu-list">
-          <li>
-            <nuxt-link tag="a" :to="`/nimbus`" class="is-block">
-              Nimbus For Work
-              <span class="icon is-small is-right-icon"><i class="fas fa-chevron-right"></i></span>
-            </nuxt-link>
-          </li>
-          <li>
-            <nuxt-link tag="a" :to="`/blockpunk`" class="is-block">
-              BlockPunk
-              <span class="icon is-small is-right-icon"><i class="fas fa-chevron-right"></i></span>
-            </nuxt-link>
-          </li>
           <li>
             <nuxt-link tag="a" :to="`/`" class="has-icon">
               <span class="icon"><i class="fas fa-plus"></i></span>
               New
+            </nuxt-link>
+          </li>
+        </ul>
+        <p class="menu-label">Tenant name</p>
+        <ul class="menu-list">
+          <li>
+            <nuxt-link tag="a" :to="`/`" class="has-icon">
+              <span class="icon"><i class="fas fa-users"></i></span>
+              Users
+            </nuxt-link>
+          </li>
+          <li>
+            <nuxt-link tag="a" :to="`/`" class="has-icon">
+              <span class="icon"><i class="fas fa-cog"></i></span>
+              Settings
             </nuxt-link>
           </li>
         </ul>
@@ -41,6 +44,12 @@
             <nuxt-link tag="a" :to="`/`" class="has-icon">
               <span class="icon"><i class="fas fa-cog"></i></span>
               Settings
+            </nuxt-link>
+          </li>
+          <li>
+            <nuxt-link tag="a" :to="`/`" class="has-icon has-text-grey-light">
+              <span class="icon"><i class="fas fa-chevron-left"></i></span>
+              Teams
             </nuxt-link>
           </li>
         </ul>

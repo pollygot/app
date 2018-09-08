@@ -8,6 +8,7 @@
 //
 @import '~bulma';
 @import "../../node_modules/bulma-extensions/bulma-checkradio/dist/css/bulma-checkradio.sass";
+@import "../../node_modules/bulma-extensions/bulma-switch/dist/css/bulma-switch.sass";
 
 //
 // Helpers
@@ -70,6 +71,29 @@ html {
 body, #__nuxt, #__layout {
   min-height: 100vh;
 }
+html, body {
+  overflow: hidden;
+}
+.columns.full-height {
+  height: 100vh;
+}
+#content {
+  background: #F5F6FA;
+  border-left: 1px solid $light-grey;
+  box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
+  overflow: auto;
+  overflow-x: hidden;
+  .navbar {
+    border-bottom: 1px solid $light-grey;
+  }
+}
+.page-enter-active, .page-leave-active {
+  transition: opacity .2s;
+}
+.page-enter, .page-leave-to {
+  opacity: 0;
+}
 .navbar-item {
   text-transform: uppercase;
 }
@@ -93,6 +117,9 @@ body, #__nuxt, #__layout {
     box-shadow: 1px 3px 12px 3px rgba(0,0,0,0.30);
     i { background: darken($grey, 15%); }
   }
+}
+.has-text-mono {
+  font-family: monospace;
 }
 .has-corners {
   border-radius: 4px;
@@ -136,7 +163,7 @@ body, #__nuxt, #__layout {
       font-size: 0.9rem;
       border-radius: 0;
       border: 1px solid rgba(0,0,0,0);
-      &.is-active, &:hover {
+      &.is-active, &:hover, &.is-block {
         -webkit-transition: all 0.2s ease;
         transition: all 0.2s ease;
         color: #000;
@@ -146,17 +173,18 @@ body, #__nuxt, #__layout {
         box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.04);
       }
       &.is-active {
-        // color: #fff;
         color: $primary;
         background: #fff;
-        // background: $primary;
-        // box-shadow: 0px 0px 6px 3px rgba(0, 0, 0, 0.08)
-        // box-shadow: 0px 0px 10px 2px rgba($primary, 0.30);
       }
       &.has-icon {
         padding-left:15px;
         .icon {
           margin-right: 10px;
+        }
+      }
+      &.is-block {
+        .icon.is-right-icon {
+          float: right;
         }
       }
     }
