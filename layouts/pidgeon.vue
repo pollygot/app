@@ -5,7 +5,7 @@
         <p class="menu-label">Tables</p>
         <ul class="menu-list">
           <li v-for="(link, i) in tableList" :key="i">
-            <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
+            <nuxt-link tag="a" :to="`/pidgeon/${$route.params.appId}/tables/${link.resource}`" :class="{ 'is-active': link.isActive }">
               {{link.label}}
             </nuxt-link>
           </li>

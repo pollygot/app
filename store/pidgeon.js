@@ -1,17 +1,21 @@
-import axios from 'axios'
-
 export const state = () => ({
+  baseUrl: '',
   swagger: {},
   customViews: [ ] // custom views (pulled from Pollygot Core)
 })
 
 export const mutations = {
-  setSwagger (state, swaggerDefinition) {
+  setBaseUrl(state, url) {
+    state.baseUrl = url
+  },
+  setSwagger(state, swaggerDefinition) {
     state.swagger = swaggerDefinition
   }
 }
 
 export const getters = {
+  baseUrl: state => state.baseUrl,
+
   // Returns an array of columns for a give table in the database (resourceKey is the table name)
   columnsForResource: state => resourceKey => {
     let tableDefinition = state.swagger.definitions[`${resourceKey}`]
