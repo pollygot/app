@@ -29,7 +29,7 @@
               <li :class="{'is-active': (optionsTab === 'BODY')}"><a @click="optionsTab = 'BODY'">Body</a></li>
               <li :class="{'is-active': (optionsTab === 'HEADERS')}" @click="optionsTab = 'HEADERS'"><a>Headers</a></li>
               <li :class="{'is-active': (optionsTab === 'PAGINATION')}" @click="optionsTab = 'PAGINATION'"><a>Pagination</a></li>
-              <li :class="{'is-active': (optionsTab === 'COLUMNS')}"><a>Filters</a></li>
+              <li :class="{'is-active': (optionsTab === 'COLUMNS')}" @click="optionsTab = 'COLUMNS'"><a>Columns</a></li>
             </ul>
           </div>
           <div class="" v-show="optionsTab === 'PAGINATION'">
@@ -94,6 +94,14 @@
             </div>
           </div>
 
+          <div v-show="optionsTab === 'COLUMNS'">
+            <PostgrestColumnSelector
+              :baseTable="resourceKey"
+              :selectString="queryParams.select"
+              @onUpdated="(newString) => queryParams.select = newString"
+            />
+          </div>
+
 
         </div>
       </div>
@@ -150,12 +158,13 @@ const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 const DEFAULT_HEADERS = { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
 import axios from 'axios'
+import PostgrestColumnSelector from '~/components/PostgrestColumnSelector'
 import * as Helpers from '~/lib/helpers'
 import * as Postgrest from '~/lib/postgrest'
 import { mapGetters } from 'vuex'
 export default {
   layout: 'pidgeon',
-  components: { },
+  components: { PostgrestColumnSelector },
   data () {
     return {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
@@ -166,7 +175,8 @@ export default {
       responseTab: 'RESPONSE',
       queryParams: {
         limit: DEFAULT_PAGINATION_SIZE,
-        offset: DEFAULT_OFFSET
+        offset: DEFAULT_OFFSET,
+        select: '*'
       }
     }
   },
@@ -179,7 +189,9 @@ export default {
     }),
     nextUrl: {
       get () {
+        console.log('queryString', this.queryParams)
         let queryString = Helpers.serialize(this.queryParams)
+        console.log('queryString', queryString)
         return `${this.resourceUrl}?${queryString}`
       },
       set () {

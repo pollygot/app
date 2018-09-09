@@ -1,3 +1,5 @@
+import * as Postgrest from '~/lib/postgrest'
+
 export const state = () => ({
   baseUrl: '',
   swagger: {},
@@ -19,8 +21,11 @@ export const getters = {
   // Returns an array of columns for a give table in the database (resourceKey is the table name)
   columnsForResource: state => resourceKey => {
     let tableDefinition = state.swagger.definitions[`${resourceKey}`]
-    return Object.entries(tableDefinition.properties).map(([k, v]) => (Object.assign({ ...v, key: k }, v)))
+    return Object.entries(tableDefinition.properties)
+      .map(([k, v]) => (Object.assign({ ...v, key: k }, v)))
+      .map(x => Postgrest.enrichSwaggerColumnDefinition(x))
   },
+
   // Finds all the primary keys for a resource.
   // @TODO: This is a bit of a hack - would be good if I can do a pull request on PostgREST to improve the swagger spec
   primaryKeysForResource: state => resourceKey => {
