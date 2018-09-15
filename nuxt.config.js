@@ -17,7 +17,11 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
-  serverMiddleware: ['./auth'],
+  // we need to run most the functionality on the server since there are private jets associated with most tenants' apps
+  serverMiddleware: [
+    './api/auth',
+    './api/kue',
+  ],
   router: {
     middleware: ['auth']
   },

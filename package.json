@@ -28,7 +28,8 @@
     "express-jwt": "^5.3.1",
     "jsonwebtoken": "^8.3.0",
     "moment": "^2.22.2",
-    "nuxt": "^1.0.0"
+    "nuxt": "^1.0.0",
+    "vue-infinite-loading": "^2.3.3"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
@@ -36,6 +37,8 @@
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-vue": "^4.0.0",
+    "less": "^3.8.1",
+    "less-loader": "^4.1.0",
     "node-sass": "^4.9.3",
     "nuxt-sass-resources-loader": "^2.0.4",
     "sass-loader": "^7.1.0",

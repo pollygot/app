@@ -131,7 +131,7 @@ html, body {
   overflow: auto;
   overflow-x: hidden;
   box-shadow: 3px 0 5px 0px rgba(0,0,0,0.05);
-  z-index: 999;
+  z-index: 9;
   .navbar {
     border-bottom: 1px solid $light-grey;
     width: 100%;
@@ -166,7 +166,7 @@ html, body {
       &.is-active, &:hover, &.is-block {
         -webkit-transition: all 0.2s ease;
         transition: all 0.2s ease;
-        color: #000;
+        color: $grey;
         background: #fff;
         border-radius: 5px;
         border: 1px solid rgba(0,0,0,0.1);
@@ -181,17 +181,66 @@ html, body {
         .icon {
           margin-right: 10px;
         }
-      }
-      &.is-block {
-        .icon.is-right-icon {
-          float: right;
+        span {
+          line-height: 1.5rem;
         }
       }
+      .icon.is-right-icon {
+        float: right;
+        margin-right: 0px;
+      }
+
     }
   }
 }
 .main {
   margin: 20px;
+}
+
+
+.list-menu {
+  background: #fff;
+  .list-menu-item {
+    display: flex;
+    flex-direction: row;
+    padding: 8px 5px;
+    border-bottom: 1px solid #dbdbdb;
+
+    .list-item, .left .icon, .right .icon {
+      color: $grey;
+    }
+
+    &:hover, &.is-active {
+      .list-item, .left .icon, .right .icon {
+        color: $primary;
+      }
+    }
+
+    .list-item {
+      display: block;
+      font-weight: bold;
+      &.caption {
+        font-weight: normal;
+        font-size: 0.9rem;
+      }
+    }
+    .left {
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .center {
+      padding: 0 5px;
+      flex: 2;
+    }
+    .right {
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
 // Animations
