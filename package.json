@@ -1,7 +1,7 @@
 {
-  "name": "restiface",
+  "name": "pollygot.app",
   "version": "1.0.0",
-  "description": "PostgREST Admin Interface",
+  "description": "Pollygot App",
   "author": "kiwicopple",
   "private": true,
   "scripts": {
