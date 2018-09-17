@@ -1,7 +1,7 @@
 <template>
   <div class="Apps">
     <section class="section" >
-      <div class="columns">
+      <div class="columns is-centered">
         <div class="column m-l-lg m-r-lg">
           <h4 class="title is-4">{{tenant.name}}</h4>
           <nuxt-link class="" tag="a"  v-for="app in tenant.apps" :key="app.id" :to="`/${app.appKey.toLowerCase()}/${app.id}`">
@@ -11,7 +11,7 @@
             </div>
           </nuxt-link>
         </div>
-        <div class="column m-l-lg m-r-lg">
+        <!-- <div class="column m-l-lg m-r-lg">
           <h4 class="title is-4">Add new app</h4>
           <nuxt-link class="" tag="a"  v-for="app in allPollygotApps" :key="app.id" :to="`/`">
             <div class="box m-b-md">
@@ -19,7 +19,7 @@
               <p>{{app.description}}</p>
             </div>
           </nuxt-link>
-        </div>
+        </div> -->
       </div>
 
     </section>
