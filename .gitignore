@@ -10,7 +10,11 @@ npm-debug.log
 # Nuxt generate
 dist
 
-# Config 
+# Config
 *.env
 !sample.env
 config/*
+
+# Deploy
+.elasticbeanstalk
+.ebignore

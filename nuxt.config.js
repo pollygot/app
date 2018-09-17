@@ -95,6 +95,7 @@ module.exports = {
     }
   },
   axios: {
+    baseURL: process.env.API_URL || 'http://localhost:3000',
     proxy: false,
     proxyHeaders: false
   },

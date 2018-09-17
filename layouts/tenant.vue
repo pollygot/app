@@ -2,17 +2,14 @@
   <div class="columns is-gapless full-height">
     <SideBar>
       <aside class="menu">
-        <p class="menu-label">Apps</p>
+        <p class="menu-label">Team</p>
         <ul class="menu-list">
           <li>
-            <nuxt-link tag="a" :to="`/`" class="has-icon">
-              <span class="icon"><i class="fas fa-plus"></i></span>
-              New
+            <nuxt-link tag="a" :to="`/`" class="has-icon is-active">
+              <span class="icon"><i class="fas fa-th"></i></span>
+              Apps
             </nuxt-link>
           </li>
-        </ul>
-        <p class="menu-label">Tenant name</p>
-        <ul class="menu-list">
           <li>
             <nuxt-link tag="a" :to="`/`" class="has-icon">
               <span class="icon"><i class="fas fa-users"></i></span>
@@ -25,31 +22,10 @@
               Settings
             </nuxt-link>
           </li>
-        </ul>
-        <p class="menu-label">Account</p>
-        <ul class="menu-list">
-          <li>
-            <nuxt-link tag="a" :to="`/`" class="has-icon">
-              <span class="icon"><i class="fas fa-user"></i></span>
-              Profile
-            </nuxt-link>
-          </li>
-          <li>
-            <nuxt-link tag="a" :to="`/`" class="has-icon">
-              <span class="icon"><i class="fas fa-gift"></i></span>
-              Invites
-            </nuxt-link>
-          </li>
-          <li>
-            <nuxt-link tag="a" :to="`/`" class="has-icon">
-              <span class="icon"><i class="fas fa-cog"></i></span>
-              Settings
-            </nuxt-link>
-          </li>
           <li>
             <nuxt-link tag="a" :to="`/`" class="has-icon has-text-grey-light">
               <span class="icon"><i class="fas fa-chevron-left"></i></span>
-              Teams
+              Account
             </nuxt-link>
           </li>
         </ul>
