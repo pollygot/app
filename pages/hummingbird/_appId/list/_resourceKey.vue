@@ -52,30 +52,28 @@
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 import axios from 'axios'
+import * as Helpers from '~/lib/helpers'
 import Pagination from '~/components/Pagination.vue'
 import Table from '~/components/Table.vue'
-import { encrypt, decrypt, getRangeDataFromPostgrestHeaders } from '~/lib/helpers'
 export default {
   layout: 'hummingbird',
   components: {  Pagination, Table },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, store }) {
-    let { appId } = params
-    let pollyApp = store.getters['app'](appId)
-    let postgrestUrl = `${pollyApp.config.url}/${params.resourceKey}`
-    let postgrestQueryString = (query.q) ? decrypt(query.q) : `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
-    let fullUrl = `${postgrestUrl}?${postgrestQueryString}`
-    let { data:records, headers } = await axios.get(fullUrl, {
-      'headers': { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
+    let { appId, resourceKey } = params
+    let { q } = query
+    let postgrestQueryString = (q) ? Helpers.decrypt(q) : `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
+    let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
+      'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
     })
-    let rangeData = getRangeDataFromPostgrestHeaders(headers)
+    let rangeData = Helpers.getRangeDataFromPostgrestHeaders(response.headers)
     return {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
       currentRangeEnd: rangeData.rangeEnd,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestQueryString: postgrestQueryString,
-      records: records,
+      records: response.data,
       resourceKey: params.resourceKey,
       totalRecords: rangeData.totalRecords,
     }
@@ -117,7 +115,8 @@ export default {
           if (!pk) throw new Error('Can\'t find a Primary Key for this record')
           return x + '=eq.' + pk
         })
-        let path = `/hummingbird/${this.$route.params.appId}/record/edit/` + this.resourceKey + '?q=' + encrypt(selectors.join('&'))
+        let q = Helpers.encrypt(selectors.join('&'))
+        let path = `/hummingbird/${this.$route.params.appId}/record/edit/` + this.resourceKey + '?q=' + encodeURIComponent(q) // there is an occasional "+" appearing when not re-encoded. Not sure why..
         this.$router.push({ path: path })
       } catch (error) {
         console.log('error', error)
@@ -132,7 +131,7 @@ export default {
       if (newParams.limit) q += `limit=${newParams.limit}&`
       if (newParams.offset) q += `offset=${newParams.offset}&`
       if (newParams.order) q += `order=${newParams.order}&`
-      if (q !== '') route.query.q = encrypt(q.substring(0, q.length - 1)) // remove the trailing &
+      if (q !== '') route.query.q = Helpers.encrypt(q.substring(0, q.length - 1)) // remove the trailing &
       this.$router.push(route)
     },
     sort: function (columnName) {

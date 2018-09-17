@@ -8,6 +8,7 @@ app.get('/:appId/stats', async (req, res, next) => {
   let { appId } = req.params
   let app = await Pollygot.getAppConfig(appId)
   let baseUrl = app.config.url
+  console.log('baseUrl', baseUrl)
   let { data } = await axios.get(`${baseUrl}/stats`)
   res.json(data)
 })

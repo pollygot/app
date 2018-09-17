@@ -1,11 +1,12 @@
 require('dotenv').config()
+const webpack = require('webpack')
 
 module.exports = {
   /*
   ** Headers of the page
   */
   head: {
-    title: 'Restiface by Pollygot',
+    title: 'Pollygot',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -21,6 +22,7 @@ module.exports = {
   serverMiddleware: [
     './api/auth',
     './api/kue',
+    './api/postgrest',
   ],
   router: {
     middleware: ['auth']
@@ -40,7 +42,6 @@ module.exports = {
   */
   css: [
     { src: '@/assets/css/main.scss', lang: 'scss' },
-    // { src: '~/font-awesome/scss/font-awesome.scss', lang: 'scss' }
   ],
   /*
   ** Customize the progress bar color
@@ -50,6 +51,14 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.VERSION': require('./package.json').version
+      })
+    ],
+    transpile: [ './lib/**/*', './api/**/*' ],
+    vendor: [ 'axios', 'moment' ],
+    watch: [ './api/**/*' ],
     /*
     ** Run ESLint on save
     */

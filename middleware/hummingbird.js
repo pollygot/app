@@ -1,8 +1,6 @@
 import axios from 'axios'
-export default function ({params, store}) {
+export default async function ({app, params, store}) {
   let { appId } = params
-  let app = store.getters['app'](appId)
-  return axios.get(app.config.url).then((res) => {
-    store.commit('hummingbird/setSwagger', res.data)
-  })
+  let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/`)
+  store.commit('hummingbird/setSwagger', response.data)
 }

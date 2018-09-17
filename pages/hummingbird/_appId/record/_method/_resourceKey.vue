@@ -153,28 +153,25 @@
 
 <script>
 import axios from 'axios'
-import ModalConfirm from '~/components/ModalConfirm.vue'
 import * as Helpers from '~/lib/helpers'
+import ModalConfirm from '~/components/ModalConfirm.vue'
 export default {
   layout: 'hummingbird',
   components: { ModalConfirm },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, route, store }) {
-    let { appId } = params
-    let pollyApp = store.getters['app'](appId)
-    let isCreated = false
-    let selector = Helpers.decrypt(query.q)
+    let { appId, resourceKey } = params
+    let isCreated = (params.method === 'edit') ? true : false
     let record = {}
-    let resourceUrl = `${pollyApp.config.url}/${params.resourceKey}`
-    if (params.method === 'edit') {
-      isCreated = true
-      let fullUrl = `${resourceUrl}?${selector}`
-      let {data} = await axios.get(fullUrl, {
-        'headers': { 'Accept': 'application/vnd.pgrst.object+json' }
+    if (isCreated) {
+      console.log('variable', `/api/postgrest/${appId}/${resourceKey}?q=${query.q}`)
+      let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${query.q}`, {
+        'headers': { 'accept': 'application/vnd.pgrst.object+json' }
       })
-      record = data
+      console.log('response', response)
+      record = response.data
     }
-    let availableFields = app.store.getters['hummingbird/columnsForResource'](params.resourceKey)
+    let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
     let formattedFields = availableFields
       .map(x => Helpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
       .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
@@ -185,11 +182,10 @@ export default {
       confirmDeleteModalVisible: false,
       formattedFields: formattedFields,
       isCreated: isCreated,
-      pageTitle: params.resourceKey.replace(/_/g, ' '),
-      primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](params.resourceKey) || [],
+      pageTitle: resourceKey.replace(/_/g, ' '),
+      primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
       record: record,
-      resourceKey: params.resourceKey,
-      resourceUrl: resourceUrl
+      resourceKey: resourceKey
     }
   },
   methods: {
@@ -237,10 +233,10 @@ export default {
         this.formattedFields
           .filter(x => Helpers.hasDataChanged(x)) // get only modified fields
           .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
-        let url = `${this.resourceUrl}?${selector}`
-        return axios.patch(url, data, {
-          'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
-        })
+        // let url = `${this.resourceUrl}?${selector}`
+        // return axios.patch(url, data, {
+        //   'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
+        // })
       } else console.error('Can\'t find a Primary Key for this record', 'ERROR')
     },
   }

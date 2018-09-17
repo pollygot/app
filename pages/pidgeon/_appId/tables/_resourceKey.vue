@@ -149,22 +149,31 @@
 
 
     </section>
-    
+
   </div>
 </template>
 
 <script>
+// const Helpers = require('~/lib/helpers2.js')
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 const DEFAULT_HEADERS = { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
 import axios from 'axios'
 import PostgrestColumnSelector from '~/components/PostgrestColumnSelector'
 import * as Helpers from '~/lib/helpers'
-import * as Postgrest from '~/lib/postgrest'
 import { mapGetters } from 'vuex'
 export default {
   layout: 'pidgeon',
   components: { PostgrestColumnSelector },
+
+  // Initialise defaults and empty state for page
+  async asyncData ({ app, params, query, store }) {
+    let { appId } = params
+    return {
+      pollyAppId: appId
+    }
+  },
+
   data () {
     return {
       DEFAULT_OFFSET: DEFAULT_OFFSET,

@@ -25,7 +25,9 @@
             <span class="icon"><i class="fas fa-chevron-right"></i></span>
           </div>
         </a>
-        <infinite-loading @infinite="infiniteHandler" spinner="waveDots" v-if="list.length"></infinite-loading>
+        <infinite-loading @infinite="infiniteHandler" spinner="waveDots" v-if="list.length">
+          <span slot="no-results">END</span>
+        </infinite-loading>
       </div>
     </div>
 
@@ -56,7 +58,7 @@
         </div>
         <h5 class="title is-5 m-t-xl">Data</h5>
         <div class="box">
-          <pre class="">{{job.data}}</pre>
+          <pre class="" v-if="job.data">{{JSON.stringify(job.data, null, 2)}}</pre>
         </div>
         <!-- <h5 class="title is-5 m-t-xl">Logs</h5>
         <div class="box">
@@ -134,7 +136,6 @@ export default {
       return this.$axios.$get(`/api/kue/${this.pollyAppId}/stats`)
     },
     getJobs: async function (jobState, limit, offset) {
-      console.log('jobState', jobState)
       return this.$axios.$get(`/api/kue/${this.pollyAppId}/jobs?state=${jobState}&limit=${limit}&offset=${offset}`)
     },
     isActiveJob (job) {

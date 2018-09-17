@@ -1,7 +1,8 @@
 import axios from 'axios'
 import config from '../config/default'
+import constants from '../lib/constants'
 export const state = () => ({
-  apps: config.apps || [], // all the Pollygot Apps that are available on Pollygot
+  apps: constants.apps, // all the Pollygot Apps that are available on Pollygot
   tenants: config.tenants || [] // all the tenants for this user, which should include the apps for each tenant
 })
 
@@ -9,10 +10,6 @@ export const actions = {
   async nuxtServerInit({ commit }, { app, req, route }) {
     const path = route.path.toLowerCase()
     const { appId } = route.params
-    let pollyApp = null
-
-    if (path.indexOf('/hummingbird') === 0) pollyApp = config.apps.HUMMINGBIRD.key
-    else if (path.indexOf('/pidgeon') === 0) pollyApp = config.apps.PIDGEON.key
   }
 }
 
