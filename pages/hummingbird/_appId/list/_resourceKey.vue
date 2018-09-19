@@ -1,63 +1,42 @@
 <template>
 <div>
 
-  <div class="main">
-
-    <nav class="level is-mobile p-t-lg p-b-lg">
-      <div class="level-left">
-        <div class=" level-item control">
-          <div class="dropdown is-hoverable  ">
-            <div class="dropdown-trigger">
-              <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
-                <span class="icon is-small has-text-grey" v-show="currentViewType === VIEW_TYPES.GRID"><i class="fas fa-table"></i></span>
-                <span class="icon is-small has-text-grey" v-show="currentViewType === VIEW_TYPES.CALENDAR"><i class="far fa-calendar-alt"></i></span>
-                <span class="icon is-small has-text-grey" v-show="currentViewType === VIEW_TYPES.KANBAN"><i class="fas fa-columns"></i></span>
-                <span class="is-capitalized">{{currentViewType}}</span>
-              </button>
-            </div>
-            <div class="dropdown-menu" role="menu">
-              <div class="dropdown-content">
-                <a class="dropdown-item" @click="goToView(VIEW_TYPES.GRID)">
-                  <span class="icon is-small has-text-grey m-r-sm"><i class="fas fa-table"></i></span>
-                  <span>Grid</span>
-                </a>
-                <a class="dropdown-item" @click="goToView(VIEW_TYPES.CALENDAR)">
-                  <span class="icon is-small has-text-grey m-r-sm"><i class="far fa-calendar-alt"></i></span>
-                  <span>Calendar</span>
-                </a>
-                <a class="dropdown-item" @click="goToView(VIEW_TYPES.KANBAN)">
-                  <span class="icon is-small has-text-grey m-r-sm"><i class="fas fa-columns"></i></span>
-                  <span>Kanban</span>
-                </a>
-              </div>
-            </div>
+  <div class="">
+    <div class="top-level m-b-md">
+      <nav class="level is-mobile p-lg m-none">
+        <div class="level-left">
+          <a class="level-item button is-small" @click="toggleFilters" :class="{'is-dark': filterPanelVisible}">
+            <span class="icon is-small"><i class="fas fa-filter"></i></span>
+            <span>{{filteredColumns.length || 'Filter'}}</span>
+          </a>
+          <a class="level-item button is-small" @click="toggleSorting" :class="{'is-dark': sortPanelVisible}">
+            <span class="icon is-small"><i class="fas fa-sort"></i></span>
+            <span>{{sortedColumns.length || 'Sort'}}</span>
+          </a>
+        </div>
+        <div class="level-right">
+          <div class="m-r-none level-item">
+            <router-link tag="a"
+              class="super-button button is-medium is-primary is-rounded"
+              :to="'/new/' + resourceKey">
+              <span>New</span>
+              <span class="icon">
+                <i class="fas fa-fw fa-arrow-right"></i>
+              </span>
+            </router-link>
           </div>
         </div>
-        <a class="level-item button is-small" @click="toggleFilters" :class="{'is-dark': filterPanelVisible}">
-          <span class="icon is-small"><i class="fas fa-filter"></i></span>
-          <span>{{filteredColumns.length || 'Filter'}}</span>
-        </a>
-        <a class="level-item button is-small" @click="toggleSorting" :class="{'is-dark': sortPanelVisible}">
-          <span class="icon is-small"><i class="fas fa-sort"></i></span>
-          <span>{{sortedColumns.length || 'Sort'}}</span>
-        </a>
+      </nav>
+      <div class="tabs is-centered is-small">
+        <ul>
+          <li :class="{'is-active': (currentViewType === VIEW_TYPES.GRID)}"><a @click="goToView(VIEW_TYPES.GRID)">Grid</a></li>
+          <li :class="{'is-active': (currentViewType === VIEW_TYPES.CALENDAR)}"><a @click="goToView(VIEW_TYPES.CALENDAR)">Calendar</a></li>
+          <li :class="{'is-active': (currentViewType === VIEW_TYPES.KANBAN)}"><a @click="goToView(VIEW_TYPES.KANBAN)">Kanban</a></li>
+        </ul>
       </div>
+    </div>
 
-      <div class="level-right">
-        <div class="m-r-none level-item">
-          <router-link tag="a"
-            class="super-button button is-medium is-primary is-rounded"
-            :to="'/new/' + resourceKey">
-            <span>New</span>
-            <span class="icon">
-              <i class="fas fa-fw fa-arrow-right"></i>
-            </span>
-          </router-link>
-        </div>
-      </div>
-    </nav>
-
-    <div class="table-box box p-none" v-if="currentViewType === VIEW_TYPES.GRID && records.length">
+    <div class="table-box box p-none m-md m-b-xl" v-if="currentViewType === VIEW_TYPES.GRID && records.length">
       <Table
         class=""
         :columns="tableColumns(this.resourceKey)"
@@ -80,9 +59,9 @@
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
 
-    <div class="section p-b-none">
+    <div class="pagination-section">
       <Pagination
-        v-show="records.length"
+        v-show="totalRecords > paginationSize"
         :currentRangeStart="postgrestParams.offset || 0"
         :currentRangeEnd="currentRangeEnd"
         :paginationSize="postgrestParams.limit || currentRangeEnd"
@@ -178,6 +157,9 @@ export default {
     },
     isSorted () {
       return !!this.postgrestParams.order
+    },
+    paginationSize () {
+      return this.postgrestParams.limit || DEFAULT_PAGINATION_SIZE
     },
     // parse the params from the query string
     postgrestParams () {
@@ -283,6 +265,20 @@ export default {
 </script>
 
 <style lang="scss">
+.top-level {
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.pagination-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: #fff;
+    width: 100vw;
+    height: 50px;
+    padding: 12px 12px 12px 280px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
 .table-box {
   overflow: auto;
   overflow-y: hidden;

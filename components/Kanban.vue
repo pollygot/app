@@ -2,13 +2,15 @@
 <div class="Kanban">
 
   <div class="columns is-mobile">
-    <div class="column is-narrow p-xs" v-for="(state, i) in states" :key="i">
+    <div class="column is-narrow p-xs p-b-0 m-b-0" v-for="(state, i) in states" :key="i">
       <div class="lane p-sm" :class="{ 'm-r-lg': ((i+1) === states.length)}">
-        <div class="title is-6 is-capitalized m-sm m-b-md" v-if="!i">Uncategorized</div>
-        <div class="title is-6 is-capitalized m-sm m-b-md" v-if="i">{{state.toLowerCase()}}</div>
+        <div class="title is-6 is-capitalized m-sm m-b-md has-text-centered">{{(!i) ? 'Uncategorized' : state.toLowerCase()}}</div>
         <div class="cards">
-          <div class="box p-sm" v-for="(card, i) in cards(state)" :key="'card'+i">
-            {{card}}
+          <div class="card box" v-for="(card, i) in cards(state)" :key="'card'+i">
+            <div v-for="(column, j) in columnKeys" :key="'col-td'+j" class="field" v-if="card[`${column}`] !== null && card[`${column}`] !== ''">
+              <label class="label heading has-text-grey-light">{{ column.replace(/_/g, ' ') }}</label>
+              <span>{{ card[`${column}`].toString() || '&nbsp;' }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -19,6 +21,7 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 export default {
   name: 'Kanban',
   props: {
@@ -32,6 +35,9 @@ export default {
     }
   },
   computed: {
+    columnKeys () {
+      return this.columns.map(x => x.key)
+    },
     states () {
       let pivotColumn = this.columns.find(x => (x.key === this.pivotKey))
       if (!pivotColumn) return []
@@ -46,6 +52,9 @@ export default {
 }
 </script>
 <style lang="scss">
+#content {
+  overflow: hidden !important;
+}
 .Kanban {
   .columns {
     overflow-x: auto;
@@ -56,10 +65,14 @@ export default {
   .lane {
     width: 240px;
     border-radius: 4px;
-    background: #dedede;
     .cards {
-      height: calc(100vh - 270px);
+      height: calc(100vh - 230px);
       overflow-y: auto;
+      .card {
+        border-radius: 4px;
+        padding: 8px;
+        margin: 6px 1px;
+      }
     }
   }
 }
