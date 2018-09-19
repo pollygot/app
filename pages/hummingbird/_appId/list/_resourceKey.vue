@@ -36,25 +36,28 @@
       </div>
     </div>
 
-    <div class="table-box box p-none m-md m-b-xl" v-if="currentViewType === VIEW_TYPES.GRID && records.length">
-      <Table
-        class=""
-        :columns="tableColumns(this.resourceKey)"
-        :records="records"
-        :sortedColumns="sortedColumns"
-        :key="tableComponentMounted"
-        tableSize="LARGE"
-        @onHeaderClicked="tableHeaderClicked"
-        @onRecordClicked="gridRecordClicked"
-      />
-    </div>
-    <div class="" v-if="currentViewType === VIEW_TYPES.KANBAN && records.length">
-      <Kanban 
-        pivotKey="status"
-        :columns="tableColumns(this.resourceKey)"
-        :records="records"
-      />
-    </div>
+    <transition name="fade-in">
+      <div class="table-box box p-none m-md m-b-xl" v-show="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
+        <Table
+          class=""
+          :columns="tableColumns(this.resourceKey)"
+          :records="records"
+          :sortedColumns="sortedColumns"
+          tableSize="LARGE"
+          @onHeaderClicked="tableHeaderClicked"
+          @onRecordClicked="gridRecordClicked"
+        />
+      </div>
+    </transition>
+    <transition name="fade-in">
+      <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
+        <Kanban 
+          pivotKey="status"
+          :columns="tableColumns(this.resourceKey)"
+          :records="records"
+        />
+      </div>
+    </transition>
     <div class="table-box box p-none" v-if="!records.length">
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
@@ -135,6 +138,7 @@ export default {
 
       // give some components a key so they refresh on route change / data refresh
       filterComponentMounted: 'filters' + Date.now(), 
+      kanbanComponentMounted: 'kanban' + Date.now(), 
       sortComponentMounted: 'sorts' + Date.now(), 
       tableComponentMounted: 'records' + Date.now()
     }

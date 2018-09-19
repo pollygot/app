@@ -2,19 +2,25 @@
 <div class="Kanban">
 
   <div class="columns is-mobile">
+
     <div class="column is-narrow p-xs p-b-0 m-b-0" v-for="(state, i) in states" :key="i">
       <div class="lane p-sm" :class="{ 'm-r-lg': ((i+1) === states.length)}">
-        <div class="title is-6 is-capitalized m-sm m-b-md has-text-centered">{{(!i) ? 'Uncategorized' : state.toLowerCase()}}</div>
-        <div class="cards">
-          <div class="card box" v-for="(card, i) in cards(state)" :key="'card'+i">
-            <div v-for="(column, j) in columnKeys" :key="'col-td'+j" class="field" v-if="card[`${column}`] !== null && card[`${column}`] !== ''">
-              <label class="label heading has-text-grey-light">{{ column.replace(/_/g, ' ') }}</label>
-              <span>{{ card[`${column}`].toString() || '&nbsp;' }}</span>
+        <div class="title is-6 is-capitalized m-sm m-b-md has-text-centered">{{(i && state) ? state.toLowerCase() : 'Uncategorized'}}</div>
+
+        <draggable>
+          <div class="cards drag-container" >
+            <div class="card box draggable-item" v-for="(card, i) in cards(state)" :key="'card'+i">
+              <div v-for="(column, j) in columnKeys" :key="'col-td'+j" class="field" v-if="card[`${column}`] !== null && card[`${column}`] !== ''">
+                <span class="heading has-text-grey-light">{{ column.replace(/_/g, ' ') }}</span>
+                <span>{{ card[`${column}`].toString() || '&nbsp;' }}</span>
+              </div>
             </div>
           </div>
-        </div>
+        </draggable>
+
       </div>
     </div>
+    
   </div>
 
 </div>
@@ -29,6 +35,7 @@ export default {
     columns: { required: true, type: Array }, 
     records: { required: true, type: Array }, // the data to be displayed
   },
+  components: { draggable },
   data () {
     return {
       sidebarVisible: true,
