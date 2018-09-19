@@ -2,7 +2,7 @@
   <div class="Apps">
     <section class="section" >
       <div class="columns is-centered">
-        <div class="column m-l-lg m-r-lg">
+        <div class="column is-4 m-l-lg m-r-lg">
           <h4 class="title is-4">{{tenant.name}}</h4>
           <nuxt-link class="" tag="a"  v-for="app in tenant.apps" :key="app.id" :to="`/${app.appKey.toLowerCase()}/${app.id}`">
             <div class="box m-b-md">

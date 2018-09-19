@@ -8,6 +8,7 @@
 //
 @import '~bulma';
 @import "../../node_modules/bulma-extensions/bulma-checkradio/dist/css/bulma-checkradio.sass";
+@import "../../node_modules/bulma-extensions/bulma-quickview/dist/css/bulma-quickview.sass";
 @import "../../node_modules/bulma-extensions/bulma-switch/dist/css/bulma-switch.sass";
 
 //
@@ -123,6 +124,14 @@ html, body {
 }
 .has-corners {
   border-radius: 4px;
+}
+.draggable-item {
+  &:hover {
+    cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
 }
 .sidebar {
   height: 100vh;

@@ -1,11 +1,6 @@
 <template>
 <div class="">
 
-  <!-- <div class="columns">
-    <div class="column" v-for="(column, index) in columns" v-bind:style="{width: column.width}" :key="index">
-      {{column.label || column.name}}
-    </div>
-  </div> -->
   <div class="box has-corners">
       <table class="table is-responsive is-fullwidth is-hoverable" v-bind:class="{ 'is-small': tableSize === 'SMALL' }">
         <thead>
@@ -16,15 +11,16 @@
                 <label for="exampleCheckbox" class="p-r-none"></label>
               </div>
             </th>
-            <th v-for="(column, i) in columns" :key="'col-h'+i">
+            <th v-for="(columnName, i) in columns" :key="'col-h'+i">
               <a
-                @click="$emit('onSort', column)"
+                @click="$emit('onHeaderClicked', columnName)"
+                class="is-capitalized"
                 :class="{
-                  'sort-desc': (sortColumn === column && sortDirection === 'desc'),
-                  'sort-asc': (sortColumn === column && sortDirection === 'asc')
+                  'sort-desc': (isSorted(columnName) && sortDirection(columnName) === 'desc'),
+                  'sort-asc': (isSorted(columnName) && sortDirection(columnName) === 'asc')
                 }"
               >
-                {{column}}
+                {{columnName.replace(/_/g, ' ')}}
               </a>
             </th>
           </tr>
@@ -62,29 +58,37 @@ export default {
   props: {
     columns: { required: true, type: Array },
     records: { required: true, type: Array }, // the data to be displayed
-    sortColumn: { required: false, type: String },
-    sortDirection: { required: false, type: String },
+    sortedColumns: { required: false, type: Array },
     tableSize: { required: false, type: String, default: 'SMALL' } // how large the text / cell size is
   },
-  data: function () {
+  data () {
     return {
     }
   },
   computed: {
   },
   methods: {
-    getDateAndTime: function (dateString) {
+    getDateAndTime (dateString) {
       if (!dateString) return null
       return moment(dateString).format('HH:mm - DD MMM YYYY')
     },
-    getDate: function (dateString) {
+    getDate (dateString) {
       if (!dateString) return null
       return moment(dateString).format('DD MMM YYYY')
     },
-    getValue: function (column, record) {
+    getValue (column, record) {
       let value = record[`${column.key}`]
       if (value && column.modifier) value = column.modifier(value)
       return value
+    },
+    isSorted (columnName) {
+      if (!this.sortedColumns) return false
+      return this.sortedColumns.some(x => (x.key === columnName))
+    },
+    sortDirection (columnName) {
+      if (!this.sortedColumns.length) return false
+      let col = this.sortedColumns.find(x => (x.key === columnName)) || {}
+      return col.sort || 'asc'
     }
   }
 }

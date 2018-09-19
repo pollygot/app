@@ -2,7 +2,7 @@
 <div>
 
   <div class="main">
-    <nav class="level is-mobile">
+    <nav class="level is-mobile p-t-lg p-b-lg">
       <div class="level-left"></div>
 
       <div class="animated zoomInRight level-right">
