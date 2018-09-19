@@ -13,7 +13,7 @@
             </th>
             <th v-for="(column, i) in columnKeys" :key="'col-h'+i">
               <a
-                @click="$emit('onHeaderClicked', column.key)"
+                @click="$emit('onHeaderClicked', column)"
                 class="is-capitalized"
                 :class="{
                   'sort-desc': (isSorted(column) && sortDirection(column) === 'desc'),
@@ -61,10 +61,6 @@ export default {
     sortedColumns: { required: false, type: Array },
     tableSize: { required: false, type: String, default: 'SMALL' } // how large the text / cell size is
   },
-  data () {
-    return {
-    }
-  },
   computed: {
     columnKeys () {
       return this.columns.map(x => x.key)
@@ -110,13 +106,15 @@ export default {
     td {
       cursor: pointer;
       white-space:nowrap;
-
       figure {
         box-shadow: 0px 0px 3px 2px rgba(0,0,0,0.1) !important;
       }
     }
     th {
       white-space:nowrap;
+      a {
+        color: #484848;
+      }
     }
   }
   a.sort-down:after {
