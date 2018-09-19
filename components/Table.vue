@@ -29,8 +29,8 @@
           <tr v-for="(record, index) in records" :key="'record-'+index">
             <td class="p-r-none">
               <div class="field">
-                <input class="is-checkradio is-small" id="exampleCheckbox" type="checkbox" name="exampleCheckbox">
-                <label for="exampleCheckbox" class="p-r-none"></label>
+                <input class="is-checkradio is-small" :id="'check-'+index" type="checkbox" :name="'check-'+index">
+                <label :for="'check-'+index" class="p-r-none"></label>
               </div>
             </td>
             <td v-for="(column, i) in columns" :key="'col-td'+i"  @click="$emit('onRecordClicked', record)" >
