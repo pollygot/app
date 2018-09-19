@@ -125,7 +125,7 @@ html, body {
 .has-corners {
   border-radius: 4px;
 }
-.draggable-item {
+.drag-container {
   &:hover {
     cursor: move;
     cursor: grab;

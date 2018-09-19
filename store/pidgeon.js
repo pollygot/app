@@ -1,4 +1,4 @@
-import * as Postgrest from '~/lib/postgrest'
+import * as PostgrestHelpers from '~/lib/postgrestHelpers'
 
 export const state = () => ({
   baseUrl: '',
@@ -23,7 +23,7 @@ export const getters = {
     let tableDefinition = state.swagger.definitions[`${resourceKey}`]
     return Object.entries(tableDefinition.properties)
       .map(([k, v]) => (Object.assign({ ...v, key: k }, v)))
-      .map(x => Postgrest.enrichSwaggerColumnDefinition(x))
+      .map(x => PostgrestHelpers.enrichSwaggerColumnDefinition(x))
   },
 
   // Finds all the primary keys for a resource.

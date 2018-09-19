@@ -5,11 +5,19 @@
 
     <nav class="level is-mobile p-t-lg p-b-lg">
       <div class="level-left">
-        <a class="button" @click="toggleSorting">Sort</a>
+        <a class="level-item button is-small" @click="toggleFilters" :class="{'is-dark': filterPanelVisible}">
+          <span class="icon is-small"><i class="fas fa-filter"></i></span>
+          <span>{{filteredColumns.length || 'Filter'}}</span>
+        </a>
+        <a class="level-item button is-small" @click="toggleSorting" :class="{'is-dark': sortPanelVisible}">
+          <span class="icon is-small"><i class="fas fa-sort"></i></span>
+          <span>{{sortedColumns.length || 'Sort'}}</span>
+        </a>
       </div>
 
       <div class="level-right">
-        <p class="m-r-none level-item">
+        <div class="m-r-none level-item">
+
           <router-link tag="a"
             class="super-button button is-medium is-primary is-rounded"
             :to="'/new/' + resourceKey">
@@ -18,12 +26,13 @@
               <i class="fas fa-fw fa-arrow-right"></i>
             </span>
           </router-link>
-        </p>
+        </div>
       </div>
     </nav>
 
     <div class="table-box box p-none">
       <Table
+        v-show="records.length"
         class=""
         :columns="columnNames"
         :records="records"
@@ -33,10 +42,12 @@
         @onHeaderClicked="tableHeaderClicked"
         @onRecordClicked="gridRecordClicked"
       />
+      <h3 class="title is-5 has-text-centered m-xl" v-show="!records.length">No records found</h3>
     </div>
 
     <div class="section p-b-none">
       <Pagination
+        v-show="records.length"
         :currentRangeStart="postgrestParams.offset || 0"
         :currentRangeEnd="currentRangeEnd"
         :paginationSize="postgrestParams.limit || currentRangeEnd"
@@ -47,6 +58,14 @@
 
   </div>
 
+  <PostgrestFilterPanel
+    :allColumns="tableColumns(resourceKey, true)"
+    :isVisible="filterPanelVisible"
+    :existingFilters="filteredColumns"
+    :key="filterComponentMounted"
+    @onFilter="filterColumns"
+    @onHidePanel="() => { filterPanelVisible = false }"
+  />
   <PostgrestSortPanel
     :allColumns="tableColumns(resourceKey, true)"
     :isVisible="sortPanelVisible"
@@ -64,15 +83,16 @@ const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 const DEFAULT_POSTGREST_QUERY = `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
 import axios from 'axios'
-import draggable from 'vuedraggable'
 import * as Helpers from '~/lib/helpers'
+import * as PostgrestHelpers from '~/lib/postgrestHelpers'
 import Pagination from '~/components/Pagination.vue'
+import PostgrestFilterPanel from '~/components/PostgrestFilterPanel.vue'
 import PostgrestSortPanel from '~/components/PostgrestSortPanel.vue'
 import Table from '~/components/Table.vue'
 import { mapGetters } from 'vuex'
 export default {
   layout: 'hummingbird',
-  components: {  draggable, Pagination, PostgrestSortPanel, Table },
+  components: {  Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
   watchQuery: ['q'],
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
@@ -81,13 +101,14 @@ export default {
     let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
       'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
     })
-    let rangeData = Helpers.getRangeDataFromPostgrestHeaders(response.headers)
     console.log('response', response)
+    let rangeData = Helpers.getRangeDataFromPostgrestHeaders(response.headers)
     return {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
       DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
-      currentRangeEnd: rangeData.rangeEnd,
+      currentRangeEnd: rangeData.rangeEnd || 0,
+      filterPanelVisible: false,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestQueryString: postgrestQueryString,
       sortPanelVisible: false,
@@ -96,22 +117,31 @@ export default {
       totalRecords: rangeData.totalRecords,
 
       // give some components a key so they refresh on route change / data refresh
-      sortComponentMounted: Date.now(), 
-      tableComponentMounted: Date.now()
+      filterComponentMounted: 'filters' + Date.now(), 
+      sortComponentMounted: 'sorts' + Date.now(), 
+      tableComponentMounted: 'records' + Date.now()
     }
   },
   computed: {
     ...mapGetters({
       tableColumns: 'hummingbird/columnsForResource'
     }),
-    columnNames: function () {
+    columnNames () {
       return this.tableColumns(this.resourceKey).map(x => x.key)
+    },
+    filteredColumns () {
+      if (!this.isFiltered) return []
+      let param = this.postgrestParams.or
+      return PostgrestHelpers.parseFilterString(param.substring(1, param.length -1))
+    },
+    isFiltered: function () {
+      return !!this.postgrestParams.or
     },
     isSorted: function () {
       return !!this.postgrestParams.order
     },
     // parse the params from the query string
-    postgrestParams: function () {
+    postgrestParams () {
       let result = {}
       this.postgrestQueryString.split('&').forEach(part => {
         let item = part.split('=')
@@ -121,16 +151,13 @@ export default {
       if (result.offset) result.offset = parseInt(result.offset) // convert to number instead of string
       return result
     },
-    sortedColumns: function () {
+    sortedColumns () {
       if (!this.isSorted) return []
       let sorting = this.postgrestParams.order.split(',')
       return sorting.map(x => ({ key: x.split('.')[0], sort: x.split('.')[1] }))
     },
   },
   methods: {
-    // getRecords: async function () {
-      
-    // }
     gridRecordClicked (record) {
       try {
         let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
@@ -155,9 +182,30 @@ export default {
       if (newParams.limit) q += `limit=${newParams.limit}&`
       if (newParams.offset) q += `offset=${newParams.offset}&`
       if (newParams.order) q += `order=${newParams.order}&`
+      if (newParams.filters) q += `${newParams.filters}&`
       if (q !== '') route.query.q = Helpers.encrypt(q.substring(0, q.length - 1)) // remove the trailing &
       console.log('q', q)
       this.$router.push(route)
+    },
+    filterColumns (columns) {
+      this.filterPanelVisible = false
+      if (!columns.length) {
+        this.pushParams({ ...this.postgrestParams, filters: null })
+      } else {
+        let ors = []
+        let ands = []
+        columns.forEach(col => {
+          if (col.andOr === 'and') {
+            ands.push(col)
+          } else {
+            ors.push(ands)
+            ands = [col]
+          }
+        })
+        ors.push(ands)
+        let criteria = PostgrestHelpers.generateFilterString(ors)
+        this.pushParams({ ...this.postgrestParams, filters: criteria })
+      }
     },
     sortColumns (columns) {
       this.sortPanelVisible = false
@@ -178,6 +226,9 @@ export default {
         let newSorting = [{key: alreadySorted.key, sort: newDirection}, ...modified] // push to front
         this.sortColumns(newSorting)
       }
+    },
+    toggleFilters () {
+      this.filterPanelVisible = !this.filterPanelVisible
     },
     toggleSorting () {
       this.sortPanelVisible = !this.sortPanelVisible
