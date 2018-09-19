@@ -5,6 +5,34 @@
 
     <nav class="level is-mobile p-t-lg p-b-lg">
       <div class="level-left">
+        <div class=" level-item control">
+          <div class="dropdown is-hoverable  ">
+            <div class="dropdown-trigger">
+              <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
+                <span class="icon is-small has-text-grey" v-show="currentViewType === VIEW_TYPES.GRID"><i class="fas fa-table"></i></span>
+                <span class="icon is-small has-text-grey" v-show="currentViewType === VIEW_TYPES.CALENDAR"><i class="far fa-calendar-alt"></i></span>
+                <span class="icon is-small has-text-grey" v-show="currentViewType === VIEW_TYPES.KANBAN"><i class="fas fa-columns"></i></span>
+                <span class="is-capitalized">{{currentViewType}}</span>
+              </button>
+            </div>
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-content">
+                <a class="dropdown-item" @click="goToView(VIEW_TYPES.GRID)">
+                  <span class="icon is-small has-text-grey m-r-sm"><i class="fas fa-table"></i></span>
+                  <span>Grid</span>
+                </a>
+                <a class="dropdown-item" @click="goToView(VIEW_TYPES.CALENDAR)">
+                  <span class="icon is-small has-text-grey m-r-sm"><i class="far fa-calendar-alt"></i></span>
+                  <span>Calendar</span>
+                </a>
+                <a class="dropdown-item" @click="goToView(VIEW_TYPES.KANBAN)">
+                  <span class="icon is-small has-text-grey m-r-sm"><i class="fas fa-columns"></i></span>
+                  <span>Kanban</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
         <a class="level-item button is-small" @click="toggleFilters" :class="{'is-dark': filterPanelVisible}">
           <span class="icon is-small"><i class="fas fa-filter"></i></span>
           <span>{{filteredColumns.length || 'Filter'}}</span>
@@ -17,7 +45,6 @@
 
       <div class="level-right">
         <div class="m-r-none level-item">
-
           <router-link tag="a"
             class="super-button button is-medium is-primary is-rounded"
             :to="'/new/' + resourceKey">
@@ -30,11 +57,10 @@
       </div>
     </nav>
 
-    <div class="table-box box p-none">
+    <div class="table-box box p-none" v-if="currentViewType === VIEW_TYPES.GRID && records.length">
       <Table
-        v-show="records.length"
         class=""
-        :columns="columnNames"
+        :columns="tableColumns(this.resourceKey)"
         :records="records"
         :sortedColumns="sortedColumns"
         :key="tableComponentMounted"
@@ -42,7 +68,16 @@
         @onHeaderClicked="tableHeaderClicked"
         @onRecordClicked="gridRecordClicked"
       />
-      <h3 class="title is-5 has-text-centered m-xl" v-show="!records.length">No records found</h3>
+    </div>
+    <div class="" v-if="currentViewType === VIEW_TYPES.KANBAN && records.length">
+      <Kanban 
+        pivotKey="status"
+        :columns="tableColumns(this.resourceKey)"
+        :records="records"
+      />
+    </div>
+    <div class="table-box box p-none" v-if="!records.length">
+      <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
 
     <div class="section p-b-none">
@@ -82,6 +117,7 @@
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 const DEFAULT_POSTGREST_QUERY = `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
+const VIEW_TYPES = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
 import axios from 'axios'
 import * as Helpers from '~/lib/helpers'
 import * as PostgrestHelpers from '~/lib/postgrestHelpers'
@@ -89,11 +125,12 @@ import Pagination from '~/components/Pagination.vue'
 import PostgrestFilterPanel from '~/components/PostgrestFilterPanel.vue'
 import PostgrestSortPanel from '~/components/PostgrestSortPanel.vue'
 import Table from '~/components/Table.vue'
+import Kanban from '~/components/Kanban.vue'
 import { mapGetters } from 'vuex'
 export default {
   layout: 'hummingbird',
-  components: {  Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
-  watchQuery: ['q'],
+  components: { Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
+  watchQuery: ['q', 'v'],
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
     let { q } = query
@@ -101,15 +138,16 @@ export default {
     let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
       'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
     })
-    console.log('response', response)
     let rangeData = Helpers.getRangeDataFromPostgrestHeaders(response.headers)
     return {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
       DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
+      VIEW_TYPES: VIEW_TYPES,
       currentRangeEnd: rangeData.rangeEnd || 0,
       filterPanelVisible: false,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
+      pivotColumn: {},
       postgrestQueryString: postgrestQueryString,
       sortPanelVisible: false,
       records: response.data,
@@ -126,18 +164,19 @@ export default {
     ...mapGetters({
       tableColumns: 'hummingbird/columnsForResource'
     }),
-    columnNames () {
-      return this.tableColumns(this.resourceKey).map(x => x.key)
+    currentViewType () {
+      let { v } = this.$route.query
+      return v || VIEW_TYPES.GRID // grid is the default
     },
     filteredColumns () {
       if (!this.isFiltered) return []
       let param = this.postgrestParams.or
       return PostgrestHelpers.parseFilterString(param.substring(1, param.length -1))
     },
-    isFiltered: function () {
+    isFiltered () {
       return !!this.postgrestParams.or
     },
-    isSorted: function () {
+    isSorted () {
       return !!this.postgrestParams.order
     },
     // parse the params from the query string
@@ -158,6 +197,13 @@ export default {
     },
   },
   methods: {
+    goToView (viewType) {
+      let query = Object.assign({}, this.$route.query)
+      if (viewType === VIEW_TYPES.GRID) delete query.v
+      else query.v = viewType
+      let route = { path: this.$route.path, query: query }
+      this.$router.push(route)
+    },
     gridRecordClicked (record) {
       try {
         let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
@@ -182,7 +228,7 @@ export default {
       if (newParams.limit) q += `limit=${newParams.limit}&`
       if (newParams.offset) q += `offset=${newParams.offset}&`
       if (newParams.order) q += `order=${newParams.order}&`
-      if (newParams.filters) q += `${newParams.filters}&`
+      if (newParams.or) q += `or=${newParams.or}&`
       if (q !== '') route.query.q = Helpers.encrypt(q.substring(0, q.length - 1)) // remove the trailing &
       console.log('q', q)
       this.$router.push(route)
@@ -204,7 +250,8 @@ export default {
         })
         ors.push(ands)
         let criteria = PostgrestHelpers.generateFilterString(ors)
-        this.pushParams({ ...this.postgrestParams, filters: criteria })
+        console.log('criteria', criteria)
+        this.pushParams({ ...this.postgrestParams, or: criteria })
       }
     },
     sortColumns (columns) {
@@ -221,8 +268,6 @@ export default {
       else {
         let modified = this.sortedColumns.filter(x => (x.key !== key))
         let newDirection = (alreadySorted.sort === 'asc') ? 'desc' : 'asc'
-        console.log('alreadySorted.sor', alreadySorted.sort)
-        console.log('newDirection', newDirection)
         let newSorting = [{key: alreadySorted.key, sort: newDirection}, ...modified] // push to front
         this.sortColumns(newSorting)
       }

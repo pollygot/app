@@ -25,14 +25,15 @@
           </div>
         </div>
 
-        <span class="button m-l-sm is-light" @click="cancel()">Cancel</span>
-        <span class="button m-l-sm is-primary is-outlined" @click="applyFilters()">Apply</span>
+        <div class="buttons is-right header-buttons">
+          <span class="button is-outlined is-rounded is-small " @click="cancel()">Cancel</span>
+          <span class="button is-dark is-outlined is-rounded is-small" @click="applyFilters()">Apply</span>
+        </div>
 
         <draggable v-model="newFilters">
-          <div class="m-b-md p-sm drag-container" v-for="(filter, index) in newFilters" :key="'sort'+filter.key+index">
+          <div class="m-b-sm p-sm drag-container" v-for="(filter, index) in newFilters" :key="'sort'+filter.key+index">
             <button class="delete is-small" @mousedown="remove(index)"></button>
-            <button class="delete is-small" @mousedown="remove(index)"></button>
-            <div class="and-or-criteria buttons has-addons is-centered" :class="{'hidden': !index}">
+            <div class="and-or-criteria buttons has-addons is-centered m-b-sm" :class="{'hidden': !index}">
               <button class="button is-small is-rounded" @mousedown="changeAndOr(filter, 'and')" :class="{'is-dark': filter.andOr === 'and'}" onClick="">AND</button>
               <button class="button is-small is-rounded" @mousedown="changeAndOr(filter, 'or')" :class="{'is-primary': filter.andOr === 'or'}">OR</button>
             </div>
@@ -64,6 +65,7 @@
               <div class="field">
                 <div class="control is-expanded">
                   <input class="input is-small" type="text" :placeholder="operators.find(x => (x.value === filter.criteria)).hint || '... filter'" v-model="filter.filterString" >
+                  <p class="help is-danger" v-show="!filter.filterString.length">Required</p>
                 </div>
               </div>
             </div>
@@ -117,7 +119,8 @@ export default {
       this.newFilters.push({...column, ...this.emptyFilter})
     },
     applyFilters () {
-      if (this.newFilters.length) this.newFilters[0].andOr = 'and'
+      this.newFilters = this.newFilters.filter(x => (x.filterString.length))
+      if (this.newFilters.length) {this.newFilters[0].andOr = 'and'}
       this.$emit('onFilter', this.newFilters)
     },
     cancel () {
@@ -134,7 +137,6 @@ export default {
     sortBy (column, direction) {
       this.newFilters = [...this.newFilters].map(x => {
         if (x.key === column.key) x.sort = direction
-        this.forceHasChanged = true
         return x
       })
     }
@@ -143,6 +145,11 @@ export default {
 </script>
 <style lang="scss">
 .PostgrestFilterPanel {
+  .header-buttons {
+    position: absolute;
+    top: 18px;
+    right: 15px;
+  }
   .drag-container {
     position: relative;
     border-radius: 3px;

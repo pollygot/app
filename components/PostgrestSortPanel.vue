@@ -24,9 +24,10 @@
             </div>
           </div>
         </div>
-
-        <span class="button m-l-sm is-light" @click="cancel()">Cancel</span>
-        <span class="button m-l-sm is-primary is-outlined" @click="applySorting()" v-show="hasSortingChanged">Apply</span>
+        <div class="buttons is-right header-buttons">
+          <span class="button is-outlined is-rounded is-small " @click="cancel()">Cancel</span>
+          <span class="button is-dark is-outlined is-rounded is-small" @click="applySorting()">Apply</span>
+        </div>
 
         <draggable v-model="newSorting">
           <div class="m-b-md" v-for="(column) in newSorting" :key="'sort'+column.key">
@@ -59,15 +60,10 @@ export default {
   components: { draggable },
   data () {
     return {
-      forceHasChanged: false,
       newSorting: [...this.sortedColumns]
     }
   },
   computed: {
-    hasSortingChanged () {
-      if (this.forceHasChanged) return true
-      return JSON.stringify({ a: this.sortedColumns}) != JSON.stringify({ a: this.newSorting}) // crude but workable
-    },
     unsortedColumns () {
       let sorted = this.newSorting.map(x => x.key)
       return this.allColumns.filter(x => (!sorted.includes(x.key)))
@@ -88,7 +84,6 @@ export default {
     sortBy (column, direction) {
       this.newSorting = [...this.newSorting].map(x => {
         if (x.key === column.key) x.sort = direction
-        this.forceHasChanged = true
         return x
       })
     }
@@ -97,6 +92,11 @@ export default {
 </script>
 <style lang="scss">
 .PostgrestSortPanel {
+  .header-buttons {
+    position: absolute;
+    top: 18px;
+    right: 15px;
+  }
  .draggable-item.box {
    position: relative;
   .delete {

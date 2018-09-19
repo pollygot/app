@@ -11,16 +11,16 @@
                 <label for="exampleCheckbox" class="p-r-none"></label>
               </div>
             </th>
-            <th v-for="(columnName, i) in columns" :key="'col-h'+i">
+            <th v-for="(column, i) in columnKeys" :key="'col-h'+i">
               <a
-                @click="$emit('onHeaderClicked', columnName)"
+                @click="$emit('onHeaderClicked', column.key)"
                 class="is-capitalized"
                 :class="{
-                  'sort-desc': (isSorted(columnName) && sortDirection(columnName) === 'desc'),
-                  'sort-asc': (isSorted(columnName) && sortDirection(columnName) === 'asc')
+                  'sort-desc': (isSorted(column) && sortDirection(column) === 'desc'),
+                  'sort-asc': (isSorted(column) && sortDirection(column) === 'asc')
                 }"
               >
-                {{columnName.replace(/_/g, ' ')}}
+                {{column.replace(/_/g, ' ')}}
               </a>
             </th>
           </tr>
@@ -33,7 +33,7 @@
                 <label :for="'check-'+index" class="p-r-none"></label>
               </div>
             </td>
-            <td v-for="(column, i) in columns" :key="'col-td'+i"  @click="$emit('onRecordClicked', record)" >
+            <td v-for="(column, i) in columnKeys" :key="'col-td'+i"  @click="$emit('onRecordClicked', record)" >
               <span>
                 {{
                   record[`${column}`] ||
@@ -66,6 +66,9 @@ export default {
     }
   },
   computed: {
+    columnKeys () {
+      return this.columns.map(x => x.key)
+    }
   },
   methods: {
     getDateAndTime (dateString) {
