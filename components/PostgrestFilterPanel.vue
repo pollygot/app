@@ -152,7 +152,7 @@ export default {
   }
   .drag-container {
     position: relative;
-    border-radius: 3px;
+    border-radius: 5px;
     border: 1px solid #fff;
     .delete {
       position: absolute;
@@ -160,9 +160,8 @@ export default {
       right: 0.5rem;
     }
     &:hover {
-      background: #fefefe;
-      border-radius: 3px;
-      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.03);
+      border: 1px solid #fff;
     }
     .box:hover {
       cursor: default;
@@ -172,9 +171,10 @@ export default {
     visibility: hidden;
   }
   .sortable-chosen, .sortable-drag, .sortable-ghost {
-    background: #F5F6FA;
-    border-radius: 3px;
+    background: rgba(0,0,0,0.03);
     border: 1px solid rgba(0,0,0,0.1);
+    // background-image: linear-gradient(to right, rgba(0,0,0,0.1) , rgba(0,0,0,0.05));
+    // box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
   }
  
 }
