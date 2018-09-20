@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="HummingbirdList">
 
   <div class="">
     <div class="top-level m-b-md">
@@ -265,32 +265,34 @@ export default {
 </script>
 
 <style lang="scss">
-.top-level {
-  background: #fff;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-.pagination-section {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+.HummingbirdList {
+  .top-level {
     background: #fff;
-    width: 100vw;
-    height: 50px;
-    padding: 12px 12px 12px 280px;
-    border-top: 1px solid rgba(0,0,0,0.1);
-}
-.table-box {
-  overflow: auto;
-  overflow-y: hidden;
-  font-size: 0.9rem;
-  td:hover {
-    cursor: pointer;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
   }
-  a.sort-asc:after {
-   content: ' ▾';
+  .pagination-section {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background: #fff;
+      width: 100vw;
+      height: 50px;
+      padding: 12px 12px 12px 280px;
+      border-top: 1px solid rgba(0,0,0,0.1);
   }
-  a.sort-desc:after {
-   content: ' ▴';
+  .table-box {
+    overflow: auto;
+    overflow-y: hidden;
+    font-size: 0.9rem;
+    td:hover {
+      cursor: pointer;
+    }
+    a.sort-asc:after {
+    content: ' ▾';
+    }
+    a.sort-desc:after {
+    content: ' ▴';
+    }
   }
 }
 </style>

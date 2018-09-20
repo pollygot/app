@@ -76,10 +76,6 @@ export default {
       sidebarVisible: true,
     }
   },
-  created () {
-    console.log('sidebar', this.tenants)
-    console.log('currentTenant', this.currentTenant)
-  },
   computed: {
     ...mapGetters({
       app: 'app',

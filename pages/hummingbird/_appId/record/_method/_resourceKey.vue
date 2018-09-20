@@ -1,136 +1,142 @@
 <template>
-<div>
+<div class="HummingbirdRecord">
 
-  <div class="main">
-    <nav class="level is-mobile p-t-lg p-b-lg">
-      <div class="level-left"></div>
-
-      <div class="animated zoomInRight level-right">
-        <div class="level-item">
-          <div class="dropdown is-hoverable is-right" v-show="isCreated">
-            <div class="dropdown-trigger">
-              <button class="button is-dark is-small is-rounded is-outlined" aria-haspopup="true">
-                <span class="icon is-small "><i class="fas fa-cog" aria-hidden="true"></i></span>
-              </button>
-            </div>
-            <div class="dropdown-menu" role="menu">
-              <div class="dropdown-content">
-                <a class="dropdown-item" @click="newRecord()">
-                  <p>
-                    <span>New</span>
-                    <span><code>CTRL+N</code></span>
-                  </p>
-                </a>
-                <a class="dropdown-item" @click="confirmDeleteModalVisible = true">
-                  <p>
-                    <span>Delete</span>
-                    <span><code>DEL</code></span>
-                  </p>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="level-item m-r-none ">
-          <a class="super-button button is-medium is-primary is-rounded" @click="save()">
-            <span>Save</span>
-            <span class="icon">
-              <i class="fas fa-fw fa-save"></i>
-            </span>
-          </a>
-        </div>
+  <nav class="top-level level is-mobile p-lg">
+    <div class="level-left">
+      <div class="level ">
+        <a class="button" @click="back()">
+          <span class="icon">
+            <i class="fas fa-arrow-left"></i>
+          </span>
+        </a>
       </div>
-    </nav>
-
-    <div class="box has-corners">
-        <template v-for="field in formattedFields">
-
-          <div class="field is-horizontal" v-if="field.type === 'enum'" :key="field.key">
-            <div class="field-label is-normal">
-              <label class="label">{{field.label}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control select is-fullwidth">
-                  <select v-model="field.value">
-                    <option
-                      v-for="(e, i) in field.enum"
-                      :key="field.key + 'enum' + i"
-                    >{{e}}</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="field is-horizontal" v-else-if="field.type === 'integer'" :key="field.key">
-            <div class="field-label is-normal">
-              <label class="label is-capitalized">{{field.label}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control is-expanded">
-                  <input class="input is-fullwidth" type="number" :placeholder="field.value" v-model="field.value">
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="field is-horizontal" v-else-if="field.type === 'boolean'" :key="field.key">
-            <div class="field-label is-normal">
-              <label class="label is-capitalized">{{field.label}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field p-t-sm">
-                <input class="is-checkradio" :id="'chk'+field.key" type="checkbox" :name="'chk'+field.key"  v-model="field.value">
-                <label :for="'chk'+field.key" class="m-none"></label>
-              </div>
-            </div>
-          </div>
-
-          <div class="field is-horizontal" v-else-if="field.type === 'timestamp'" :key="field.key">
-            <div class="field-label is-normal">
-              <label class="label is-capitalized">{{field.label}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p>
-                  <input class="input is-fullwidth" type="datetime-local" :placeholder="field.value" v-model="field.value">
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="field is-horizontal" v-else-if="field.type === 'json'" :key="field.key">
-            <div class="field-label is-normal">
-              <label class="label is-capitalized">{{field.label}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control is-expanded">
-                  <textarea class="textarea is-small is-fullwidth" :placeholder="field.value" v-model="field.value" rows="15"></textarea>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="field is-horizontal" v-else :key="field.key">
-            <div class="field-label is-normal">
-              <label class="label is-capitalized">{{field.label}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control is-expanded">
-                  <input class="input is-fullwidth" type="text" :placeholder="field.value" v-model="field.value">
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </template>
     </div>
 
+    <div class="animated zoomInRight level-right">
+      <div class="level-item">
+        <div class="dropdown is-hoverable is-right" v-show="isCreated">
+          <div class="dropdown-trigger">
+            <button class="button is-dark is-small is-rounded is-outlined" aria-haspopup="true">
+              <span class="icon is-small "><i class="fas fa-cog" aria-hidden="true"></i></span>
+            </button>
+          </div>
+          <div class="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+              <a class="dropdown-item" @click="newRecord()">
+                <p>
+                  <span>New</span>
+                  <span><code>CTRL+N</code></span>
+                </p>
+              </a>
+              <a class="dropdown-item" @click="confirmDeleteModalVisible = true">
+                <p>
+                  <span>Delete</span>
+                  <span><code>DEL</code></span>
+                </p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="level-item m-r-none ">
+        <a class="super-button button is-medium is-primary is-rounded" @click="save()">
+          <span>Save</span>
+          <span class="icon">
+            <i class="fas fa-fw fa-save"></i>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="m-lg box has-corners">
+      <template v-for="field in formattedFields">
+
+        <div class="field is-horizontal" v-if="field.type === 'enum'" :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control select is-fullwidth">
+                <select v-model="field.value">
+                  <option
+                    v-for="(e, i) in field.enum"
+                    :key="field.key + 'enum' + i"
+                  >{{e}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal" v-else-if="field.type === 'integer'" :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label is-capitalized">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded">
+                <input class="input is-fullwidth" type="number" :placeholder="field.value" v-model="field.value">
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal" v-else-if="field.type === 'boolean'" :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label is-capitalized">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field p-t-sm">
+              <input class="is-checkradio" :id="'chk'+field.key" type="checkbox" :name="'chk'+field.key"  v-model="field.value">
+              <label :for="'chk'+field.key" class="m-none"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal" v-else-if="field.type === 'timestamp'" :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label is-capitalized">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p>
+                <input class="input is-fullwidth" type="datetime-local" :placeholder="field.value" v-model="field.value">
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal" v-else-if="field.type === 'json'" :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label is-capitalized">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded">
+                <textarea class="textarea is-small is-fullwidth" :placeholder="field.value" v-model="field.value" rows="15"></textarea>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal" v-else :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label is-capitalized">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded">
+                <input class="input is-fullwidth" type="text" :placeholder="field.value" v-model="field.value">
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </template>
   </div>
+
   <ModalConfirm
     :icon="'fa-times'"
     :isVisible="confirmDeleteModalVisible"
@@ -159,16 +165,19 @@ export default {
   layout: 'hummingbird',
   components: { ModalConfirm },
   watchQuery: ['q'],
+  beforeRouteEnter (to, from, next) {
+    next(vm => { vm.fromRoute = from }) // needed for the "back" function
+  },
   async asyncData ({ app, params, query, route, store }) {
     let { appId, resourceKey } = params
     let isCreated = (params.method === 'edit') ? true : false
+    const proxyUrlBase = `/api/postgrest/${appId}/${resourceKey}`
     let record = {}
     if (isCreated) {
-      console.log('variable', `/api/postgrest/${appId}/${resourceKey}?q=${query.q}`)
-      let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${query.q}`, {
+      console.log('page refreshed', `${proxyUrlBase}?q=${query.q}`)
+      let { data:response } = await app.$axios.get(`${proxyUrlBase}?q=${query.q}`, {
         'headers': { 'accept': 'application/vnd.pgrst.object+json' }
       })
-      console.log('response', response)
       record = response.data
     }
     let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
@@ -178,17 +187,24 @@ export default {
       .map(x => Helpers.enrichSwaggerField(x)) // add useful data to each field. eg, add Date() to timestamp strings
 
     return {
+      appId: appId,
       availableFields: availableFields,
       confirmDeleteModalVisible: false,
       formattedFields: formattedFields,
       isCreated: isCreated,
       pageTitle: resourceKey.replace(/_/g, ' '),
       primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
+      proxyUrlBase: proxyUrlBase,
       record: record,
       resourceKey: resourceKey
     }
   },
   methods: {
+    back () {
+      let { resourceKey } = this.fromRoute.params
+      if (resourceKey && resourceKey === this.resourceKey) this.$router.go(-1)
+      else this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
+    },
     createRecord: function () {
       let self = this
       let data = {} // the object to be sent to the database
@@ -218,41 +234,43 @@ export default {
       }
 
       if (response) {
-        this.record = response
-        this.isCreated = true
+        console.log('response', response)
         this.$toast.success('Saved!', { duration: 1000 })
-        let path = '/record/edit/' + this.resourceKey + '?q=' + Helpers.encrypt(this.getUniqueSelector())
+        let q = Helpers.encrypt(this.getUniqueSelector())
+        let path = `/hummingbird/${this.appId}/record/edit/${this.resourceKey}?q=` + encodeURIComponent(q) // there is an occasional "+" appearing when not re-encoded. Not sure why..
         this.$router.replace({path: path})
       }
     },
     // update the database. This uses PATCH so only the data that is passed will be updated
     updateRecord: function () {
       let data = {} // the object to be sent to the database
-      let selector = this.getUniqueSelector()
+      let selector = this.getUniqueSelector() // @TODO: Should we do a GET request to make sure that there is only a single record returned? PG can do this (returning a 406 if you use the header 'Accept': 'application/vnd.pgrst.object+json')
       if (selector !== null) {
         this.formattedFields
           .filter(x => Helpers.hasDataChanged(x)) // get only modified fields
           .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
-        // let url = `${this.resourceUrl}?${selector}`
-        // return axios.patch(url, data, {
-        //   'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
-        // })
-      } else console.error('Can\'t find a Primary Key for this record', 'ERROR')
+        let url = `${this.proxyUrlBase}?${selector}`
+        return axios.patch(url, data, {
+          'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
+        })
+      } else this.$toast.error('Can\'t find a Primary Key for this record', { duration: 4000 })
     },
   }
 }
 </script>
 
-<style>
-.container {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
+<style lang="scss">
+.HummingbirdRecord {
+  .container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
 
-.links {
-  padding-top: 15px;
+  .links {
+    padding-top: 15px;
+  }
 }
 </style>
