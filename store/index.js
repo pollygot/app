@@ -19,5 +19,5 @@ export const getters = {
   tenants: state => state.tenants,
 
   // all apps for this user (in all tenants)
-  userApps: state => state.tenants.reduce((acc, tenant) => (acc.concat(tenant.apps)), [])
+  userApps: state => state.tenants.reduce((acc, tenant) => (acc.concat(tenant.apps)), []) 
 }

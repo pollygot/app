@@ -18,7 +18,12 @@ npm run dev # serve with hot reload at localhost:3000
 Development Philosophy:
 
 - Fat pages and thin components. Try to keep the components as light as possible so they can be reused everywhere. This will end up with some very heavy pages that are doing lots of things, and also may result in a lot of code duplication at the start. However this is a comfortable trade-off for the confidence that it will bring to make changes to components without having to re-engineer other areas of the site. Also testing is very minimal at this stage, so changes to shared code is probably going to cause changes
-- Refactor. Don't worry about creating the perfect code base from the start. Move fast, then refactor when we have a better idea of what the codebase is going to look like.
+- Refactor. Don't prematurely try to create the perfect code base from the start. You think some code will be reused so you put it into a common file or in the store - but what if it's never reused? Then your code is complicated than it needed to be. Refactoring decisions
+  - is this slow?
+  - is this confusing?
+  - is this untestable?
+  - is this immutable?
+  - am I *currently* using this code in multiple places?
 - Boy scout. See a small improvement to clean up the code, or add comments? Make the change, then commit with `boy scout`. No other commit message is required. Small changes are welcomed.
 
 ## Deployment
