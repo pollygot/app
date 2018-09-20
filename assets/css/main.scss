@@ -264,16 +264,6 @@ html, body {
   opacity: 0;
 }
 
-.fade-in-enter-active {
-  transition: opacity .2s ease-in .2s; // trying to add a delay so there isn't any flicker
-}
-.fade-in-leave-active {
-  transition: opacity 0s;
-}
-.fade-in-enter, .fade-in-leave-to {
-  opacity: 0;
-}
-
 
 .shake-enter-active, .shake-leave-active {
   animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
