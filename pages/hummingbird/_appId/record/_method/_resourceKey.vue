@@ -115,13 +115,26 @@
           <div class="field-body">
             <div class="field">
               <p class="control is-expanded">
-                <textarea class="textarea is-small is-fullwidth" :placeholder="field.value" v-model="field.value" rows="15"></textarea>
+                <textarea class="textarea is-small is-fullwidth" :placeholder="field.value" v-model="field.value" rows="10"></textarea>
               </p>
             </div>
           </div>
         </div>
 
-        <div class="field is-horizontal" v-else :key="field.key">
+        <div class="field is-horizontal" v-else-if="field.type === 'string' && field.format === 'text'" :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label is-capitalized">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded">
+                <textarea class="textarea" :placeholder="field.value" v-model="field.value" rows="2"></textarea>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal" v-else-if="field.type === 'string' && field.format === 'character varying'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label is-capitalized">{{field.label}}</label>
           </div>
@@ -174,7 +187,6 @@ export default {
     const proxyUrlBase = `/api/postgrest/${appId}/${resourceKey}`
     let record = {}
     if (isCreated) {
-      console.log('page refreshed', `${proxyUrlBase}?q=${query.q}`)
       let { data:response } = await app.$axios.get(`${proxyUrlBase}?q=${query.q}`, {
         'headers': { 'accept': 'application/vnd.pgrst.object+json' }
       })
@@ -186,6 +198,8 @@ export default {
       .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
       .map(x => Helpers.enrichSwaggerField(x)) // add useful data to each field. eg, add Date() to timestamp strings
 
+    console.log('page availableFields', availableFields)
+    console.log('page refreshed', formattedFields)
     return {
       appId: appId,
       availableFields: availableFields,
