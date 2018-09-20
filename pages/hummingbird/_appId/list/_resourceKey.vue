@@ -145,7 +145,6 @@ export default {
     }),
     currentViewType () {
       let { v } = this.$route.query
-      console.log('variable', v || VIEW_TYPES.GRID)
       return v || VIEW_TYPES.GRID // grid is the default
     },
     filteredColumns () {
