@@ -54,7 +54,7 @@
         :records="records"
       />
     </div>
-    <div class="table-box box p-none" v-if="!records.length">
+    <div class="p-none m-md m-b-xl" v-if="!records.length">
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
 
