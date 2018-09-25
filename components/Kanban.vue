@@ -73,7 +73,7 @@ export default {
     width: 240px;
     border-radius: 4px;
     .cards {
-      height: calc(100vh - 230px);
+      height: calc(100vh - 180px);
       overflow-y: auto;
       .card {
         border-radius: 4px;

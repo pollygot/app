@@ -127,11 +127,13 @@ html, body {
   border-radius: 4px;
 }
 .drag-container {
-  &:hover {
-    cursor: move;
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
+  .handle {
+    &:hover {
+      cursor: move;
+      cursor: grab;
+      cursor: -moz-grab;
+      cursor: -webkit-grab;
+    }
   }
 }
 .sidebar {

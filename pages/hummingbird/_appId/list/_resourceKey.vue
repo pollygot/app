@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <div class="table-box box p-none m-md m-b-xl" v-show="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
+    <div class="table-box box p-none m-md m-b-xxl" v-show="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
       <Table
         class=""
         :columns="tableColumns(this.resourceKey)"
@@ -46,6 +46,16 @@
         @onHeaderClicked="tableHeaderClicked"
         @onRecordClicked="gridRecordClicked"
       />
+      <div class="pagination-section">
+        <Pagination
+          v-show="totalRecords > paginationSize"
+          :currentRangeStart="postgrestParams.offset || 0"
+          :currentRangeEnd="currentRangeEnd"
+          :paginationSize="postgrestParams.limit || currentRangeEnd"
+          :totalRecords="totalRecords"
+          @onNewRangeStart="paginate"
+        />
+      </div>
     </div>
     <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
       <Kanban 
@@ -58,16 +68,6 @@
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
 
-    <div class="pagination-section">
-      <Pagination
-        v-show="totalRecords > paginationSize"
-        :currentRangeStart="postgrestParams.offset || 0"
-        :currentRangeEnd="currentRangeEnd"
-        :paginationSize="postgrestParams.limit || currentRangeEnd"
-        :totalRecords="totalRecords"
-        @onNewRangeStart="paginate"
-      />
-    </div>
 
   </div>
 
@@ -266,19 +266,22 @@ export default {
 
 <style lang="scss">
 .HummingbirdList {
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: auto;
   .top-level {
     background: #fff;
     border-bottom: 1px solid rgba(0,0,0,0.1);
   }
   .pagination-section {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      background: #fff;
-      width: 100vw;
-      height: 50px;
-      padding: 12px 12px 12px 280px;
-      border-top: 1px solid rgba(0,0,0,0.1);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: #fff;
+    width: 100vw;
+    height: 50px;
+    padding: 12px 20px 12px 280px;
+    border-top: 1px solid rgba(0,0,0,0.1);
   }
   .table-box {
     overflow: auto;

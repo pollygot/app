@@ -31,7 +31,7 @@
 
         <draggable v-model="newSorting">
           <div class="drag-container m-b-md" v-for="(column) in newSorting" :key="'sort'+column.key">
-            <div class="draggable-item box has-corners p-sm " >
+            <div class="draggable-item handle box has-corners p-sm " >
               <button class="delete is-small" @click="remove(column)"></button>
               <span class="is-capitalized">{{column.key.replace(/_/g, ' ')}}</span>
               <span class="buttons has-addons">

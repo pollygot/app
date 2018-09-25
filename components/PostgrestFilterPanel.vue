@@ -30,12 +30,13 @@
           <span class="button is-dark is-outlined is-rounded is-small" @click="applyFilters()">Apply</span>
         </div>
 
-        <draggable v-model="newFilters">
+        <draggable v-model="newFilters" :options="{handle:'.handle'}">
           <div class="m-b-sm p-sm drag-container" v-for="(filter, index) in newFilters" :key="'sort'+filter.key+index">
-            <button class="delete is-small" @mousedown="remove(index)"></button>
+            <button class="handle button is-small is-white"><span class="icon is-small"><i class="fas fa-arrows-alt"></i></span></button>
+            <button class="remove button is-small is-white"><span class="icon is-small" @click="remove(index)"><i class="fas fa-times"></i></span></button>
             <div class="and-or-criteria buttons has-addons is-centered m-b-sm" :class="{'hidden': !index}">
-              <button class="button is-small is-rounded" @mousedown="changeAndOr(filter, 'and')" :class="{'is-dark': filter.andOr === 'and'}" onClick="">AND</button>
-              <button class="button is-small is-rounded" @mousedown="changeAndOr(filter, 'or')" :class="{'is-primary': filter.andOr === 'or'}">OR</button>
+              <button class="button is-small is-rounded" @click="changeAndOr(filter, 'and')" :class="{'is-dark': filter.andOr === 'and'}" onClick="">AND</button>
+              <button class="button is-small is-rounded" @click="changeAndOr(filter, 'or')" :class="{'is-primary': filter.andOr === 'or'}">OR</button>
             </div>
             <div class="draggable-item box has-corners " >
 
@@ -154,9 +155,14 @@ export default {
     position: relative;
     border-radius: 5px;
     border: 1px solid #fff;
-    .delete {
+    .handle {
       position: absolute;
-      top: 0.7rem;
+      top: 0.4rem;
+      right: 2.5rem;
+    }
+    .remove {
+      position: absolute;
+      top: 0.4rem;
       right: 0.5rem;
     }
     &:hover {

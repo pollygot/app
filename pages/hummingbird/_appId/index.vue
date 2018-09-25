@@ -2,10 +2,7 @@
   <div>
     <section class="section">
 
-      <div class="box has-text-centered">
-        <h5 class="title is-6">Hummingbird</h5>
-        <p>App</p>
-      </div>
+      <h5 class="title is-6 has-text-centered">Hummingbird</h5>
 
     </section>
   </div>
