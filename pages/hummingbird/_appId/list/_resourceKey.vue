@@ -18,7 +18,7 @@
           <div class="m-r-none level-item">
             <router-link tag="a"
               class="super-button button is-medium is-primary is-rounded"
-              :to="'/new/' + resourceKey">
+              :to="`/hummingbird/${appId}/record/new/${resourceKey}`">
               <span>New</span>
               <span class="icon">
                 <i class="fas fa-fw fa-arrow-right"></i>
@@ -128,6 +128,7 @@ export default {
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
       DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
       VIEW_TYPES: VIEW_TYPES,
+      appId: appId,
       currentRangeEnd: rangeData.rangeEnd || 0,
       filterPanelVisible: false,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
