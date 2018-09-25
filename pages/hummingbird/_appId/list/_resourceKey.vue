@@ -46,9 +46,15 @@
         @onHeaderClicked="tableHeaderClicked"
         @onRecordClicked="gridRecordClicked"
       />
-      <div class="pagination-section">
+      <div class="pagination-section" v-show="totalRecords > paginationSize">
+        <div class="select page-size">
+          <select @change="(e) => updateLimit(e.target.value)">
+            <option :selected="paginationSize === 20">20</option>
+            <option :selected="paginationSize === 50">50</option>
+            <option :selected="paginationSize === 100">100</option>
+          </select>
+        </div>
         <Pagination
-          v-show="totalRecords > paginationSize"
           :currentRangeStart="postgrestParams.offset || 0"
           :currentRangeEnd="currentRangeEnd"
           :paginationSize="postgrestParams.limit || currentRangeEnd"
@@ -259,6 +265,9 @@ export default {
     },
     toggleSorting () {
       this.sortPanelVisible = !this.sortPanelVisible
+    },
+    updateLimit (newSize) {
+      this.pushParams({ ...this.postgrestParams, limit: newSize })
     }
   }
 }
@@ -279,9 +288,15 @@ export default {
     left: 0;
     background: #fff;
     width: 100vw;
-    height: 50px;
+    height: 52px;
     padding: 12px 20px 12px 280px;
     border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: row;
+    .page-size {
+      display: inline;
+      margin: -2px 20px 0 0;
+    }
   }
   .table-box {
     overflow: auto;
