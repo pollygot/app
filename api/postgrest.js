@@ -9,8 +9,14 @@ app.use(express.json())
 const PATCH_HEADERS = {
   'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
 }
+const POST_HEADERS = {
+  'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
+}
 
-// Proxy all GET requests
+/**
+ * Get records
+ * https://postgrest.org/en/v5.0/api.html#horizontal-filtering-rows
+ */
 app.get('/:appId/:resourceKey?', async (req, res, next) => {
   let { appId, resourceKey } = req.params
   let app = await Pollygot.getAppConfig(appId)
@@ -24,9 +30,9 @@ app.get('/:appId/:resourceKey?', async (req, res, next) => {
   .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
 
-
 /**
- * updateRecord - update the database. This uses PATCH so only the data that is passed will be updated
+ * Update the database. This uses PATCH so only the data that is passed will be updated
+ * https://postgrest.org/en/v5.0/api.html#insertions-updates
  */
 app.patch('/:appId/:resourceKey', async (req, res, next) => {
   if (!req.query) return res.status(422).json({ data: 'Must provide a selector' })
@@ -43,13 +49,31 @@ app.patch('/:appId/:resourceKey', async (req, res, next) => {
   .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
 
+/**
+ * Create or update.
+ * https://postgrest.org/en/v5.0/api.html#insertions-updates
+ */
+app.post('/:appId/:resourceKey', async (req, res, next) => {
+  if (!req.body) return res.status(422).json({ data: 'Must provide a payload' })
+
+  const { appId } = req.params
+  const payload = req.body
+  let app = await Pollygot.getAppConfig(appId)
+  let postPath = req.url.replace(`/${appId}`, '') // use this Proxy URL, but strip out the appId
+  let fullUrl = `${app.config.url}/${postPath}`
+
+  axios.post(fullUrl, payload, POST_HEADERS)
+  .then(response => { return res.json({ data: response.data, headers: response.headers }) })
+  .catch(e => { return res.status(e.response.status).json(e.response.data) })
+})
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err) // eslint-disable-line no-console
   res.status(401).send(err + '')
 })
 
-
+// Cleanses axios/express headers for PostgREST.
 const _attachHeaders = (reqeustHeaders) => {
   let headers = {}
   if (reqeustHeaders['range-unit']) headers['range-unit'] = reqeustHeaders['range-unit']

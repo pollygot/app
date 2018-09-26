@@ -215,57 +215,53 @@ export default {
   },
   methods: {
     back () {
-      let { resourceKey } = this.fromRoute.params
+      let resourceKey = (this.fromRoute && this.fromRoute.params) ? this.fromRoute.params.resourceKey : null
       if (resourceKey && resourceKey === this.resourceKey) this.$router.go(-1)
       else this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
     },
-    createRecord: function () {
+    createRecord () {
       let self = this
       let data = {} // the object to be sent to the database
       this.formattedFields
         .filter(x => x.value) // get fields that have been filled out
         .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
-      // return Helpers
-      //   .createOrUpdateRecord(this.apiUrl, data)
-      //   .catch(e => { console.error(e) })
+      let url = `${this.proxyUrlBase}`
+      return this.$axios.post(this.proxyUrlBase, data).catch(e => {
+        let { data } = e.response.data
+        this.$toast.error(details, { duration: 4000 })
+        return { data: null }
+      })
     },
-    getUniqueSelector: function () { // use this function rather than the props so that new records are covered
-      let pkFilters = this.primaryKeys.map(x => (`${x}=eq.${this.record[x]}`))
+    getUniqueSelector (record) { // use this function rather than the props so that new records are covered
+      console.log('this.primaryKeys', this.primaryKeys)
+      console.log('record', record)
+      let pkFilters = this.primaryKeys.map(x => (`${x}=eq.${record[x]}`))
       if (!pkFilters.length) console.error('No PRIMARY KEY')
       return pkFilters.join('&')
     },
     save: async function () {
-      let response = null
-      if (this.isCreated) { // update
-        let { data } = await this.updateRecord().catch(e => {
-          let { details } = e.response.data
-          this.$toast.error(details, { duration: 4000 })
-        })
-        if (data) response = data
-      } else if (!this.isCreated) { // create
-        let { data } = await this.createRecord()
-        if (data) response = data
-      }
-
-      if (response) {
-        console.log('response', response)
+      let { data:proxyResponse } = (this.isCreated) ? await this.updateRecord() : await this.createRecord()
+      if (proxyResponse && proxyResponse.data) {
+        let response = proxyResponse.data
         this.$toast.success('Saved!', { duration: 1000 })
-        let q = Helpers.encrypt(this.getUniqueSelector())
+        let q = Helpers.encrypt(this.getUniqueSelector(response))
         let path = `/hummingbird/${this.appId}/record/edit/${this.resourceKey}?q=` + encodeURIComponent(q) // there is an occasional "+" appearing when not re-encoded. Not sure why..
         this.$router.replace({path: path})
       }
     },
     // update the database. This uses PATCH so only the data that is passed will be updated
-    updateRecord: function () {
+    updateRecord () {
       let data = {} // the object to be sent to the database
-      let selector = this.getUniqueSelector() // @TODO: Should we do a GET request to make sure that there is only a single record returned? PG can do this (returning a 406 if you use the header 'Accept': 'application/vnd.pgrst.object+json')
+      let selector = this.getUniqueSelector(this.record) // @TODO: Should we do a GET request to make sure that there is only a single record returned? PG can do this (returning a 406 if you use the header 'Accept': 'application/vnd.pgrst.object+json')
       if (selector !== null) {
         this.formattedFields
           .filter(x => Helpers.hasDataChanged(x)) // get only modified fields
           .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
         let url = `${this.proxyUrlBase}?${selector}`
-        return axios.patch(url, data, {
-          'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }
+        return this.$axios.patch(url, data).catch(e => {
+          let { data } = e.response.data
+          this.$toast.error(details, { duration: 4000 })
+          return { data: null }
         })
       } else this.$toast.error('Can\'t find a Primary Key for this record', { duration: 4000 })
     },
