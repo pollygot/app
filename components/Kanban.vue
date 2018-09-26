@@ -11,11 +11,11 @@
             <a class="card box draggable-item" v-for="(card, i) in states['' + stateName]" :key="'card'+stateName+i" >
               <div v-for="(column, j) in columnKeys" :key="'col-td'+j" class="field" v-if="card[`${column}`] !== null && card[`${column}`] !== ''">
                 <span class="heading has-text-grey-light">{{ column.replace(/_/g, ' ') }}</span>
-                <span>{{ card[`${column}`].toString() || '&nbsp;' }}</span>
+                <div class="value">{{ card[`${column}`].toString() || '&nbsp;' }}</div>
               </div>
             </a>
           </draggable>
-          <a class="button m-t-xs footer-button is-dark">Load more</a>
+          <a class="button m-t-xs footer-button">Load more</a>
       </div>
     </div>
       
@@ -80,7 +80,7 @@ export default {
     border: 1px solid rgba($color: #000, $alpha: 0.1);
     display: flex;
     flex-direction: column;
-    background: rgba($color: #000, $alpha: 0.07);
+    background: #fff;
     .cards {
       flex: 1 1 auto;
       height: calc(100vh - 220px);
@@ -91,11 +91,20 @@ export default {
       .card {
         border-radius: 4px;
         margin-bottom: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 2px 1px rgba($color: #000, $alpha: 0.09);
+        &:hover {
+          box-shadow: 0 0 2px 2px rgba($color: #000, $alpha: 0.15);
+        }
+        .value {
+          white-space: nowrap; 
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
     .footer-button {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
+      border: 0px;
     }
   }
 }

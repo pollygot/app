@@ -5,6 +5,7 @@
     <div class="top-level m-b-md">
       <nav class="level is-mobile p-lg m-none">
         <div class="level-left">
+          <!--START Generic fields -->
           <a class="level-item button is-small" @click="toggleFilters" :class="{'is-dark': filterPanelVisible}">
             <span class="icon is-small"><i class="fas fa-filter"></i></span>
             <span>{{filteredColumns.length || 'Filter'}}</span>
@@ -13,6 +14,18 @@
             <span class="icon is-small"><i class="fas fa-sort"></i></span>
             <span>{{sortedColumns.length || 'Sort'}}</span>
           </a>
+          <!--END Generic fields -->
+
+          <!--START Kanban fields -->
+          <div class="level-item control has-icons-left" v-show="currentViewType === VIEW_TYPES.KANBAN && enumColumns.length">
+            <div class="select is-small">
+              <select v-model="kanbanPivotKey">
+                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized">{{column.key.replace(/_/g, ' ')}}</option>
+              </select>
+            </div>
+            <div class="icon is-small is-left"><i class="fas fa-columns"></i></div>
+          </div>
+          <!--END Kanban fields -->
         </div>
         <div class="level-right">
           <div class="m-r-none level-item">
@@ -66,10 +79,28 @@
     </div>
     <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
       <Kanban 
-        pivotKey="status"
+        v-if="kanbanPivotKey"
+        :pivotKey="kanbanPivotKey"
         :columns="tableColumns(this.resourceKey)"
         :records="records"
       />
+      <div v-show="!kanbanPivotKey && enumColumns.length">
+        <h3 class="title is-5 has-text-centered m-xl">Select a field you'd like to pivot on.</h3>
+        <div class="field has-addons has-addons-centered">
+          <div class="control has-icons-left">
+            <div class="select">
+              <select v-model="kanbanPivotKey" class="definitely-has-corners">
+                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized">{{column.key.replace(/_/g, ' ')}}</option>
+              </select>
+            </div>
+            <div class="icon is-left"><i class="fas fa-columns"></i></div>
+          </div>
+        </div>
+      </div>
+      <div v-show="!enumColumns.length">
+        <h3 class="title is-5 has-text-centered m-t-xl">There aren't any columns in this table to pivot.</h3>
+        <p class="has-text-centered">You can only pivot on columns with pre-defined database types.. for now :)</p>
+      </div>
     </div>
     <div class="p-none m-md m-b-xl" v-if="!records.length">
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
@@ -132,6 +163,7 @@ export default {
       appId: appId,
       currentRangeEnd: rangeData.rangeEnd || 0,
       filterPanelVisible: false,
+      kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       pivotColumn: {},
       postgrestQueryString: postgrestQueryString,
@@ -154,6 +186,9 @@ export default {
     currentViewType () {
       let { v } = this.$route.query
       return v || VIEW_TYPES.GRID // grid is the default
+    },
+    enumColumns () {
+      return this.tableColumns(this.resourceKey).filter(x => ('enum' in x)) || []
     },
     filteredColumns () {
       if (!this.isFiltered) return []
@@ -226,7 +261,7 @@ export default {
     filterColumns (columns) {
       this.filterPanelVisible = false
       if (!columns.length) {
-        this.pushParams({ ...this.postgrestParams, filters: null })
+        this.pushParams({ ...this.postgrestParams, or: null })
       } else {
         let ors = []
         let ands = []
@@ -316,6 +351,9 @@ export default {
     a.sort-desc:after {
     content: ' ▴';
     }
+  }
+  .definitely-has-corners {
+    border-radius: 5px !important;
   }
 }
 </style>
