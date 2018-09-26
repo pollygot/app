@@ -19,8 +19,11 @@
           <!--START Kanban fields -->
           <div class="level-item control has-icons-left" v-show="currentViewType === VIEW_TYPES.KANBAN && enumColumns.length">
             <div class="select is-small">
-              <select v-model="kanbanPivotKey">
-                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized">{{column.key.replace(/_/g, ' ')}}</option>
+              <select @change="changeKanbanPivot">
+                <option :selected="!viewParams.pivot_key"></option>
+                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
+                  {{column.key.replace(/_/g, ' ')}}
+                </option>
               </select>
             </div>
             <div class="icon is-small is-left"><i class="fas fa-columns"></i></div>
@@ -79,18 +82,21 @@
     </div>
     <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
       <Kanban 
-        v-if="kanbanPivotKey"
-        :pivotKey="kanbanPivotKey"
+        v-if="viewParams.pivot_key"
+        :pivotKey="viewParams.pivot_key"
         :columns="tableColumns(this.resourceKey)"
         :records="records"
       />
-      <div v-show="!kanbanPivotKey && enumColumns.length">
+      <div v-show="!viewParams.pivot_key && enumColumns.length">
         <h3 class="title is-5 has-text-centered m-xl">Select a field you'd like to pivot on.</h3>
         <div class="field has-addons has-addons-centered">
           <div class="control has-icons-left">
             <div class="select">
-              <select v-model="kanbanPivotKey" class="definitely-has-corners">
-                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized">{{column.key.replace(/_/g, ' ')}}</option>
+              <select class="definitely-has-corners" @change="changeKanbanPivot">
+                <option :selected="!viewParams.pivot_key"></option>
+                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
+                  {{column.key.replace(/_/g, ' ')}}
+                </option>
               </select>
             </div>
             <div class="icon is-left"><i class="fas fa-columns"></i></div>
@@ -132,7 +138,10 @@
 <script>
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
-const DEFAULT_POSTGREST_QUERY = `select=*&limit=${DEFAULT_PAGINATION_SIZE}`
+const DEFAULT_POSTGREST_QUERY = {
+  select: '*',
+  limit:DEFAULT_PAGINATION_SIZE
+}
 const VIEW_TYPES = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
 import axios from 'axios'
 import * as Helpers from '~/lib/helpers'
@@ -149,8 +158,13 @@ export default {
   watchQuery: ['q', 'v'],
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
-    let { q } = query
-    let postgrestQueryString = (q) ? Helpers.decrypt(q) : DEFAULT_POSTGREST_QUERY
+    let { q, v } = query
+    let newParams = q ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
+
+    // Convert the newParms into a query string for PostgREST
+    let postgrestQueryString = ''
+    Object.keys(newParams).forEach(key => { postgrestQueryString += `${key}=${newParams[key]}&` })
+    postgrestQueryString = postgrestQueryString.substring(0, postgrestQueryString.length - 1) // remove the trailing &
     let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
       'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
     })
@@ -165,12 +179,12 @@ export default {
       filterPanelVisible: false,
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
-      pivotColumn: {},
-      postgrestQueryString: postgrestQueryString,
+      postgrestParams: newParams,
       sortPanelVisible: false,
       records: response.data,
       resourceKey: params.resourceKey,
       totalRecords: rangeData.totalRecords,
+      viewParams: (v) ? JSON.parse(Helpers.decrypt(v)) : '',
 
       // give some components a key so they refresh on route change / data refresh
       filterComponentMounted: 'filters' + Date.now(), 
@@ -184,8 +198,8 @@ export default {
       tableColumns: 'hummingbird/columnsForResource'
     }),
     currentViewType () {
-      let { v } = this.$route.query
-      return v || VIEW_TYPES.GRID // grid is the default
+      let { view } = this.viewParams
+      return view || VIEW_TYPES.GRID // grid is the default
     },
     enumColumns () {
       return this.tableColumns(this.resourceKey).filter(x => ('enum' in x)) || []
@@ -204,17 +218,6 @@ export default {
     paginationSize () {
       return this.postgrestParams.limit || DEFAULT_PAGINATION_SIZE
     },
-    // parse the params from the query string
-    postgrestParams () {
-      let result = {}
-      this.postgrestQueryString.split('&').forEach(part => {
-        let item = part.split('=')
-        result[item[0]] = decodeURIComponent(item[1])
-      })
-      if (result.limit) result.limit = parseInt(result.limit) // convert to number instead of string
-      if (result.offset) result.offset = parseInt(result.offset) // convert to number instead of string
-      return result
-    },
     sortedColumns () {
       if (!this.isSorted) return []
       let sorting = this.postgrestParams.order.split(',')
@@ -222,12 +225,12 @@ export default {
     },
   },
   methods: {
+    changeKanbanPivot (e) {
+      let { value } = e.target
+      this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: value })
+    },
     goToView (viewType) {
-      let query = Object.assign({}, this.$route.query)
-      if (viewType === VIEW_TYPES.GRID) delete query.v
-      else query.v = viewType
-      let route = { path: this.$route.path, query: query }
-      this.$router.push(route)
+      this.pushEncodedQuery('v', { view: viewType }) // start again when the view changes, no need to keep other view params
     },
     gridRecordClicked (record) {
       try {
@@ -245,23 +248,24 @@ export default {
       }
     },
     paginate (start) {
-      this.pushParams({ ...this.postgrestParams, offset: start })
+      this.pushEncodedQuery('q', { ...this.postgrestParams, offset: start })
     },
-    pushParams (newParams) {
-      let route = { path: this.$route.path, query: {} }
-      let q = ''
-      if (newParams.limit) q += `limit=${newParams.limit}&`
-      if (newParams.offset) q += `offset=${newParams.offset}&`
-      if (newParams.order) q += `order=${newParams.order}&`
-      if (newParams.or) q += `or=${newParams.or}&`
-      if (q !== '') route.query.q = Helpers.encrypt(q.substring(0, q.length - 1)) // remove the trailing &
-      console.log('q', q)
-      this.$router.push(route)
+    // // This will convert an stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
+    pushEncodedQuery (
+      queryKey, // what the query key will be in the new route. Use "q" to update the Postgrest query and "v" to update the view
+      newParams // a full object that can be converted into a string
+    ) {
+      let query = {...this.$route.query} || {}
+      if (Object.keys(newParams).length) query[`${queryKey}`] = Helpers.encrypt(JSON.stringify(newParams))
+      else delete query[`${queryKey}`]
+      this.$router.push({ path: this.$route.path, query: query })
     },
     filterColumns (columns) {
       this.filterPanelVisible = false
       if (!columns.length) {
-        this.pushParams({ ...this.postgrestParams, or: null })
+        let mutatedParams = { ...this.postgrestParams }
+        delete mutatedParams.or
+        this.pushEncodedQuery('q', mutatedParams)
       } else {
         let ors = []
         let ands = []
@@ -276,13 +280,13 @@ export default {
         ors.push(ands)
         let criteria = PostgrestHelpers.generateFilterString(ors)
         console.log('criteria', criteria)
-        this.pushParams({ ...this.postgrestParams, or: criteria })
+        this.pushEncodedQuery('q', { ...this.postgrestParams, or: criteria })
       }
     },
     sortColumns (columns) {
       this.sortPanelVisible = false
       let ordering = columns.map(x => ( `${x.key}.${x.sort}`)).join(',')
-      this.pushParams({ ...this.postgrestParams, order: ordering })
+      this.pushEncodedQuery('q', { ...this.postgrestParams, order: ordering })
     },
     tableHeaderClicked (key) {
       let alreadySorted = this.sortedColumns.find(x => (x.key === key)) || false
@@ -304,7 +308,7 @@ export default {
       this.sortPanelVisible = !this.sortPanelVisible
     },
     updateLimit (newSize) {
-      this.pushParams({ ...this.postgrestParams, limit: newSize })
+      this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
     }
   }
 }
