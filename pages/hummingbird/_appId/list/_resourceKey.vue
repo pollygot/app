@@ -20,7 +20,7 @@
           <div class="level-item control has-icons-left" v-show="currentViewType === VIEW_TYPES.KANBAN && enumColumns.length">
             <div class="select is-small">
               <select @change="changeKanbanPivot">
-                <option :selected="!viewParams.pivot_key"></option>
+                <option :selected="!viewParams.pivot_key">Select feld</option>
                 <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
                   {{column.key.replace(/_/g, ' ')}}
                 </option>
@@ -80,6 +80,9 @@
         />
       </div>
     </div>
+    <div class="" v-show="currentViewType === VIEW_TYPES.CALENDAR && records.length" :key="calendarComponentMounted">
+      <Calendar />
+    </div>
     <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
       <Kanban 
         v-if="viewParams.pivot_key"
@@ -93,7 +96,7 @@
           <div class="control has-icons-left">
             <div class="select">
               <select class="definitely-has-corners" @change="changeKanbanPivot">
-                <option :selected="!viewParams.pivot_key"></option>
+                <option :selected="!viewParams.pivot_key">Select feld</option>
                 <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
                   {{column.key.replace(/_/g, ' ')}}
                 </option>
@@ -150,11 +153,12 @@ import Pagination from '~/components/Pagination.vue'
 import PostgrestFilterPanel from '~/components/PostgrestFilterPanel.vue'
 import PostgrestSortPanel from '~/components/PostgrestSortPanel.vue'
 import Table from '~/components/Table.vue'
+import Calendar from '~/components/Calendar.vue'
 import Kanban from '~/components/Kanban.vue'
 import { mapGetters } from 'vuex'
 export default {
   layout: 'hummingbird',
-  components: { Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
+  components: { Calendar, Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
   watchQuery: ['q', 'v'],
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
@@ -187,6 +191,7 @@ export default {
       viewParams: (v) ? JSON.parse(Helpers.decrypt(v)) : '',
 
       // give some components a key so they refresh on route change / data refresh
+      calendarComponentMounted: 'calendar' + Date.now(), 
       filterComponentMounted: 'filters' + Date.now(), 
       kanbanComponentMounted: 'kanban' + Date.now(), 
       sortComponentMounted: 'sorts' + Date.now(), 
