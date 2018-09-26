@@ -20,18 +20,12 @@
               <span class="icon is-small "><i class="fas fa-cog" aria-hidden="true"></i></span>
             </button>
           </div>
-          <div class="dropdown-menu" role="menu">
+          <div class="dropdown-menu" role="menu" v-show="isCreated">
             <div class="dropdown-content">
-              <a class="dropdown-item" @click="newRecord()">
-                <p>
-                  <span>New</span>
-                  <span><code>CTRL+N</code></span>
-                </p>
-              </a>
               <a class="dropdown-item" @click="confirmDeleteModalVisible = true">
                 <p>
                   <span>Delete</span>
-                  <span><code>DEL</code></span>
+                  <span class="m-l-sm"><code>DEL</code></span>
                 </p>
               </a>
             </div>
@@ -197,9 +191,6 @@ export default {
       .map(x => Helpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
       .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
       .map(x => Helpers.enrichSwaggerField(x)) // add useful data to each field. eg, add Date() to timestamp strings
-
-    console.log('page availableFields', availableFields)
-    console.log('page refreshed', formattedFields)
     return {
       appId: appId,
       availableFields: availableFields,
@@ -226,18 +217,30 @@ export default {
         .filter(x => x.value) // get fields that have been filled out
         .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
       let url = `${this.proxyUrlBase}`
-      return this.$axios.post(this.proxyUrlBase, data).catch(e => {
-        let { data } = e.response.data
-        this.$toast.error(details, { duration: 4000 })
-        return { data: null }
-      })
+      return this.$axios.post(this.proxyUrlBase, data).catch(this.handleErrorResponse)
     },
-    getUniqueSelector (record) { // use this function rather than the props so that new records are covered
-      console.log('this.primaryKeys', this.primaryKeys)
-      console.log('record', record)
+    deleteRecord: async function () {
+      let selector = this.getUniqueSelector(this.record)
+      let url = `${this.proxyUrlBase}?q=` + encodeURIComponent(Helpers.encrypt(selector))
+      if (!selector) {
+        this.$toast.error('Couldn\'t find a primary key', { duration: 4000 })
+      } else if (!await this.verifyUrlReturnsUnique(url)) {
+        this.$toast.error('Couldn\'t get a unique selector', { duration: 4000 })
+        return null
+      } else {
+        let { data:deleteResponse } = await this.$axios.delete(url).catch(this.handleErrorResponse)
+        if (deleteResponse) this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
+      }
+    },
+    getUniqueSelector (record) {
       let pkFilters = this.primaryKeys.map(x => (`${x}=eq.${record[x]}`))
-      if (!pkFilters.length) console.error('No PRIMARY KEY')
-      return pkFilters.join('&')
+      if (!pkFilters.length) return null
+      else return pkFilters.join('&')
+    },
+    handleErrorResponse (e) {
+      let { details } = e.response.data
+      this.$toast.error(details, { duration: 4000 })
+      return { data: null }
     },
     save: async function () {
       let { data:proxyResponse } = (this.isCreated) ? await this.updateRecord() : await this.createRecord()
@@ -250,21 +253,27 @@ export default {
       }
     },
     // update the database. This uses PATCH so only the data that is passed will be updated
-    updateRecord () {
+    updateRecord: async function () {
       let data = {} // the object to be sent to the database
-      let selector = this.getUniqueSelector(this.record) // @TODO: Should we do a GET request to make sure that there is only a single record returned? PG can do this (returning a 406 if you use the header 'Accept': 'application/vnd.pgrst.object+json')
-      if (selector !== null) {
+      let selector = this.getUniqueSelector(this.record)
+      let url = `${this.proxyUrlBase}?${selector}`
+      if (!selector) {
+        this.$toast.error('Couldn\'t find a primary key', { duration: 4000 })
+        return null
+      } else if (!await this.verifyUrlReturnsUnique(url)) {
+        this.$toast.error('Couldn\'t get a unique selector', { duration: 4000 })
+        return null
+      } else {
         this.formattedFields
           .filter(x => Helpers.hasDataChanged(x)) // get only modified fields
           .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
-        let url = `${this.proxyUrlBase}?${selector}`
-        return this.$axios.patch(url, data).catch(e => {
-          let { data } = e.response.data
-          this.$toast.error(details, { duration: 4000 })
-          return { data: null }
-        })
-      } else this.$toast.error('Can\'t find a Primary Key for this record', { duration: 4000 })
+        return this.$axios.patch(url, data).catch(this.handleErrorResponse)
+      }
     },
+    verifyUrlReturnsUnique: async function (url) {
+      let { data:proxyResponse } = await this.$axios.get(url).catch(this.handleErrorResponse)
+      return (proxyResponse && proxyResponse.data && proxyResponse.data.length === 1) ? true : false
+    }
   }
 }
 </script>

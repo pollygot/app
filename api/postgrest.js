@@ -23,11 +23,11 @@ app.get('/:appId/:resourceKey?', async (req, res, next) => {
   let fullUrl = `${app.config.url}`
   if (resourceKey) fullUrl += `/${resourceKey}`
   if (req.query && req.query.q) fullUrl += `?${Helpers.decrypt(req.query.q.toString())}`
-  console.log('fullUrl', fullUrl)
+  console.log('PostgREST: fullUrl', fullUrl)
   let headers = _attachHeaders(req.headers)
   axios.get(fullUrl, { headers: headers })
-  .then(response => { return res.json({ data: response.data, headers: response.headers }) })
-  .catch(e => { return res.status(e.response.status).json(e.response.data) })
+    .then(response => { return res.json({ data: response.data, headers: response.headers }) })
+    .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
 
 /**
@@ -43,10 +43,10 @@ app.patch('/:appId/:resourceKey', async (req, res, next) => {
   let app = await Pollygot.getAppConfig(appId)
   let patchPath = req.url.replace(`/${appId}`, '') // use this Proxy URL, but strip out the appId
   let fullUrl = `${app.config.url}/${patchPath}`
-
+  console.log('PostgREST: fullUrl', fullUrl)
   axios.patch(fullUrl, payload, PATCH_HEADERS)
-  .then(response => { return res.json({ data: response.data, headers: response.headers }) })
-  .catch(e => { return res.status(e.response.status).json(e.response.data) })
+    .then(response => { return res.json({ data: response.data, headers: response.headers }) })
+    .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
 
 /**
@@ -61,11 +61,28 @@ app.post('/:appId/:resourceKey', async (req, res, next) => {
   let app = await Pollygot.getAppConfig(appId)
   let postPath = req.url.replace(`/${appId}`, '') // use this Proxy URL, but strip out the appId
   let fullUrl = `${app.config.url}/${postPath}`
-
+  console.log('PostgREST: fullUrl', fullUrl)
   axios.post(fullUrl, payload, POST_HEADERS)
-  .then(response => { return res.json({ data: response.data, headers: response.headers }) })
-  .catch(e => { return res.status(e.response.status).json(e.response.data) })
+    .then(response => { return res.json({ data: response.data, headers: response.headers }) })
+    .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
+
+/**
+ * Delete
+ * https://postgrest.org/en/v5.0/api.html#deletions
+ */
+app.delete('/:appId/:resourceKey', async (req, res, next) => {
+  if (!req.query) return res.status(422).json({ data: 'Must provide a selector' })
+
+  const { appId, resourceKey } = req.params
+  let app = await Pollygot.getAppConfig(appId)
+  let fullUrl = `${app.config.url}/${resourceKey}` + `?${Helpers.decrypt(req.query.q.toString())}`
+  console.log('PostgREST: fullUrl', fullUrl)
+  axios.delete(fullUrl)
+    .then(response => { return res.json({ data: response.data, headers: response.headers }) })
+    .catch(e => { return res.status(e.response.status).json(e.response.data) })
+})
+
 
 // Error handler
 app.use((err, req, res, next) => {
