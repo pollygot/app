@@ -1,10 +1,25 @@
 # Pollygot
 
-Pollygot provides a single interface for you team to perform all of the necessary tasks to run a business. Wherever possible it plugs into existing opensource solutions.
+Pollygot provides a single UI/dashboard for your team to perform various tasks. Wherever possible it plugs into existing opensource solutions.
 
-Pollygot allows developers to deploy solutions which are immediately available to non-tech team members.
+This is a monorepo that includes: 
 
-Product philosophy:
+- A fully customisable CRUD interface for any Postgres database (using [PostgREST](https://postgrest.org/en/v5.0/api.html))
+- An interface for managing [Kong](https://github.com/Kong/kong)
+- An interface for managing files stored in S3 or GCP Cloud Storage
+- An interface for managing [Kue](https://github.com/Automattic/kue) 
+- An interface for doing common long running tasks (BumbleBee)
+
+Soon/Maybe:
+- Mailtrain
+- Build ML models on top of Postgres 
+- Headless CMS / Contentful 
+- DKron interface
+- Possible support for Bull / RabbitMQ 
+
+Pollygot allows developers to deploy solutions which are immediately usable for non-tech team members (with little on no additional coding). 
+
+Product philosophy:̨
 
 - This frontend should connect only to services with RESTful/Graph APIs or Websockets. It should be as thin as possible. Most of the heavy lifting should be done by the apps that it connects to.
 - Support existing opensource solutions where possible (even better if they have an existing web API)

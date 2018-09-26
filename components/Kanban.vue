@@ -3,24 +3,22 @@
 
   <div class="columns is-mobile">
 
-    <div class="column is-narrow p-xs p-b-0 m-b-0" v-for="(state, i) in states" :key="i">
-      <div class="lane p-sm" :class="{ 'm-r-lg': ((i+1) === states.length)}">
-        <div class="title is-6 is-capitalized m-sm m-b-md has-text-centered">{{(i && state) ? state.toLowerCase() : 'Uncategorized'}}</div>
+    <div class="column is-narrow p-xs p-b-0 m-b-0" v-for="(stateName, i) in stateNames" :key="'col'+i">
+      <div class="lane" :class="{ 'm-r-lg': ((i+1) === stateNames.length)}" :key="'lane'+i">
+        <div class="title is-6 is-capitalized m-sm has-text-centered">{{stateName.toLowerCase()}}</div>
 
-        <draggable>
-          <div class="cards drag-container" >
-            <div class="card box draggable-item" v-for="(card, i) in cards(state)" :key="'card'+i">
+          <draggable class="cards drag-container" v-model="states['' + stateName]" :options="{group:{ name:'states'}}" @add="stateChanged">
+            <a class="card box draggable-item" v-for="(card, i) in states['' + stateName]" :key="'card'+stateName+i" >
               <div v-for="(column, j) in columnKeys" :key="'col-td'+j" class="field" v-if="card[`${column}`] !== null && card[`${column}`] !== ''">
                 <span class="heading has-text-grey-light">{{ column.replace(/_/g, ' ') }}</span>
                 <span>{{ card[`${column}`].toString() || '&nbsp;' }}</span>
               </div>
-            </div>
-          </div>
-        </draggable>
-
+            </a>
+          </draggable>
+          <a class="button m-t-xs footer-button is-dark">Load more</a>
       </div>
     </div>
-    
+      
   </div>
 
 </div>
@@ -36,24 +34,33 @@ export default {
     records: { required: true, type: Array }, // the data to be displayed
   },
   components: { draggable },
+  created () {
+    let pivotColumn = this.columns.find(x => (x.key === this.pivotKey))
+    if (!pivotColumn) this.states = []
+    else {
+      // this.stateNames = [''].concat(pivotColumn.enum) // we may need to add an "UNCATEGORIZED" colum - tbd
+      this.stateNames = [].concat(pivotColumn.enum)
+      let states = {}
+      this.stateNames.forEach(name => {
+        this.$set(this.states, name, this.records.filter(x => x[`${this.pivotKey}`] === name)) // use $set to preserve Vue reactivity
+      })
+    }
+    console.log('created', this.states)
+  },
   data () {
     return {
-      sidebarVisible: true,
+      states: {},
+      stateNames: []
     }
   },
   computed: {
     columnKeys () {
       return this.columns.map(x => x.key)
-    },
-    states () {
-      let pivotColumn = this.columns.find(x => (x.key === this.pivotKey))
-      if (!pivotColumn) return []
-      return [''].concat(pivotColumn.enum)
     }
   },
   methods: {
-    cards (state) {
-      return this.records.filter(x => x[`${this.pivotKey}`] === state)
+    stateChanged (v) {
+      console.log('v', v)
     }
   }
 }
@@ -65,21 +72,30 @@ export default {
 .Kanban {
   .columns {
     overflow-x: auto;
-    margin-left: -30px;
-    margin-right: -30px;
     padding: 0 30px 0px 30px;
   }
   .lane {
     width: 240px;
-    border-radius: 4px;
+    border-radius: 5px;
+    border: 1px solid rgba($color: #000, $alpha: 0.1);
+    display: flex;
+    flex-direction: column;
+    background: rgba($color: #000, $alpha: 0.07);
     .cards {
-      height: calc(100vh - 180px);
+      flex: 1 1 auto;
+      height: calc(100vh - 220px);
+      overflow-x: hidden;
       overflow-y: auto;
+      margin: 4px;
+      padding: 4px;
       .card {
         border-radius: 4px;
-        padding: 8px;
-        margin: 6px 1px;
+        margin-bottom: 8px;
       }
+    }
+    .footer-button {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
   }
 }

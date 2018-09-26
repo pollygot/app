@@ -55,6 +55,7 @@
           </select>
         </div>
         <Pagination
+          class="pages"
           :currentRangeStart="postgrestParams.offset || 0"
           :currentRangeEnd="currentRangeEnd"
           :paginationSize="postgrestParams.limit || currentRangeEnd"
@@ -297,6 +298,9 @@ export default {
     .page-size {
       display: inline;
       margin: -2px 20px 0 0;
+    }
+    .pages {
+      flex-grow: 2;
     }
   }
   .table-box {
