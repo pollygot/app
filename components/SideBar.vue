@@ -77,10 +77,6 @@ export default {
       sidebarVisible: true,
     }
   },
-  mounted () {
-    let sidebarElement = this.$refs['sidebar']
-    const ps = new PerfectScrollbar(sidebarElement)
-  },
   computed: {
     ...mapGetters({
       app: 'app',
@@ -104,7 +100,15 @@ export default {
     toggleSidebar () {
       this.sidebarVisible = !this.sidebarVisible
     }
-  }
+  },
+  mounted () {
+    let sidebarElement = this.$refs['sidebar']
+    this.sidebarScroll = new PerfectScrollbar(sidebarElement,{ wheelPropagation: true })
+  },
+  beforeDestroy () {
+    if (this.sidebarScroll) this.sidebarScroll.destroy()
+    this.sidebarScroll = null
+  },
 }
 </script>
 <style lang="scss">

@@ -62,10 +62,6 @@ export default {
     sortedColumns: { required: false, type: Array },
     tableSize: { required: false, type: String, default: 'SMALL' } // how large the text / cell size is
   },
-  mounted () {
-    let tableElement = this.$refs['table_element']
-    const ps = new PerfectScrollbar(tableElement)
-  },
   computed: {
     columnKeys () {
       return this.columns.map(x => x.key)
@@ -94,7 +90,15 @@ export default {
       let col = this.sortedColumns.find(x => (x.key === columnName)) || {}
       return col.sort || 'asc'
     }
-  }
+  },
+  mounted () {
+    let tableElement = this.$refs['table_element']
+    this.tableScroll = new PerfectScrollbar(tableElement, { wheelPropagation: true })
+  },
+  beforeDestroy () {
+    if (this.tableScroll) this.tableScroll.destroy()
+    this.tableScroll = null
+  },
 }
 </script>
 
@@ -106,7 +110,7 @@ export default {
     padding: 0;
     position: relative;
     overflow: hidden;
-    overflow-x: scroll;
+    overflow-x: auto;
     .table {
       &.is-small {
         font-size: 0.8em;

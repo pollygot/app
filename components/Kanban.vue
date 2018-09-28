@@ -34,13 +34,6 @@ export default {
     columns: { required: true, type: Array }, 
     records: { required: true, type: Array }, // the data to be displayed
   },
-  // mounted () {
-  //   this.stateNames.forEach(s => {
-  //     let el = this.$refs[`${s}_element`]
-  //     console.log('this.$refs', el)
-  //     if (!!el) new PerfectScrollbar(el)
-  //   })
-  // },
   components: { draggable },
   created () {
     let pivotColumn = this.columns.find(x => (x.key === this.pivotKey))
@@ -53,7 +46,6 @@ export default {
         this.$set(this.states, name, this.records.filter(x => x[`${this.pivotKey}`] === name)) // use $set to preserve Vue reactivity
       })
     }
-    console.log('created', this.states)
   },
   data () {
     return {
@@ -70,7 +62,19 @@ export default {
     stateChanged (v) {
       console.log('v', v)
     }
-  }
+  },
+  mounted () {
+    this.scrollbars = []
+    this.stateNames.forEach(s => {
+      let vueEl = this.$refs[`${s}_element`]
+      let nativeEl = vueEl[0].$el
+      if (nativeEl) this.scrollbars.push(new PerfectScrollbar(nativeEl, { maxScrollbarLength: 200, wheelPropagation: true }))
+    })
+  },
+  beforeDestroy () {
+    this.scrollbars.forEach(x => { x.destroy() })
+    this.scrollbars = null
+  },
 }
 </script>
 <style lang="scss">
@@ -90,6 +94,7 @@ export default {
     flex-direction: column;
     background: #fff;
     .cards {
+      position: relative;
       flex: 1 1 auto;
       height: calc(100vh - 220px);
       overflow-x: hidden;

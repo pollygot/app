@@ -255,11 +255,12 @@ export default {
     paginate (start) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, offset: start })
     },
-    // // This will convert an stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
-    pushEncodedQuery (
-      queryKey, // what the query key will be in the new route. Use "q" to update the Postgrest query and "v" to update the view
-      newParams // a full object that can be converted into a string
-    ) {
+    /**
+     * This will convert an stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
+     * @param queryKey what the query key will be in the new route. Use "q" to update the Postgrest query and "v" to update the view
+     * @param newParams a full object that can be converted into a string
+     */
+    pushEncodedQuery (queryKey, newParams) {
       let query = {...this.$route.query} || {}
       if (Object.keys(newParams).length) query[`${queryKey}`] = Helpers.encrypt(JSON.stringify(newParams))
       else delete query[`${queryKey}`]
