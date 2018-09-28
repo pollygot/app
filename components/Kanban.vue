@@ -84,7 +84,7 @@ export default {
 .Kanban {
   .columns {
     overflow-x: auto;
-    padding: 0 30px 0px 30px;
+    padding: 5px 20px;
   }
   .lane {
     width: 240px;
