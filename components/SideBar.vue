@@ -1,5 +1,5 @@
 <template>
-<div class="Sidebar sidebar column is-narrow is-hidden-mobile" v-show="sidebarVisible">
+<div class="Sidebar sidebar column is-narrow is-hidden-mobile" v-show="sidebarVisible" ref="sidebar">
 
   <nav class="navbar has-text-centered" v-if="!currentTenant">
     <div class="navbar-brand">
@@ -69,12 +69,20 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import PerfectScrollbar from 'perfect-scrollbar'
 export default {
   data () {
     return {
       dropdownActive: false,
       sidebarVisible: true,
     }
+  },
+  mounted () {
+    let sidebarElement = this.$refs['sidebar']
+    console.log('this.$refs', this.$refs)
+    console.log('sidebarElement', sidebarElement)
+    const ps = new PerfectScrollbar(sidebarElement, { wheelSpeed:1})
+    ps.update()
   },
   computed: {
     ...mapGetters({
@@ -104,6 +112,8 @@ export default {
 </script>
 <style lang="scss">
 .Sidebar {
+  position: relative;
+  height: 100vh;
   .top-padding {
     padding-top: 80px;
   }
@@ -115,6 +125,7 @@ export default {
     .dropdown-trigger {
       width: 100%;
       border-bottom: 1px solid rgba(0,0,0,0.1);
+      background: #fff;
       a {
         display: block;
         padding: 10px 0 10px 20px;
