@@ -14,6 +14,30 @@
             <span class="icon is-small"><i class="fas fa-sort"></i></span>
             <span>{{sortedColumns.length || 'Sort'}}</span>
           </a>
+          
+      <div class="level-item field is-grouped">
+        <div class="control">
+          <div class="dropdown is-hoverable  ">
+            <div class="dropdown-trigger">
+              <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
+                <span class="icon is-small has-text-grey"><i class="fas fa-cog" aria-hidden="true"></i></span>
+                <span>View</span>
+              </button>
+            </div>
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-content">
+                <a class="dropdown-item"><span>Add to favourites</span></a>
+                <a class="dropdown-item"><span>Save as new view</span></a>
+                <a class="dropdown-item"><span>Overwite current view</span></a>
+                <hr class="dropdown-divider">
+                <p class="dropdown-item heading is-size-7">Advanced</p>
+                <a class="dropdown-item" @click="() => {this.queryEditorMode = true}"><span>Query editor</span></a>
+                <a class="dropdown-item" @click="() => {this.viewEditorMode = true}"><span>View editor</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
           <!--END Generic fields -->
 
           <!--START Kanban fields -->
@@ -52,6 +76,26 @@
       </div>
     </div>
 
+
+    <div class="box m-md" v-show="queryEditorMode">
+      <textarea class="textarea has-text-mono" v-model="userModifiedPostgrestParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>  
+      <p class="help is-danger" v-show="!isValidJsonObject(userModifiedPostgrestParams)">There is an error in your syntax.</p>
+      <div class="buttons is-right m-t-md">
+        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.queryEditorMode = false }">Hide</span>
+        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.userModifiedPostgrestParams = JSON.stringify(this.postgrestParams, null, 2) }">Revert changes</span>
+        <span class="button is-rounded is-dark is-small">Apply</span>
+      </div>
+    </div>
+    <div class="box m-md " v-show="viewEditorMode">
+      <textarea class="textarea has-text-mono" v-model="userModifiedViewParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>
+      <p class="help is-danger" v-show="!isValidJsonObject(userModifiedViewParams)">There is an error in your syntax.</p>
+      <div class="buttons is-right m-t-md">
+        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.viewEditorMode = false }">Hide</span>
+        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.userModifiedViewParams = JSON.stringify(this.viewParams, null, 2) }">Revert changes</span>
+        <span class="button is-rounded is-dark is-small">Apply</span>
+      </div>
+    </div>
+
     <div class="table-box box p-none m-md m-b-xxl" v-show="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
       <Table
         class=""
@@ -65,16 +109,16 @@
       <div class="pagination-section" v-show="totalRecords > paginationSize">
         <div class="select page-size">
           <select @change="(e) => updateLimit(e.target.value)">
-            <option :selected="paginationSize === 20">20</option>
-            <option :selected="paginationSize === 50">50</option>
-            <option :selected="paginationSize === 100">100</option>
+            <option :selected="postgrestParams.limit === '20'" value="20">20</option>
+            <option :selected="postgrestParams.limit === '50'" value="50">50</option>
+            <option :selected="postgrestParams.limit === '100'" value="100">100</option>
           </select>
         </div>
         <Pagination
           class="pages"
           :currentRangeStart="postgrestParams.offset || 0"
           :currentRangeEnd="currentRangeEnd"
-          :paginationSize="postgrestParams.limit || currentRangeEnd"
+          :paginationSize="parseInt(postgrestParams.limit) || currentRangeEnd"
           :totalRecords="totalRecords"
           @onNewRangeStart="paginate"
         />
@@ -115,7 +159,6 @@
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
 
-
   </div>
 
   <PostgrestFilterPanel
@@ -146,6 +189,10 @@ const DEFAULT_POSTGREST_QUERY = {
   limit:DEFAULT_PAGINATION_SIZE
 }
 const VIEW_TYPES = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
+const DEFAULT_VIEW_PARAMS = {
+  view: VIEW_TYPES.GRID
+}
+const NUM_SPACES = 2
 import axios from 'axios'
 import * as Helpers from '~/lib/helpers'
 import * as PostgrestHelpers from '~/lib/postgrestHelpers'
@@ -164,10 +211,16 @@ export default {
     let { appId, resourceKey } = params
     let { q, v } = query
     let newParams = q ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
+    let viewParams = v ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
 
     // Convert the newParms into a query string for PostgREST
     let postgrestQueryString = ''
-    Object.keys(newParams).forEach(key => { postgrestQueryString += `${key}=${newParams[key]}&` })
+    let mutatedParams = {...newParams}
+    if (mutatedParams.criteria) {
+      mutatedParams.or = mutatedParams.criteria
+      delete mutatedParams.criteria
+    }
+    Object.keys(mutatedParams).forEach(key => { postgrestQueryString += `${key}=${mutatedParams[key]}&` })
     postgrestQueryString = postgrestQueryString.substring(0, postgrestQueryString.length - 1) // remove the trailing &
     let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
       'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
@@ -177,6 +230,7 @@ export default {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
       DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
+      NUM_SPACES: NUM_SPACES,
       VIEW_TYPES: VIEW_TYPES,
       appId: appId,
       currentRangeEnd: rangeData.rangeEnd || 0,
@@ -184,11 +238,17 @@ export default {
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestParams: newParams,
-      sortPanelVisible: false,
+      queryEditorMode: false,
       records: response.data,
       resourceKey: params.resourceKey,
+      sortPanelVisible: false,
       totalRecords: rangeData.totalRecords,
-      viewParams: (v) ? JSON.parse(Helpers.decrypt(v)) : '',
+      userModifiedPostgrestParams: JSON.stringify({...newParams}, null, NUM_SPACES),
+      userModifiedPostgrestParamsError: false,
+      userModifiedViewParams: JSON.stringify({...viewParams}, null, NUM_SPACES),
+      userModifiedViewParamsError: false,
+      viewEditorMode: false,
+      viewParams: viewParams,
 
       // give some components a key so they refresh on route change / data refresh
       calendarComponentMounted: 'calendar' + Date.now(), 
@@ -202,20 +262,22 @@ export default {
     ...mapGetters({
       tableColumns: 'hummingbird/columnsForResource'
     }),
+    Helpers: { 
+      get() { return Helpers } // expose all Helpers to the page
+    },
     currentViewType () {
-      let { view } = this.viewParams
-      return view || VIEW_TYPES.GRID // grid is the default
+      return this.viewParams.view
     },
     enumColumns () {
       return this.tableColumns(this.resourceKey).filter(x => ('enum' in x)) || []
     },
     filteredColumns () {
       if (!this.isFiltered) return []
-      let param = this.postgrestParams.or
+      let param = this.postgrestParams.criteria
       return PostgrestHelpers.parseFilterString(param.substring(1, param.length -1))
     },
     isFiltered () {
-      return !!this.postgrestParams.or
+      return !!this.postgrestParams.criteria
     },
     isSorted () {
       return !!this.postgrestParams.order
@@ -233,6 +295,29 @@ export default {
     changeKanbanPivot (e) {
       let { value } = e.target
       this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: value })
+    },
+    filterColumns (columns) {
+      this.filterPanelVisible = false
+      if (!columns.length) {
+        let mutatedParams = { ...this.postgrestParams }
+        delete mutatedParams.criteria
+        this.pushEncodedQuery('q', mutatedParams)
+      } else {
+        let ors = []
+        let ands = []
+        columns.forEach(col => {
+          if (col.andOr === 'and') {
+            ands.push(col)
+          } else {
+            ors.push(ands)
+            ands = [col]
+          }
+        })
+        ors.push(ands)
+        let criteria = PostgrestHelpers.generateFilterString(ors)
+        console.log('criteria', criteria)
+        this.pushEncodedQuery('q', { ...this.postgrestParams, criteria: criteria })
+      }
     },
     goToView (viewType) {
       this.pushEncodedQuery('v', { view: viewType }) // start again when the view changes, no need to keep other view params
@@ -252,6 +337,13 @@ export default {
         console.log('error', error)
       }
     },
+    isValidJsonObject (stringifiedJson) {
+      try { 
+        JSON.parse(stringifiedJson)
+        return true
+      } 
+      catch (error) { return false }
+    },
     paginate (start) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, offset: start })
     },
@@ -265,29 +357,6 @@ export default {
       if (Object.keys(newParams).length) query[`${queryKey}`] = Helpers.encrypt(JSON.stringify(newParams))
       else delete query[`${queryKey}`]
       this.$router.push({ path: this.$route.path, query: query })
-    },
-    filterColumns (columns) {
-      this.filterPanelVisible = false
-      if (!columns.length) {
-        let mutatedParams = { ...this.postgrestParams }
-        delete mutatedParams.or
-        this.pushEncodedQuery('q', mutatedParams)
-      } else {
-        let ors = []
-        let ands = []
-        columns.forEach(col => {
-          if (col.andOr === 'and') {
-            ands.push(col)
-          } else {
-            ors.push(ands)
-            ands = [col]
-          }
-        })
-        ors.push(ands)
-        let criteria = PostgrestHelpers.generateFilterString(ors)
-        console.log('criteria', criteria)
-        this.pushEncodedQuery('q', { ...this.postgrestParams, or: criteria })
-      }
     },
     sortColumns (columns) {
       this.sortPanelVisible = false
@@ -315,7 +384,7 @@ export default {
     },
     updateLimit (newSize) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
-    }
+    },
   }
 }
 </script>
