@@ -79,10 +79,7 @@ export default {
   },
   mounted () {
     let sidebarElement = this.$refs['sidebar']
-    console.log('this.$refs', this.$refs)
-    console.log('sidebarElement', sidebarElement)
-    const ps = new PerfectScrollbar(sidebarElement, { wheelSpeed:1})
-    ps.update()
+    const ps = new PerfectScrollbar(sidebarElement)
   },
   computed: {
     ...mapGetters({
