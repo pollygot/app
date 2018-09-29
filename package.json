@@ -30,6 +30,7 @@
     "moment": "^2.22.2",
     "nuxt": "^1.0.0",
     "perfect-scrollbar": "^1.4.0",
+    "vue-click-outside": "^1.0.7",
     "vue-infinite-loading": "^2.3.3",
     "vuedraggable": "^2.16.0"
   },

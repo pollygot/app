@@ -182,17 +182,6 @@
 </template>
 
 <script>
-const DEFAULT_OFFSET = 0
-const DEFAULT_PAGINATION_SIZE = 20
-const DEFAULT_POSTGREST_QUERY = {
-  select: '*',
-  limit:DEFAULT_PAGINATION_SIZE
-}
-const VIEW_TYPES = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
-const DEFAULT_VIEW_PARAMS = {
-  view: VIEW_TYPES.GRID
-}
-const NUM_SPACES = 2
 import axios from 'axios'
 import * as Helpers from '~/lib/helpers'
 import * as PostgrestHelpers from '~/lib/postgrestHelpers'
@@ -203,10 +192,15 @@ import Table from '~/components/Table.vue'
 import Calendar from '~/components/Calendar.vue'
 import Kanban from '~/components/Kanban.vue'
 import { mapGetters } from 'vuex'
+
+const DEFAULT_OFFSET = 0 // Pagination
+const DEFAULT_PAGINATION_SIZE = 20 // Pagination
+const DEFAULT_POSTGREST_QUERY = { select: '*', limit: DEFAULT_PAGINATION_SIZE }
+const VIEW_TYPES = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
+const DEFAULT_VIEW_PARAMS = { view: VIEW_TYPES.GRID }
+const NUM_SPACES = 2 // for tabsToSpaces in text areas
+
 export default {
-  layout: 'hummingbird',
-  components: { Calendar, Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
-  watchQuery: ['q', 'v'],
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
     let { q, v } = query
@@ -222,6 +216,8 @@ export default {
     }
     Object.keys(mutatedParams).forEach(key => { postgrestQueryString += `${key}=${mutatedParams[key]}&` })
     postgrestQueryString = postgrestQueryString.substring(0, postgrestQueryString.length - 1) // remove the trailing &
+
+    // Get the data for the page
     let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
       'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
     })
@@ -250,7 +246,7 @@ export default {
       viewEditorMode: false,
       viewParams: viewParams,
 
-      // give some components a key so they refresh on route change / data refresh
+      // give some components keys to force refresh
       calendarComponentMounted: 'calendar' + Date.now(), 
       filterComponentMounted: 'filters' + Date.now(), 
       kanbanComponentMounted: 'kanban' + Date.now(), 
@@ -262,13 +258,13 @@ export default {
     ...mapGetters({
       tableColumns: 'hummingbird/columnsForResource'
     }),
-    Helpers: { 
-      get() { return Helpers } // expose all Helpers to the page
+    Helpers: { // expose all Helpers to the page
+      get() { return Helpers } 
     },
-    currentViewType () {
+    currentViewType () { // GRID, CALENDAR etc
       return this.viewParams.view
     },
-    enumColumns () {
+    enumColumns () { // Used for pivoting to a Kanban view. Only let the user pivot on predefined database Enums (for now)
       return this.tableColumns(this.resourceKey).filter(x => ('enum' in x)) || []
     },
     filteredColumns () {
@@ -276,7 +272,7 @@ export default {
       let param = this.postgrestParams.criteria
       return PostgrestHelpers.parseFilterString(param.substring(1, param.length -1))
     },
-    isFiltered () {
+    isFiltered () { 
       return !!this.postgrestParams.criteria
     },
     isSorted () {
@@ -385,7 +381,12 @@ export default {
     updateLimit (newSize) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
     },
-  }
+  },
+
+  // View handlers
+  layout: 'hummingbird',
+  watchQuery: ['q', 'v'],
+  components: { Calendar, Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
 }
 </script>
 

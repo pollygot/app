@@ -34,7 +34,6 @@ export default {
     columns: { required: true, type: Array }, 
     records: { required: true, type: Array }, // the data to be displayed
   },
-  components: { draggable },
   created () {
     let pivotColumn = this.columns.find(x => (x.key === this.pivotKey))
     if (!pivotColumn) this.states = []
@@ -63,6 +62,9 @@ export default {
       console.log('v', v)
     }
   },
+
+  // View handlers
+  components: { draggable },
   mounted () {
     this.scrollbars = []
     this.stateNames.forEach(s => {

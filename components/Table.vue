@@ -91,6 +91,8 @@ export default {
       return col.sort || 'asc'
     }
   },
+
+  // View handlers
   mounted () {
     let tableElement = this.$refs['table_element']
     this.tableScroll = new PerfectScrollbar(tableElement, { wheelPropagation: true })

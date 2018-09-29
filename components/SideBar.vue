@@ -12,7 +12,7 @@
   </nav>
   <div v-if="currentTenant">
 
-      <div class="tenant-dropdown dropdown" :class="{ 'is-active': dropdownActive}" @click="dropdownActive = !dropdownActive">
+      <div class="tenant-dropdown dropdown" :class="{ 'is-active': dropdownActive}" @click="dropdownActive = !dropdownActive"  v-click-outside="() => {this.dropdownActive = false}" >
           <div class="dropdown-trigger is-fullwidth">
             <a class="" >
               <div class="is-size-4 title m-b-sm">{{currentTenant.name}}
@@ -69,6 +69,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import ClickOutside from 'vue-click-outside'
 import PerfectScrollbar from 'perfect-scrollbar'
 export default {
   data () {
@@ -101,6 +102,9 @@ export default {
       this.sidebarVisible = !this.sidebarVisible
     }
   },
+
+  // View handlers
+  directives: { ClickOutside },
   mounted () {
     let sidebarElement = this.$refs['sidebar']
     this.sidebarScroll = new PerfectScrollbar(sidebarElement,{ wheelPropagation: true })
