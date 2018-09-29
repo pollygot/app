@@ -119,6 +119,7 @@ export default {
 .Sidebar {
   position: relative;
   height: 100vh;
+  background: #fff;
   .top-padding {
     padding-top: 80px;
   }
