@@ -35,10 +35,8 @@
             <td v-for="(column, i) in columnKeys" :key="'col-td'+i"  @click="$emit('onRecordClicked', record)" >
               <span>
                 {{
-                  record[`${column}`] ||
-                  (record[`${column}`] !== null)
-                    ? record[`${column}`].toString()
-                    : '&nbsp;'
+                  record[`${column}`]
+                  || (record[`${column}`]) ? record[`${column}`].toString() : '&nbsp;'
                 }}
               </span>
             </td>
