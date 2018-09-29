@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="animated zoomInRight level-right">
+    <div class="level-right">
       <div class="level-item">
         <div class="dropdown is-hoverable is-right" v-show="isCreated">
           <div class="dropdown-trigger">
@@ -179,6 +179,7 @@
 
 <script>
 import * as Helpers from '~/lib/helpers'
+import * as PostgrestHelpers from '~/lib/postgrestHelpers'
 import Datepicker from '~/components/Datepicker.vue'
 import ModalConfirm from '~/components/ModalConfirm.vue'
 export default {
@@ -195,10 +196,9 @@ export default {
     }
     let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
     let formattedFields = availableFields
-      .map(x => Helpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
+      // .map(x => PostgrestHelpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
       .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
-      .map(x => Helpers.enrichSwaggerField(x)) // add useful data to each field. eg, add Date() to timestamp strings
-    console.log('formattedFields', formattedFields)
+      .map(x => PostgrestHelpers.enrichValues(x)) // add useful data to each field. eg, add Date() to timestamp strings
     return {
       appId: appId,
       availableFields: availableFields,
@@ -273,7 +273,7 @@ export default {
         return null
       } else {
         this.formattedFields
-          .filter(x => Helpers.hasDataChanged(x)) // get only modified fields
+          .filter(x => PostgrestHelpers.hasDataChanged(x)) // get only modified fields
           .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
         return this.$axios.patch(url, data).catch(this.handleErrorResponse)
       }

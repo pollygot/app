@@ -213,11 +213,13 @@ export default {
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
     let { q, v } = query
-    console.log('v', v)
-    console.log('variable', Helpers.decrypt(v))
     let newParams = q ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
     let viewParams = v ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
     if (!viewParams.columns.length) viewParams.columns = store.getters['hummingbird/columnsForResource'](resourceKey)
+
+    let val = function (val) { return val.replace('.net/', '.net/100t/') }
+
+    // console.log('val.toString()', val.toString())
 
     // Convert the newParms into a query string for PostgREST
     let postgrestQueryString = ''
@@ -233,7 +235,7 @@ export default {
     let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
       'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
     })
-    let rangeData = Helpers.getRangeDataFromPostgrestHeaders(response.headers)
+    let rangeData = PostgrestHelpers.getRangeDataFromResponseHeaders(response.headers)
     return {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,

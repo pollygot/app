@@ -11,16 +11,15 @@
                 <label for="exampleCheckbox" class="p-r-none"></label>
               </div>
             </th>
-            <th v-for="(column, i) in columnKeys" :key="'col-h'+i">
+            <th v-for="(column, i) in columns" :key="'col-h'+i">
               <a
                 @click="$emit('onHeaderClicked', column)"
-                class="is-capitalized"
                 :class="{
-                  'sort-desc': (isSorted(column) && sortDirection(column) === 'desc'),
-                  'sort-asc': (isSorted(column) && sortDirection(column) === 'asc')
+                  'sort-desc': (isSorted(column.key) && sortDirection(column.key) === 'desc'),
+                  'sort-asc': (isSorted(column.key) && sortDirection(column.key) === 'asc')
                 }"
               >
-                {{column.replace(/_/g, ' ')}}
+                {{column.label}}
               </a>
             </th>
           </tr>

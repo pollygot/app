@@ -1,4 +1,4 @@
-import axios from 'axios'
+import * as PostgrestHelpers from '../lib/postgrestHelpers'
 
 const VIEW_SCOPES = {
   personal: 'personal',
@@ -24,15 +24,12 @@ export const mutations = {
 
 export const getters = {
   // Returns an array of columns for a give table in the database (resourceKey is the table name)
-  columnsForResource: state => (resourceKey, sort) => {
+  columnsForResource: state => (resourceKey) => {
     let tableDefinition = state.swagger.definitions[`${resourceKey}`]
     let columnArray = Object.entries(tableDefinition.properties).map(([k, v]) => (Object.assign({ ...v, key: k, resource: resourceKey}, v)))
-    if (sort) columnArray.sort((a, b) => {
-      if (a.key > b.key) return 1
-      else if (a.key < b.key) return -1
-      else return 0
-    })
     return columnArray
+      .map(x => PostgrestHelpers.enrich(x))
+      .map(x => PostgrestHelpers.cleanse(x))
   },
   // Finds all the primary keys for a resource.
   // @TODO: This is a bit of a hack - would be good if I can do a pull request on PostgREST to improve the swagger spec
