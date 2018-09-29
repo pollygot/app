@@ -32,12 +32,44 @@
                     <p class="dropdown-item heading is-size-7">Advanced</p>
                     <a class="dropdown-item" @click="() => {this.queryEditorMode = true}"><span>Query editor</span></a>
                     <a class="dropdown-item" @click="() => {this.viewEditorMode = true}"><span>View editor</span></a>
+                    <hr class="dropdown-divider">
+                    <p class="dropdown-item heading is-size-7">Download</p>
+                    <a class="dropdown-item">CSV</a>
+                    <a class="dropdown-item">JSON</a>
                   </div>
                 </div>
               </div>
             </div>
           </div>
           <!--END Generic fields -->
+
+          <!--START CARD fields -->
+          <div class="level-item field is-grouped" v-show="currentViewType === VIEW_TYPES.CARDS">
+            <div class="control">
+              <div class="dropdown is-hoverable  ">
+                <div class="dropdown-trigger">
+                  <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
+                    <span class="icon is-small has-text-grey"><i class="fas fa-th"></i></span>
+                    <span>Cards</span>
+                  </button>
+                </div>
+                <div class="dropdown-menu" role="menu">
+                  <div class="dropdown-content">
+                    <p class="dropdown-item heading is-size-7">Card size</p>
+                    <a class="dropdown-item"><span>Small</span></a>
+                    <a class="dropdown-item"><span>Medium</span></a>
+                    <a class="dropdown-item"><span>Large</span></a>
+                    <hr class="dropdown-divider" v-show="potentialImageColumns.length">
+                    <p class="dropdown-item heading is-size-7" v-show="potentialImageColumns.length">Set card image</p>
+                    <a class="dropdown-item" v-for="(col, i) in potentialImageColumns" :key="i" @click="changeCardImage(col.key)">
+                      <span>{{col.label}}</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--END CARD fields -->
 
           <!--START Kanban fields -->
           <div class="level-item control has-icons-left" v-show="currentViewType === VIEW_TYPES.KANBAN && enumColumns.length">
@@ -69,6 +101,7 @@
       <div class="tabs is-centered is-small">
         <ul>
           <li :class="{'is-active': (currentViewType === VIEW_TYPES.GRID)}"><a @click="goToView(VIEW_TYPES.GRID)">Grid</a></li>
+          <li :class="{'is-active': (currentViewType === VIEW_TYPES.CARDS)}"><a @click="goToView(VIEW_TYPES.CARDS)">Cards</a></li>
           <li :class="{'is-active': (currentViewType === VIEW_TYPES.CALENDAR)}"><a @click="goToView(VIEW_TYPES.CALENDAR)">Calendar</a></li>
           <li :class="{'is-active': (currentViewType === VIEW_TYPES.KANBAN)}"><a @click="goToView(VIEW_TYPES.KANBAN)">Kanban</a></li>
         </ul>
@@ -111,7 +144,33 @@
         :sortedColumns="sortedColumns"
         tableSize="LARGE"
         @onHeaderClicked="tableHeaderClicked"
-        @onRecordClicked="gridRecordClicked"
+        @onRecordClicked="goToRecord"
+      />
+      <div class="pagination-section" v-show="totalRecords > paginationSize">
+        <div class="select page-size">
+          <select @change="(e) => updateLimit(e.target.value)">
+            <option :selected="postgrestParams.limit === '20'" value="20">20</option>
+            <option :selected="postgrestParams.limit === '50'" value="50">50</option>
+            <option :selected="postgrestParams.limit === '100'" value="100">100</option>
+          </select>
+        </div>
+        <Pagination
+          class="pages"
+          :currentRangeStart="postgrestParams.offset || 0"
+          :currentRangeEnd="currentRangeEnd"
+          :paginationSize="parseInt(postgrestParams.limit) || currentRangeEnd"
+          :totalRecords="totalRecords"
+          @onNewRangeStart="paginate"
+        />
+      </div>
+    </div>
+
+    <div class="p-none m-md m-b-xxl" v-show="currentViewType === VIEW_TYPES.CARDS && records.length" :key="cardsComponentMounted">
+      <CardList
+        :imageKey="viewParams.image_key"
+        :columns="viewParams.columns"
+        :records="records"
+        @onRecordClicked="goToRecord"
       />
       <div class="pagination-section" v-show="totalRecords > paginationSize">
         <div class="select page-size">
@@ -140,7 +199,7 @@
       <Kanban
         v-if="viewParams.pivot_key"
         :pivotKey="viewParams.pivot_key"
-        :columns="this.viewParams.columns"
+        :columns="viewParams.columns"
         :records="records"
       />
       <div v-show="!viewParams.pivot_key && enumColumns.length">
@@ -196,6 +255,7 @@ import axios                    from 'axios'
 import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
 import Calendar                 from '~/components/Calendar.vue'
+import CardList                 from '~/components/CardList.vue'
 import Kanban                   from '~/components/Kanban.vue'
 import Pagination               from '~/components/Pagination.vue'
 import PostgrestFilterPanel     from '~/components/PostgrestFilterPanel.vue'
@@ -205,7 +265,7 @@ import Table                    from '~/components/Table.vue'
 const DEFAULT_OFFSET                = 0 // Pagination
 const DEFAULT_PAGINATION_SIZE       = 20 // Pagination
 const DEFAULT_POSTGREST_QUERY       = { select: '*', limit: DEFAULT_PAGINATION_SIZE }
-const VIEW_TYPES                    = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
+const VIEW_TYPES                    = { GRID: 'GRID', CALENDAR: 'CALENDAR', CARDS: 'CARDS', KANBAN: 'KANBAN' }
 const DEFAULT_VIEW_PARAMS           = { view: VIEW_TYPES.GRID, columns: [] } // columns added on load
 const NUM_SPACES                    = 2 // for tabsToSpaces in text areas
 
@@ -215,6 +275,7 @@ export default {
     let { q, v } = query
     let newParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
     let viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
+    console.log('resourceKey', resourceKey)
     if (!viewParams.columns.length) viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
     
     // let val = function (val) { return val.replace('.net/', '.net/100t/') }
@@ -261,6 +322,7 @@ export default {
 
       // give some components keys to force refresh
       calendarComponentMounted: 'calendar' + Date.now(),
+      cardsComponentMounted: 'cards' + Date.now(),
       filterComponentMounted: 'filters' + Date.now(),
       kanbanComponentMounted: 'kanban' + Date.now(),
       sortComponentMounted: 'sorts' + Date.now(),
@@ -291,6 +353,10 @@ export default {
     paginationSize () {
       return this.postgrestParams.limit || DEFAULT_PAGINATION_SIZE
     },
+    potentialImageColumns () {
+      let probableFormat = PostgrestHelpers.VALID_FORMATS.TEXT
+      return this.viewParams.columns.filter(x => (x.format === probableFormat))
+    },
     sortedColumns () {
       if (!this.isSorted) return []
       let sorting = this.postgrestParams.order.split(',')
@@ -306,6 +372,9 @@ export default {
     changeKanbanPivot (e) {
       let { value } = e.target
       this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: value })
+    },
+    changeCardImage (columnKey) {
+      // this.pushEncodedQuery('v', { ...this.viewParams, image_key: columnKey }) // Not working :( - some error with the store/routes
     },
     filterColumns (columns) {
       this.filterPanelVisible = false
@@ -330,10 +399,7 @@ export default {
         this.pushEncodedQuery('q', { ...this.postgrestParams, criteria: criteria })
       }
     },
-    goToView (viewType) {
-      this.pushEncodedQuery('v', { ...this.viewParams, view: viewType })
-    },
-    gridRecordClicked (record) {
+    goToRecord (record) {
       try {
         let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
         let selectors = primaryKeys.map(x => {
@@ -347,6 +413,9 @@ export default {
       } catch (error) {
         console.log('error', error)
       }
+    },
+    goToView (viewType) {
+      this.pushEncodedQuery('v', { ...this.viewParams, view: viewType })
     },
     paginate (start) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, offset: start })
@@ -389,7 +458,7 @@ export default {
   // View handlers
   layout: 'hummingbird',
   watchQuery: ['q', 'v'],
-  components: { Calendar, Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
+  components: { Calendar, CardList, Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
 }
 </script>
 

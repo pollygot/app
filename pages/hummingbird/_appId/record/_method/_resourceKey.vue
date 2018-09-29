@@ -46,7 +46,7 @@
   <div class="m-lg box has-corners">
       <template v-for="field in formattedFields">
 
-        <div class="field is-horizontal" v-if="field.type === 'enum'" :key="field.key">
+        <div class="field is-horizontal" v-if="field.format === 'SELECT'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label">{{field.label}}</label>
           </div>
@@ -64,7 +64,7 @@
           </div>
         </div>
 
-        <div class="field is-horizontal" v-else-if="field.type === 'integer'" :key="field.key">
+        <div class="field is-horizontal" v-else-if="field.format === 'NUMBER'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label is-capitalized">{{field.label}}</label>
           </div>
@@ -77,7 +77,7 @@
           </div>
         </div>
 
-        <div class="field is-horizontal" v-else-if="field.type === 'boolean'" :key="field.key">
+        <div class="field is-horizontal" v-else-if="field.format === 'CHECKBOX'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label is-capitalized">{{field.label}}</label>
           </div>
@@ -89,7 +89,7 @@
           </div>
         </div>
 
-        <div class="field is-horizontal" v-else-if="field.type === 'timestamp'" :key="field.key">
+        <div class="field is-horizontal" v-else-if="field.format === 'DATETIME'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label is-capitalized">{{field.label}}</label>
           </div>
@@ -102,33 +102,20 @@
           </div>
         </div>
 
-        <div class="field is-horizontal" v-else-if="field.type === 'json'" :key="field.key">
+        <div class="field is-horizontal" v-else-if="field.format === 'TEXTAREA'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label is-capitalized">{{field.label}}</label>
           </div>
           <div class="field-body">
             <div class="field">
               <p class="control is-expanded">
-                <textarea class="textarea is-small is-fullwidth" :placeholder="field.value" v-model="field.value" rows="10"></textarea>
+                <textarea class="textarea is-fullwidth" :placeholder="field.value" v-model="field.value" rows="2"></textarea>
               </p>
             </div>
           </div>
         </div>
 
-        <div class="field is-horizontal" v-else-if="field.type === 'string' && field.format === 'text'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label is-capitalized">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded">
-                <textarea class="textarea" :placeholder="field.value" v-model="field.value" rows="2"></textarea>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="field is-horizontal" v-else-if="field.type === 'string' && field.format === 'character varying'" :key="field.key">
+        <div class="field is-horizontal" v-else-if="field.format === 'TEXT'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label is-capitalized">{{field.label}}</label>
           </div>
@@ -141,7 +128,7 @@
           </div>
         </div>
 
-        <div class="field is-horizontal" v-else-if="field.type === 'string' && field.format === 'date'" :key="field.key">
+        <div class="field is-horizontal" v-else-if="field.format === 'DATE'" :key="field.key">
           <div class="field-label is-normal">
             <label class="label is-capitalized">{{field.label}}</label>
           </div>

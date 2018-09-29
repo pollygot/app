@@ -13,7 +13,7 @@
             </th>
             <th v-for="(column, i) in columns" :key="'col-h'+i">
               <a
-                @click="$emit('onHeaderClicked', column)"
+                @click="$emit('onHeaderClicked', column.key)"
                 :class="{
                   'sort-desc': (isSorted(column.key) && sortDirection(column.key) === 'desc'),
                   'sort-asc': (isSorted(column.key) && sortDirection(column.key) === 'asc')
@@ -65,9 +65,9 @@ export default {
       return this.columns.map(x => x.key)
     }
   },
-  created () {
-    console.log(' records.map(x => FlattenObject(x))',  this.records.map(x => FlattenObject(x)))
-  },
+  // created () {
+  //   console.log(' records.map(x => FlattenObject(x))',  this.records.map(x => FlattenObject(x)))
+  // },
   methods: {
     getDateAndTime (dateString) {
       if (!dateString) return null
