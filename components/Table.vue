@@ -52,6 +52,7 @@
 
 <script>
 import moment from 'moment'
+import FlattenObject from 'flat'
 import PerfectScrollbar from 'perfect-scrollbar'
 export default {
   name: 'Table',
@@ -65,6 +66,9 @@ export default {
     columnKeys () {
       return this.columns.map(x => x.key)
     }
+  },
+  created () {
+    console.log(' records.map(x => FlattenObject(x))',  this.records.map(x => FlattenObject(x)))
   },
   methods: {
     getDateAndTime (dateString) {
