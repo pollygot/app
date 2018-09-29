@@ -52,11 +52,6 @@ export default {
       stateNames: []
     }
   },
-  computed: {
-    columnKeys () {
-      return this.columns.map(x => x.key)
-    }
-  },
   methods: {
     stateChanged (v) {
       console.log('v', v)

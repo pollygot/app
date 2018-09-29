@@ -213,10 +213,10 @@ export default {
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
     let { q, v } = query
-    let newParams = q ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
-    let viewParams = v ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
-    if (!viewParams.columns.length) viewParams.columns = store.getters['hummingbird/columnsForResource'](resourceKey)
-
+    let newParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
+    let viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
+    if (!viewParams.columns.length) viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
+    
     // let val = function (val) { return val.replace('.net/', '.net/100t/') }
     // console.log('val.toString()', val.toString())
 
@@ -413,6 +413,7 @@ export default {
     border-top: 1px solid rgba(0,0,0,0.1);
     display: flex;
     flex-direction: row;
+    z-index: 6;
     .page-size {
       display: inline;
       margin: -2px 20px 0 0;
