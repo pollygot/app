@@ -15,6 +15,7 @@ export const getters = {
   // Returns an array of columns for a give table in the database (resourceKey is the table name)
   columnsForResource: state => (resourceKey) => {
     let tableDefinition = state.swagger.definitions[`${resourceKey}`]
+    if (!tableDefinition) return []
     let columnArray = Object.entries(tableDefinition.properties).map(([k, v]) => (Object.assign({ ...v, key: k, resource: resourceKey}, v)))
     return columnArray
       .map(x => PostgrestHelpers.enrich(x))

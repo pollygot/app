@@ -62,8 +62,11 @@
                     <hr class="dropdown-divider" v-show="potentialImageColumns.length">
                     <p class="dropdown-item heading is-size-7" v-show="potentialImageColumns.length">Set card image</p>
                     <a class="dropdown-item" v-for="(col, i) in potentialImageColumns" :key="i" @click="changeCardImage(col.key)">
-                      <span>{{col.label}}</span>
+                      <span :class="{'has-text-primary': col.key === viewParams.image_key}">{{col.label}}</span>
                     </a>
+                    <a class="dropdown-item has-text-danger" 
+                      v-show="potentialImageColumns.length && viewParams.image_key"
+                      @click="changeCardImage(null)">Remove</a>
                   </div>
                 </div>
               </div>
@@ -374,7 +377,12 @@ export default {
       this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: value })
     },
     changeCardImage (columnKey) {
-      // this.pushEncodedQuery('v', { ...this.viewParams, image_key: columnKey }) // Not working :( - some error with the store/routes
+      if (columnKey) this.pushEncodedQuery('v', { ...this.viewParams, image_key: columnKey }) 
+      else {
+        let mutatedParams = { ...this.viewParams }
+        delete mutatedParams.image_key
+        this.pushEncodedQuery('v', mutatedParams)
+      }
     },
     filterColumns (columns) {
       this.filterPanelVisible = false
