@@ -141,6 +141,19 @@
           </div>
         </div>
 
+        <div class="field is-horizontal" v-else-if="field.type === 'string' && field.format === 'date'" :key="field.key">
+          <div class="field-label is-normal">
+            <label class="label is-capitalized">{{field.label}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p>
+                <datepicker class="input is-fullwidth" type="date" :placeholder="field.value" v-model="field.value"></datepicker>
+              </p>
+            </div>
+          </div>
+        </div>
+
       </template>
   </div>
 
@@ -165,16 +178,10 @@
 </template>
 
 <script>
-import axios from 'axios'
 import * as Helpers from '~/lib/helpers'
+import Datepicker from '~/components/Datepicker.vue'
 import ModalConfirm from '~/components/ModalConfirm.vue'
 export default {
-  layout: 'hummingbird',
-  components: { ModalConfirm },
-  watchQuery: ['q'],
-  beforeRouteEnter (to, from, next) {
-    next(vm => { vm.fromRoute = from }) // needed for the "back" function
-  },
   async asyncData ({ app, params, query, route, store }) {
     let { appId, resourceKey } = params
     let isCreated = (params.method === 'edit') ? true : false
@@ -191,6 +198,7 @@ export default {
       .map(x => Helpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
       .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
       .map(x => Helpers.enrichSwaggerField(x)) // add useful data to each field. eg, add Date() to timestamp strings
+    console.log('formattedFields', formattedFields)
     return {
       appId: appId,
       availableFields: availableFields,
@@ -274,7 +282,15 @@ export default {
       let { data:proxyResponse } = await this.$axios.get(url).catch(this.handleErrorResponse)
       return (proxyResponse && proxyResponse.data && proxyResponse.data.length === 1) ? true : false
     }
-  }
+  },
+
+  // View handlers
+  layout: 'hummingbird',
+  components: { Datepicker, ModalConfirm },
+  watchQuery: ['q'],
+  beforeRouteEnter (to, from, next) {
+    next(vm => { vm.fromRoute = from }) // for the "back" function
+  },
 }
 </script>
 

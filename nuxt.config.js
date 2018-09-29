@@ -57,7 +57,7 @@ module.exports = {
       })
     ],
     transpile: [ './lib/**/*', './api/**/*' ],
-    vendor: ['axios', 'moment', 'perfect-scrollbar', 'vue-click-outside', 'vue-infinite-loading', 'vuedraggable'],
+    vendor: ['axios', 'flatpickr', 'moment', 'perfect-scrollbar', 'vue-click-outside', 'vue-infinite-loading', 'vuedraggable'],
     watch: [ './api/**/*' ],
     /*
     ** Run ESLint on save
