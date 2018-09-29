@@ -43,7 +43,7 @@
           <div class="level-item control has-icons-left" v-show="currentViewType === VIEW_TYPES.KANBAN && enumColumns.length">
             <div class="select is-small">
               <select @change="changeKanbanPivot">
-                <option :selected="!viewParams.pivot_key">Select feld</option>
+                <option :selected="!viewParams.pivot_key">Select field</option>
                 <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
                   {{column.key.replace(/_/g, ' ')}}
                 </option>
@@ -76,15 +76,15 @@
     </div>
 
     <div class="box m-md" v-show="queryEditorMode">
-      <textarea class="textarea has-text-mono" v-model="userModifiedPostgrestParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea> 
+      <textarea class="textarea has-text-mono" v-model="userModifiedPostgrestParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>
       <p class="help is-danger"><span v-show="!Helpers.isValidJsonObject(userModifiedPostgrestParams)">There is an error in your syntax.</span>&nbsp;</p>
       <div class="buttons is-right m-t-md">
-        <span class="button is-rounded is-outlined is-small" 
+        <span class="button is-rounded is-outlined is-small"
           @click="() => { this.queryEditorMode = false }">Hide</span>
-        <span class="button is-rounded is-outlined is-small" 
+        <span class="button is-rounded is-outlined is-small"
           @click="() => { this.userModifiedPostgrestParams = JSON.stringify(this.postgrestParams, null, 2) }">Revert changes</span>
-        <span class="button is-rounded is-small is-outlined" 
-          :class="[ Helpers.isValidJsonObject(userModifiedPostgrestParams) ? 'is-dark' : 'is-danger' ]" 
+        <span class="button is-rounded is-small is-outlined"
+          :class="[ Helpers.isValidJsonObject(userModifiedPostgrestParams) ? 'is-dark' : 'is-danger' ]"
           @click="() => {this.applyManualParams('q', this.userModifiedPostgrestParams)}">Apply</span>
       </div>
     </div>
@@ -93,12 +93,12 @@
       <textarea class="textarea has-text-mono" v-model="userModifiedViewParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>
       <p class="help is-danger"><span v-show="!Helpers.isValidJsonObject(userModifiedViewParams)">There is an error in your syntax.</span>&nbsp;</p>
       <div class="buttons is-right m-t-md">
-        <span class="button is-rounded is-outlined is-small" 
+        <span class="button is-rounded is-outlined is-small"
           @click="() => { this.viewEditorMode = false }">Hide</span>
-        <span class="button is-rounded is-outlined is-small" 
+        <span class="button is-rounded is-outlined is-small"
           @click="() => { this.userModifiedViewParams = JSON.stringify(this.viewParams, null, 2) }">Revert changes</span>
-        <span class="button is-rounded is-small is-outlined" 
-          :class="[ Helpers.isValidJsonObject(userModifiedViewParams) ? 'is-dark' : 'is-danger' ]" 
+        <span class="button is-rounded is-small is-outlined"
+          :class="[ Helpers.isValidJsonObject(userModifiedViewParams) ? 'is-dark' : 'is-danger' ]"
           @click="() => {this.applyManualParams('v', this.userModifiedViewParams)}">Apply</span>
       </div>
     </div>
@@ -137,7 +137,7 @@
     </div>
 
     <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
-      <Kanban 
+      <Kanban
         v-if="viewParams.pivot_key"
         :pivotKey="viewParams.pivot_key"
         :columns="this.viewParams.columns"
@@ -149,7 +149,7 @@
           <div class="control has-icons-left">
             <div class="select">
               <select class="definitely-has-corners" @change="changeKanbanPivot">
-                <option :selected="!viewParams.pivot_key">Select feld</option>
+                <option :selected="!viewParams.pivot_key">Select field</option>
                 <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
                   {{column.key.replace(/_/g, ' ')}}
                 </option>
@@ -261,16 +261,16 @@ export default {
       viewParams: viewParams,
 
       // give some components keys to force refresh
-      calendarComponentMounted: 'calendar' + Date.now(), 
-      filterComponentMounted: 'filters' + Date.now(), 
-      kanbanComponentMounted: 'kanban' + Date.now(), 
-      sortComponentMounted: 'sorts' + Date.now(), 
+      calendarComponentMounted: 'calendar' + Date.now(),
+      filterComponentMounted: 'filters' + Date.now(),
+      kanbanComponentMounted: 'kanban' + Date.now(),
+      sortComponentMounted: 'sorts' + Date.now(),
       tableComponentMounted: 'records' + Date.now()
     }
   },
   computed: {
     Helpers: { // expose all Helpers to the page
-      get() { return Helpers } 
+      get() { return Helpers }
     },
     currentViewType () { // GRID, CALENDAR etc
       return this.viewParams.view
@@ -283,7 +283,7 @@ export default {
       let param = this.postgrestParams.criteria
       return PostgrestHelpers.parseFilterString(param.substring(1, param.length -1))
     },
-    isFiltered () { 
+    isFiltered () {
       return !!this.postgrestParams.criteria
     },
     isSorted () {
