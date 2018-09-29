@@ -95,7 +95,7 @@ export default {
   // View handlers
   mounted () {
     let tableElement = this.$refs['table_element']
-    this.tableScroll = new PerfectScrollbar(tableElement, { wheelPropagation: true })
+    if (tableElement) this.tableScroll = new PerfectScrollbar(tableElement, { wheelPropagation: true })
   },
   beforeDestroy () {
     if (this.tableScroll) this.tableScroll.destroy()

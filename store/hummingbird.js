@@ -26,7 +26,7 @@ export const getters = {
   // Returns an array of columns for a give table in the database (resourceKey is the table name)
   columnsForResource: state => (resourceKey, sort) => {
     let tableDefinition = state.swagger.definitions[`${resourceKey}`]
-    let columnArray = Object.entries(tableDefinition.properties).map(([k, v]) => (Object.assign({ ...v, key: k }, v)))
+    let columnArray = Object.entries(tableDefinition.properties).map(([k, v]) => (Object.assign({ ...v, key: k, resource: resourceKey}, v)))
     if (sort) columnArray.sort((a, b) => {
       if (a.key > b.key) return 1
       else if (a.key < b.key) return -1

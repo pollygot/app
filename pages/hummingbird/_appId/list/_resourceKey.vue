@@ -14,30 +14,29 @@
             <span class="icon is-small"><i class="fas fa-sort"></i></span>
             <span>{{sortedColumns.length || 'Sort'}}</span>
           </a>
-          
-      <div class="level-item field is-grouped">
-        <div class="control">
-          <div class="dropdown is-hoverable  ">
-            <div class="dropdown-trigger">
-              <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
-                <span class="icon is-small has-text-grey"><i class="fas fa-cog" aria-hidden="true"></i></span>
-                <span>View</span>
-              </button>
-            </div>
-            <div class="dropdown-menu" role="menu">
-              <div class="dropdown-content">
-                <a class="dropdown-item"><span>Add to favourites</span></a>
-                <a class="dropdown-item"><span>Save as new view</span></a>
-                <a class="dropdown-item"><span>Overwite current view</span></a>
-                <hr class="dropdown-divider">
-                <p class="dropdown-item heading is-size-7">Advanced</p>
-                <a class="dropdown-item" @click="() => {this.queryEditorMode = true}"><span>Query editor</span></a>
-                <a class="dropdown-item" @click="() => {this.viewEditorMode = true}"><span>View editor</span></a>
+          <div class="level-item field is-grouped">
+            <div class="control">
+              <div class="dropdown is-hoverable  ">
+                <div class="dropdown-trigger">
+                  <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
+                    <span class="icon is-small has-text-grey"><i class="fas fa-cog" aria-hidden="true"></i></span>
+                    <span>View</span>
+                  </button>
+                </div>
+                <div class="dropdown-menu" role="menu">
+                  <div class="dropdown-content">
+                    <a class="dropdown-item"><span>Add to favourites</span></a>
+                    <a class="dropdown-item"><span>Save as new view</span></a>
+                    <a class="dropdown-item"><span>Overwite current view</span></a>
+                    <hr class="dropdown-divider">
+                    <p class="dropdown-item heading is-size-7">Advanced</p>
+                    <a class="dropdown-item" @click="() => {this.queryEditorMode = true}"><span>Query editor</span></a>
+                    <a class="dropdown-item" @click="() => {this.viewEditorMode = true}"><span>View editor</span></a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
           <!--END Generic fields -->
 
           <!--START Kanban fields -->
@@ -76,30 +75,38 @@
       </div>
     </div>
 
-
     <div class="box m-md" v-show="queryEditorMode">
-      <textarea class="textarea has-text-mono" v-model="userModifiedPostgrestParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>  
-      <p class="help is-danger" v-show="!isValidJsonObject(userModifiedPostgrestParams)">There is an error in your syntax.</p>
+      <textarea class="textarea has-text-mono" v-model="userModifiedPostgrestParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea> 
+      <p class="help is-danger"><span v-show="!Helpers.isValidJsonObject(userModifiedPostgrestParams)">There is an error in your syntax.</span>&nbsp;</p>
       <div class="buttons is-right m-t-md">
-        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.queryEditorMode = false }">Hide</span>
-        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.userModifiedPostgrestParams = JSON.stringify(this.postgrestParams, null, 2) }">Revert changes</span>
-        <span class="button is-rounded is-dark is-small">Apply</span>
+        <span class="button is-rounded is-outlined is-small" 
+          @click="() => { this.queryEditorMode = false }">Hide</span>
+        <span class="button is-rounded is-outlined is-small" 
+          @click="() => { this.userModifiedPostgrestParams = JSON.stringify(this.postgrestParams, null, 2) }">Revert changes</span>
+        <span class="button is-rounded is-small is-outlined" 
+          :class="[ Helpers.isValidJsonObject(userModifiedPostgrestParams) ? 'is-dark' : 'is-danger' ]" 
+          @click="() => {this.applyManualParams('q', this.userModifiedPostgrestParams)}">Apply</span>
       </div>
     </div>
+
     <div class="box m-md " v-show="viewEditorMode">
       <textarea class="textarea has-text-mono" v-model="userModifiedViewParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>
-      <p class="help is-danger" v-show="!isValidJsonObject(userModifiedViewParams)">There is an error in your syntax.</p>
+      <p class="help is-danger"><span v-show="!Helpers.isValidJsonObject(userModifiedViewParams)">There is an error in your syntax.</span>&nbsp;</p>
       <div class="buttons is-right m-t-md">
-        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.viewEditorMode = false }">Hide</span>
-        <span class="button is-rounded is-dark is-outlined is-small" @click="() => { this.userModifiedViewParams = JSON.stringify(this.viewParams, null, 2) }">Revert changes</span>
-        <span class="button is-rounded is-dark is-small">Apply</span>
+        <span class="button is-rounded is-outlined is-small" 
+          @click="() => { this.viewEditorMode = false }">Hide</span>
+        <span class="button is-rounded is-outlined is-small" 
+          @click="() => { this.userModifiedViewParams = JSON.stringify(this.viewParams, null, 2) }">Revert changes</span>
+        <span class="button is-rounded is-small is-outlined" 
+          :class="[ Helpers.isValidJsonObject(userModifiedViewParams) ? 'is-dark' : 'is-danger' ]" 
+          @click="() => {this.applyManualParams('v', this.userModifiedViewParams)}">Apply</span>
       </div>
     </div>
 
     <div class="table-box box p-none m-md m-b-xxl" v-show="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
       <Table
         class=""
-        :columns="tableColumns(this.resourceKey)"
+        :columns="viewParams.columns"
         :records="records"
         :sortedColumns="sortedColumns"
         tableSize="LARGE"
@@ -124,14 +131,16 @@
         />
       </div>
     </div>
+
     <div class="" v-show="currentViewType === VIEW_TYPES.CALENDAR && records.length" :key="calendarComponentMounted">
       <Calendar />
     </div>
+
     <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
       <Kanban 
         v-if="viewParams.pivot_key"
         :pivotKey="viewParams.pivot_key"
-        :columns="tableColumns(this.resourceKey)"
+        :columns="this.viewParams.columns"
         :records="records"
       />
       <div v-show="!viewParams.pivot_key && enumColumns.length">
@@ -155,6 +164,7 @@
         <p class="has-text-centered">You can only pivot on columns with pre-defined database types.. for now :)</p>
       </div>
     </div>
+
     <div class="p-none m-md m-b-xl" v-if="!records.length">
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
@@ -162,7 +172,7 @@
   </div>
 
   <PostgrestFilterPanel
-    :allColumns="tableColumns(resourceKey, true)"
+    :allColumns="viewParams.columns"
     :isVisible="filterPanelVisible"
     :existingFilters="filteredColumns"
     :key="filterComponentMounted"
@@ -170,7 +180,7 @@
     @onHidePanel="() => { filterPanelVisible = false }"
   />
   <PostgrestSortPanel
-    :allColumns="tableColumns(resourceKey, true)"
+    :allColumns="viewParams.columns"
     :isVisible="sortPanelVisible"
     :sortedColumns="sortedColumns"
     :key="sortComponentMounted"
@@ -182,30 +192,32 @@
 </template>
 
 <script>
-import axios from 'axios'
-import * as Helpers from '~/lib/helpers'
-import * as PostgrestHelpers from '~/lib/postgrestHelpers'
-import Pagination from '~/components/Pagination.vue'
-import PostgrestFilterPanel from '~/components/PostgrestFilterPanel.vue'
-import PostgrestSortPanel from '~/components/PostgrestSortPanel.vue'
-import Table from '~/components/Table.vue'
-import Calendar from '~/components/Calendar.vue'
-import Kanban from '~/components/Kanban.vue'
-import { mapGetters } from 'vuex'
+import axios                    from 'axios'
+import * as Helpers             from '~/lib/helpers'
+import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
+import Calendar                 from '~/components/Calendar.vue'
+import Kanban                   from '~/components/Kanban.vue'
+import Pagination               from '~/components/Pagination.vue'
+import PostgrestFilterPanel     from '~/components/PostgrestFilterPanel.vue'
+import PostgrestSortPanel       from '~/components/PostgrestSortPanel.vue'
+import Table                    from '~/components/Table.vue'
 
-const DEFAULT_OFFSET = 0 // Pagination
-const DEFAULT_PAGINATION_SIZE = 20 // Pagination
-const DEFAULT_POSTGREST_QUERY = { select: '*', limit: DEFAULT_PAGINATION_SIZE }
-const VIEW_TYPES = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
-const DEFAULT_VIEW_PARAMS = { view: VIEW_TYPES.GRID }
-const NUM_SPACES = 2 // for tabsToSpaces in text areas
+const DEFAULT_OFFSET                = 0 // Pagination
+const DEFAULT_PAGINATION_SIZE       = 20 // Pagination
+const DEFAULT_POSTGREST_QUERY       = { select: '*', limit: DEFAULT_PAGINATION_SIZE }
+const VIEW_TYPES                    = { GRID: 'grid', CALENDAR: 'calendar', KANBAN: 'kanban' }
+const DEFAULT_VIEW_PARAMS           = { view: VIEW_TYPES.GRID, columns: [] } // columns added on load
+const NUM_SPACES                    = 2 // for tabsToSpaces in text areas
 
 export default {
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
     let { q, v } = query
+    console.log('v', v)
+    console.log('variable', Helpers.decrypt(v))
     let newParams = q ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
     let viewParams = v ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
+    if (!viewParams.columns.length) viewParams.columns = store.getters['hummingbird/columnsForResource'](resourceKey)
 
     // Convert the newParms into a query string for PostgREST
     let postgrestQueryString = ''
@@ -255,9 +267,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      tableColumns: 'hummingbird/columnsForResource'
-    }),
     Helpers: { // expose all Helpers to the page
       get() { return Helpers } 
     },
@@ -265,7 +274,7 @@ export default {
       return this.viewParams.view
     },
     enumColumns () { // Used for pivoting to a Kanban view. Only let the user pivot on predefined database Enums (for now)
-      return this.tableColumns(this.resourceKey).filter(x => ('enum' in x)) || []
+      return this.viewParams.columns.filter(x => ('enum' in x)) || []
     },
     filteredColumns () {
       if (!this.isFiltered) return []
@@ -288,6 +297,11 @@ export default {
     },
   },
   methods: {
+    applyManualParams (type, params) {
+      if (Helpers.isValidJsonObject(params)) {
+        this.pushEncodedQuery(type, JSON.parse(params))
+      }
+    },
     changeKanbanPivot (e) {
       let { value } = e.target
       this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: value })
@@ -316,7 +330,7 @@ export default {
       }
     },
     goToView (viewType) {
-      this.pushEncodedQuery('v', { view: viewType }) // start again when the view changes, no need to keep other view params
+      this.pushEncodedQuery('v', { ...this.viewParams, view: viewType })
     },
     gridRecordClicked (record) {
       try {
@@ -326,29 +340,17 @@ export default {
           if (!pk) throw new Error('Can\'t find a Primary Key for this record')
           return x + '=eq.' + pk
         })
-        let q = Helpers.encrypt(selectors.join('&'))
-        let path = `/hummingbird/${this.$route.params.appId}/record/edit/` + this.resourceKey + '?q=' + encodeURIComponent(q) // there is an occasional "+" appearing when not re-encoded. Not sure why..
+        let q = encodeURIComponent(Helpers.encrypt(selectors.join('&'))) // an occasional "+" appearing when not re-encoded. Not sure why but best to encode again
+        let path = `/hummingbird/${this.$route.params.appId}/record/edit/${this.resourceKey}?q=${q}`
         this.$router.push({ path: path })
       } catch (error) {
         console.log('error', error)
       }
     },
-    isValidJsonObject (stringifiedJson) {
-      try { 
-        JSON.parse(stringifiedJson)
-        return true
-      } 
-      catch (error) { return false }
-    },
     paginate (start) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, offset: start })
     },
-    /**
-     * This will convert an stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
-     * @param queryKey what the query key will be in the new route. Use "q" to update the Postgrest query and "v" to update the view
-     * @param newParams a full object that can be converted into a string
-     */
-    pushEncodedQuery (queryKey, newParams) {
+    pushEncodedQuery (queryKey, newParams) { // stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
       let query = {...this.$route.query} || {}
       if (Object.keys(newParams).length) query[`${queryKey}`] = Helpers.encrypt(JSON.stringify(newParams))
       else delete query[`${queryKey}`]
