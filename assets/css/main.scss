@@ -143,6 +143,9 @@ html, body {
 .main {
   margin: 20px;
 }
+.ps__rail-y, .ps__rail-x {
+  z-index: 5;
+}
 
 .list-menu {
   background: #fff;
@@ -188,6 +191,8 @@ html, body {
     }
   }
 }
+
+
 
 //
 // Animations

@@ -9,9 +9,9 @@
 
           <draggable :ref="stateName + '_element'" class="cards drag-container" v-model="states['' + stateName]" :options="{group:{ name:'states'}}" @add="stateChanged">
             <a class="card box draggable-item" v-for="(card, i) in states['' + stateName]" :key="'card'+stateName+i" >
-              <div v-for="(column, j) in columnKeys" :key="'col-td'+j" class="field" v-if="card[`${column}`] !== null && card[`${column}`] !== ''">
-                <span class="heading has-text-grey-light">{{ column.replace(/_/g, ' ') }}</span>
-                <div class="value">{{ card[`${column}`].toString() || '&nbsp;' }}</div>
+              <div v-for="(column, j) in columns" :key="'col-td'+j" class="field" v-if="card[`${column.key}`] !== null && card[`${column.key}`] !== '' && column.key !== pivotKey">
+                <span class="heading has-text-grey-light m-b-none">{{ column.label }}</span>
+                <div class="value">{{ card[`${column.key}`].toString() || '&nbsp;' }}</div>
               </div>
             </a>
           </draggable>
