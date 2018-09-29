@@ -217,8 +217,7 @@ export default {
     let viewParams = v ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
     if (!viewParams.columns.length) viewParams.columns = store.getters['hummingbird/columnsForResource'](resourceKey)
 
-    let val = function (val) { return val.replace('.net/', '.net/100t/') }
-
+    // let val = function (val) { return val.replace('.net/', '.net/100t/') }
     // console.log('val.toString()', val.toString())
 
     // Convert the newParms into a query string for PostgREST
