@@ -74,19 +74,33 @@
           </div>
           <!--END CARD fields -->
 
-          <!--START Kanban fields -->
-          <div class="level-item control has-icons-left" v-show="currentViewType === VIEW_TYPES.KANBAN && enumColumns.length">
-            <div class="select is-small">
-              <select @change="changeKanbanPivot">
-                <option :selected="!viewParams.pivot_key">Select field</option>
-                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
-                  {{column.key.replace(/_/g, ' ')}}
-                </option>
-              </select>
+          <!--START KANBAN fields -->
+          <div class="level-item field is-grouped" v-show="currentViewType === VIEW_TYPES.KANBAN">
+            <div class="control">
+              <div class="dropdown is-hoverable">
+                <div class="dropdown-trigger">
+                  <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
+                    <span class="icon is-small has-text-grey"><i class="fas fa-columns"></i></span>
+                    <span>Kanban</span>
+                  </button>
+                </div>
+                <div class="dropdown-menu" role="menu">
+                  <div class="dropdown-content">
+                    <p class="dropdown-item heading is-size-7">Pivot</p>
+                    <a class="dropdown-item" 
+                      v-for="column in enumColumns" 
+                      :key="column.key"
+                      @click="changeKanbanPivot(column.key)"
+                      :class="{'has-text-primary': column.key === viewParams.pivot_key}">
+                      {{column.label}}
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="icon is-small is-left"><i class="fas fa-columns"></i></div>
           </div>
-          <!--END Kanban fields -->
+          <!--END KANBAN fields -->
+
         </div>
         <div class="level-right">
           <div class="m-r-none level-item">
@@ -210,10 +224,10 @@
         <div class="field has-addons has-addons-centered">
           <div class="control has-icons-left">
             <div class="select">
-              <select class="definitely-has-corners" @change="changeKanbanPivot">
+              <select class="definitely-has-corners" @change="(e) => {this.changeKanbanPivot(e.target.value)}">
                 <option :selected="!viewParams.pivot_key">Select field</option>
                 <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
-                  {{column.key.replace(/_/g, ' ')}}
+                  {{column.label}}
                 </option>
               </select>
             </div>
@@ -372,9 +386,8 @@ export default {
         this.pushEncodedQuery(type, JSON.parse(params))
       }
     },
-    changeKanbanPivot (e) {
-      let { value } = e.target
-      this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: value })
+    changeKanbanPivot (key) {
+      this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: key })
     },
     changeCardImage (columnKey) {
       if (columnKey) this.pushEncodedQuery('v', { ...this.viewParams, image_key: columnKey }) 

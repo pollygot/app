@@ -24,7 +24,7 @@ export default {
       return this.$store.getters['hummingbird/tables'].map(x => ({
         type: 'list',
         resource: x.key,
-        label: x.key.replace(/_/g, ' '),
+        label: x.label,
         isActive: (x.key === this.$route.params.resourceKey)
       }))
     }
