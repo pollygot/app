@@ -192,6 +192,32 @@ html, body {
   }
 }
 
+.nice-checkbox {
+  border: 0.1rem solid #dbdbdb;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 4px;
+  position : relative;
+  margin-right: 10px;
+
+  &.is-active::after {
+    content: '';
+    position : absolute;
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.6rem;
+    top: 0.3rem;
+    left: 0.5rem;
+    box-sizing: border-box;
+    transform: rotate(45deg);
+    border-width: .1rem;
+    border-style: solid;
+    border-color: #0084ff;
+    border-top: 0;
+    border-left: 0;
+  }
+}
+
 
 
 //

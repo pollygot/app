@@ -6,11 +6,15 @@
       <nav class="level is-mobile p-lg m-none">
         <div class="level-left">
           <!--START Generic fields -->
-          <a class="level-item button is-small" @click="toggleFilters" :class="{'is-dark': filterPanelVisible}">
+          <a class="level-item button is-small" @click="joinPanelVisible = !joinPanelVisible" :class="{'is-dark': joinPanelVisible}">
+            <!-- <span class="icon is-small"><i class="fas fa-filter"></i></span> -->
+            <span>Joins</span>
+          </a>
+          <a class="level-item button is-small" @click="filterPanelVisible = !filterPanelVisible" :class="{'is-dark': filterPanelVisible}">
             <span class="icon is-small"><i class="fas fa-filter"></i></span>
             <span>{{filteredColumns.length || 'Filter'}}</span>
           </a>
-          <a class="level-item button is-small" @click="toggleSorting" :class="{'is-dark': sortPanelVisible}">
+          <a class="level-item button is-small" @click="sortPanelVisible = !sortPanelVisible" :class="{'is-dark': sortPanelVisible}">
             <span class="icon is-small"><i class="fas fa-sort"></i></span>
             <span>{{sortedColumns.length || 'Sort'}}</span>
           </a>
@@ -255,6 +259,14 @@
     @onFilter="filterColumns"
     @onHidePanel="() => { filterPanelVisible = false }"
   />
+  <PostgrestJoinPanel
+    :allTables="allTables"
+    :base="resourceKey"
+    :key="joinComponentMounted"
+    :isVisible="joinPanelVisible"
+    @onApply="filterColumns"
+    @onHidePanel="() => { joinPanelVisible = false }"
+  />
   <PostgrestSortPanel
     :allColumns="viewParams.columns"
     :isVisible="sortPanelVisible"
@@ -276,6 +288,7 @@ import CardList                 from '~/components/CardList.vue'
 import Kanban                   from '~/components/Kanban.vue'
 import Pagination               from '~/components/Pagination.vue'
 import PostgrestFilterPanel     from '~/components/PostgrestFilterPanel.vue'
+import PostgrestJoinPanel       from '~/components/PostgrestJoinPanel.vue'
 import PostgrestSortPanel       from '~/components/PostgrestSortPanel.vue'
 import Table                    from '~/components/Table.vue'
 
@@ -292,7 +305,7 @@ export default {
     let { q, v } = query
     let newParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
     let viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
-    console.log('resourceKey', resourceKey)
+    let allTables = store.getters['hummingbird/tables']
     if (!viewParams.columns.length) viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
     
     // let val = function (val) { return val.replace('.net/', '.net/100t/') }
@@ -319,9 +332,11 @@ export default {
       DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
       NUM_SPACES: NUM_SPACES,
       VIEW_TYPES: VIEW_TYPES,
+      allTables: allTables,
       appId: appId,
       currentRangeEnd: rangeData.rangeEnd || 0,
       filterPanelVisible: false,
+      joinPanelVisible: false,
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestParams: newParams,
@@ -341,6 +356,7 @@ export default {
       calendarComponentMounted: 'calendar' + Date.now(),
       cardsComponentMounted: 'cards' + Date.now(),
       filterComponentMounted: 'filters' + Date.now(),
+      joinComponentMounted: 'joins' + Date.now(),
       kanbanComponentMounted: 'kanban' + Date.now(),
       sortComponentMounted: 'sorts' + Date.now(),
       tableComponentMounted: 'records' + Date.now()
@@ -465,12 +481,6 @@ export default {
         this.sortColumns(newSorting)
       }
     },
-    toggleFilters () {
-      this.filterPanelVisible = !this.filterPanelVisible
-    },
-    toggleSorting () {
-      this.sortPanelVisible = !this.sortPanelVisible
-    },
     updateLimit (newSize) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
     },
@@ -479,7 +489,7 @@ export default {
   // View handlers
   layout: 'hummingbird',
   watchQuery: ['q', 'v'],
-  components: { Calendar, CardList, Kanban, Pagination, PostgrestFilterPanel, PostgrestSortPanel, Table },
+  components: { Calendar, CardList, Kanban, Pagination, PostgrestFilterPanel, PostgrestJoinPanel, PostgrestSortPanel, Table },
 }
 </script>
 
