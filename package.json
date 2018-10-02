@@ -28,6 +28,7 @@
     "express-jwt": "^5.3.1",
     "flat": "^4.1.0",
     "flatpickr": "^4.5.2",
+    "json2csv": "^4.2.1",
     "jsonwebtoken": "^8.3.0",
     "moment": "^2.22.2",
     "nuxt": "^1.0.0",

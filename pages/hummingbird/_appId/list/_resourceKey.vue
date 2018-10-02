@@ -34,7 +34,7 @@
                 <div class="dropdown-menu" role="menu">
                   <div class="dropdown-content">
                     <p class="dropdown-item heading is-size-7">Download</p>
-                    <a class="dropdown-item">CSV</a>
+                    <a class="dropdown-item" @click="downloadRecords(DOWNLOAD_FORMATS.CSV)">CSV</a>
                     <!-- <a class="dropdown-item">JSON</a> -->
                     <hr class="dropdown-divider">
                     <!-- <a class="dropdown-item"><span>Add to favourites</span></a>
@@ -291,6 +291,7 @@
 
 <script>
 import axios                    from 'axios'
+import json2csv                 from 'json2csv'
 import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
 import Calendar                 from '~/components/Calendar.vue'
@@ -310,6 +311,7 @@ const VIEW_TYPES                    = { GRID: 'GRID', CALENDAR: 'CALENDAR', CARD
 const DEFAULT_VIEW_PARAMS           = { view: VIEW_TYPES.GRID, columns: [] } // columns added on load
 const NUM_SPACES                    = 2 // for tabsToSpaces in text areas
 const PANELS                        = { COLUMNS: 'COLUMNS', JOINS: 'JOINS', FILTERS: 'FILTERS', SORTING: 'SORTING',  }
+const DOWNLOAD_FORMATS              = { CSV: 'CSV', JSON: 'JSON' }
 
 export default {
   async asyncData ({ app, params, query, store }) {
@@ -361,6 +363,7 @@ export default {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
       DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
+      DOWNLOAD_FORMATS: DOWNLOAD_FORMATS,
       NUM_SPACES: NUM_SPACES,
       PANELS: PANELS,
       VIEW_TYPES: VIEW_TYPES,
@@ -430,6 +433,17 @@ export default {
         this.pushEncodedQuery('v', mutatedParams)
       }
     },
+    downloadRecords (format) {
+      let fields = this.viewParams.columns.filter(x => (!x.hidden)).map(c => (c.key))
+      switch (format) {
+        case DOWNLOAD_FORMATS.CSV:
+          const json2csvParser = new json2csv.Parser({ fields })
+          const csv = json2csvParser.parse(this.records)
+          return window.location.href = "data:text/csv," + encodeURIComponent(csv)
+        case DOWNLOAD_FORMATS.JSON:
+          return null
+      }
+    },
     filterColumns (columns) {
       this.visiblePanel = null
       if (!columns.length) {
@@ -482,8 +496,14 @@ export default {
     },
     sortColumns (columns) {
       this.visiblePanel = null
-      let ordering = columns.map(x => ( `${x.key}.${x.sort}`)).join(',')
-      this.pushEncodedQuery('q', { ...this.postgrestParams, order: ordering })
+      if (columns.length) {
+        let ordering = columns.map(x => ( `${x.key}.${x.sort}`)).join(',')
+        this.pushEncodedQuery('q', { ...this.postgrestParams, order: ordering })
+      } else {
+        let newParams = { ...this.postgrestParams }
+        delete newParams.order
+        this.pushEncodedQuery('q', newParams)
+      }
     },
     tableHeaderClicked (key) {
       let alreadySorted = this.sortedColumns.find(x => (x.key === key)) || false
