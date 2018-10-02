@@ -1,37 +1,40 @@
+import Vue from 'vue'
 import * as PostgrestHelpers from '../lib/postgrestHelpers'
+
+import flat from 'flat'
 
 export const state = () => ({
   swagger: {},
   customViews: [ ], // custom views (pulled from Pollygot Core)
   joinTree: {
-    label: 'root',
-    selected: true,
-    nodes: [
-      {
-        label: 'item1',
-        selected: true,
-        nodes: [
-          {
-            label: 'item1.1',
-            selected: false,
-          },
-          {
-            label: 'item1.2',
-            selected: true,
-            nodes: [
-              {
-                label: 'item1.2.1',
-                selected: false,
-              }
-            ]
-          }
-        ]
-      },
-      {
-        label: 'item2',
-        selected: true,
-      }
-    ]
+    key: 'accounts',
+    selected: false,
+    // nodes: [
+    //   {
+    //     key: 'item1',
+    //     selected: true,
+    //     nodes: [
+    //       {
+    //         key: 'item1.1',
+    //         selected: false,
+    //       },
+    //       {
+    //         key: 'item1.2',
+    //         selected: true,
+    //         nodes: [
+    //           {
+    //             key: 'item1.2.1',
+    //             selected: false,
+    //           }
+    //         ]
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     key: 'item2',
+    //     selected: true,
+    //   }
+    // ]
   }
 })
 
@@ -42,17 +45,22 @@ export const mutations = {
 
   selectForeignTable(state, { resourceKey, depth, nodesToAppend}) {
     var recurse = function (tree, d) {
-      if (d === depth && tree.label === resourceKey) {
+      if (d === depth && tree.key === resourceKey) {
         tree.selected = !tree.selected
         if (nodesToAppend) tree.nodes = nodesToAppend
         return tree
       } else if (tree.nodes && tree.nodes.length) {
-        tree.nodes.forEach(node => recurse(node, d + 1))
+        return tree.nodes.forEach(node => recurse(node, d + 1))
       } else {
+        console.log('tree', tree)
         return tree
       }
     }
     recurse(state.joinTree, 0)
+    let newTree = { ...state.joinTree}
+    console.log('newTree', flat(newTree))
+    // Vue.set(state, 'joinTree', newTree) // use $set to preserve Vue reactivity
+    // state.joinTree = { ...state.joinTree }
   }
 }
 

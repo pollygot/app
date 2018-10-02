@@ -6,15 +6,19 @@
       <nav class="level is-mobile p-lg m-none">
         <div class="level-left">
           <!--START Generic fields -->
-          <a class="level-item button is-small" @click="joinPanelVisible = !joinPanelVisible" :class="{'is-dark': joinPanelVisible}">
-            <!-- <span class="icon is-small"><i class="fas fa-filter"></i></span> -->
+          <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.JOINS)" :class="{'is-dark': visiblePanel === PANELS.JOINS}">
+            <span class="icon is-small"><i class="fas fa-link"></i></span>
             <span>Joins</span>
           </a>
-          <a class="level-item button is-small" @click="filterPanelVisible = !filterPanelVisible" :class="{'is-dark': filterPanelVisible}">
+          <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.COLUMNS)" :class="{'is-dark': visiblePanel === PANELS.COLUMNS}">
+            <span class="icon is-small"><i class="fas fa-table"></i></span>
+            <span>Columns</span>
+          </a>
+          <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.FILTERS)" :class="{'is-dark': visiblePanel === PANELS.FILTERS}">
             <span class="icon is-small"><i class="fas fa-filter"></i></span>
             <span>{{filteredColumns.length || 'Filter'}}</span>
           </a>
-          <a class="level-item button is-small" @click="sortPanelVisible = !sortPanelVisible" :class="{'is-dark': sortPanelVisible}">
+          <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.SORTING)" :class="{'is-dark': visiblePanel === PANELS.SORTING}">
             <span class="icon is-small"><i class="fas fa-sort"></i></span>
             <span>{{sortedColumns.length || 'Sort'}}</span>
           </a>
@@ -251,29 +255,35 @@
 
   </div>
 
+  <!-- <PostgrestColumnsPanel
+    :allTables="allTables"
+    :base="resourceKey"
+    :key="columnsComponentMounted"
+    :isVisible="visiblePanel === PANELS.COLUMNS"
+    @onHidePanel="() => { visiblePanel = null }"
+  /> -->
   <PostgrestFilterPanel
     :allColumns="viewParams.columns"
-    :isVisible="filterPanelVisible"
+    :isVisible="visiblePanel === PANELS.FILTERS"
     :existingFilters="filteredColumns"
     :key="filterComponentMounted"
     @onFilter="filterColumns"
-    @onHidePanel="() => { filterPanelVisible = false }"
+    @onHidePanel="() => { visiblePanel = null }"
   />
   <PostgrestJoinPanel
     :allTables="allTables"
     :base="resourceKey"
     :key="joinComponentMounted"
-    :isVisible="joinPanelVisible"
-    @onApply="filterColumns"
-    @onHidePanel="() => { joinPanelVisible = false }"
+    :isVisible="visiblePanel === PANELS.JOINS"
+    @onHidePanel="() => { visiblePanel = null }"
   />
   <PostgrestSortPanel
     :allColumns="viewParams.columns"
-    :isVisible="sortPanelVisible"
+    :isVisible="visiblePanel === PANELS.SORTING"
     :sortedColumns="sortedColumns"
     :key="sortComponentMounted"
     @onSort="sortColumns"
-    @onHidePanel="() => { sortPanelVisible = false }"
+    @onHidePanel="() => { visiblePanel = null }"
   />
 
 </div>
@@ -298,6 +308,7 @@ const DEFAULT_POSTGREST_QUERY       = { select: '*', limit: DEFAULT_PAGINATION_S
 const VIEW_TYPES                    = { GRID: 'GRID', CALENDAR: 'CALENDAR', CARDS: 'CARDS', KANBAN: 'KANBAN' }
 const DEFAULT_VIEW_PARAMS           = { view: VIEW_TYPES.GRID, columns: [] } // columns added on load
 const NUM_SPACES                    = 2 // for tabsToSpaces in text areas
+const PANELS                        = { COLUMNS: 'COLUMNS', JOINS: 'JOINS', FILTERS: 'FILTERS', SORTING: 'SORTING',  }
 
 export default {
   async asyncData ({ app, params, query, store }) {
@@ -327,23 +338,15 @@ export default {
     })
     let rangeData = PostgrestHelpers.getRangeDataFromResponseHeaders(response.headers)
     return {
-      DEFAULT_OFFSET: DEFAULT_OFFSET,
-      DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
-      DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
-      NUM_SPACES: NUM_SPACES,
-      VIEW_TYPES: VIEW_TYPES,
       allTables: allTables,
       appId: appId,
       currentRangeEnd: rangeData.rangeEnd || 0,
-      filterPanelVisible: false,
-      joinPanelVisible: false,
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestParams: newParams,
       queryEditorMode: false,
       records: response.data,
       resourceKey: params.resourceKey,
-      sortPanelVisible: false,
       totalRecords: rangeData.totalRecords,
       userModifiedPostgrestParams: JSON.stringify({...newParams}, null, NUM_SPACES),
       userModifiedPostgrestParamsError: false,
@@ -351,10 +354,20 @@ export default {
       userModifiedViewParamsError: false,
       viewEditorMode: false,
       viewParams: viewParams,
+      visiblePanel: null,
 
+      // expose constants
+      DEFAULT_OFFSET: DEFAULT_OFFSET,
+      DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
+      DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
+      NUM_SPACES: NUM_SPACES,
+      PANELS: PANELS,
+      VIEW_TYPES: VIEW_TYPES,
+      
       // give some components keys to force refresh
       calendarComponentMounted: 'calendar' + Date.now(),
       cardsComponentMounted: 'cards' + Date.now(),
+      columnsComponentMounted: 'columns' + Date.now(),
       filterComponentMounted: 'filters' + Date.now(),
       joinComponentMounted: 'joins' + Date.now(),
       kanbanComponentMounted: 'kanban' + Date.now(),
@@ -414,7 +427,7 @@ export default {
       }
     },
     filterColumns (columns) {
-      this.filterPanelVisible = false
+      this.visiblePanel = null
       if (!columns.length) {
         let mutatedParams = { ...this.postgrestParams }
         delete mutatedParams.criteria
@@ -464,7 +477,7 @@ export default {
       this.$router.push({ path: this.$route.path, query: query })
     },
     sortColumns (columns) {
-      this.sortPanelVisible = false
+      this.visiblePanel = null
       let ordering = columns.map(x => ( `${x.key}.${x.sort}`)).join(',')
       this.pushEncodedQuery('q', { ...this.postgrestParams, order: ordering })
     },
@@ -483,6 +496,10 @@ export default {
     },
     updateLimit (newSize) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
+    },
+    toggleVisiblePanel (panelName) {
+      let visible = (this.visiblePanel === panelName) ? null : panelName
+      this.visiblePanel = visible
     },
   },
 

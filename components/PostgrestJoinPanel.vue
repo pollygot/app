@@ -9,33 +9,11 @@
           <span class="button is-dark is-outlined is-rounded is-small" @click="apply()">Apply</span>
         </div>
 
-        <aside class="menu">
-          <ul class="menu-list">
-            <li>
-              <a class="field">
-                <input class="is-checkradio" id="table" type="checkbox" name="table">
-                <label for="table" class="m-l-none is-capitalized">{{base}}</label>
-              </a>
-            </li>
-            <li>
-              <ul>
-                <li v-for="(join, i) in joins(base)" :key="i">
-                  <a class="field">
-                    <input class="is-checkradio" id="table" type="checkbox" name="table">
-                    <label for="table" class="m-l-none is-capitalized">{{join.key}}</label>
-                  </a>
-                </li>
-              </ul>
-            </li>
-
-          </ul>
-        </aside>
-
         <PostgrestJoinMenu
           :allTables="allTables"
           :nodes="tree.nodes" 
           :depth="0"   
-          :label="tree.label"
+          :label="tree.key"
           :selected="tree.selected" 
           ></PostgrestJoinMenu>
         
@@ -82,13 +60,5 @@ export default {
 }
 </script>
 <style lang="scss">
-.PostgrestJoinPanel {
-  .header-buttons {
-    position: absolute;
-    top: 18px;
-    right: 15px;
-  }
- 
-}
 </style>
 

@@ -14,7 +14,7 @@
           :key="i"
           :nodes="node.nodes"
           :selected="node.selected" 
-          :label="node.label"
+          :label="node.key"
           :depth="depth + 1"   
         >
         </PostgrestJoinMenu>
@@ -45,10 +45,20 @@ export default {
   },
   methods: {
     toggleTable() {
-      console.log('allTables', this.allTables)
       let payload = {
         resourceKey: this.label,
         depth: this.depth
+      }
+      if (!this.selected) {
+        let joins = this.allTables.filter(x => {
+          return x.properties.some(column => (column.fk && column.fk_table === this.label))
+        }).map(j => {
+          let o = {...j}
+          delete o.properties
+          return o
+        })
+        console.log('joins', joins)
+        if (joins && joins.length) payload.nodesToAppend = joins
       }
       this.$store.commit('hummingbird/selectForeignTable', payload)
       console.log('this', this.label)
