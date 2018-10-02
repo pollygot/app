@@ -33,17 +33,17 @@
                 </div>
                 <div class="dropdown-menu" role="menu">
                   <div class="dropdown-content">
-                    <a class="dropdown-item"><span>Add to favourites</span></a>
+                    <p class="dropdown-item heading is-size-7">Download</p>
+                    <a class="dropdown-item">CSV</a>
+                    <!-- <a class="dropdown-item">JSON</a> -->
+                    <hr class="dropdown-divider">
+                    <!-- <a class="dropdown-item"><span>Add to favourites</span></a>
                     <a class="dropdown-item"><span>Save as new view</span></a>
                     <a class="dropdown-item"><span>Overwite current view</span></a>
-                    <hr class="dropdown-divider">
+                    <hr class="dropdown-divider"> -->
                     <p class="dropdown-item heading is-size-7">Advanced</p>
                     <a class="dropdown-item" @click="() => {this.queryEditorMode = true}"><span>Query editor</span></a>
                     <a class="dropdown-item" @click="() => {this.viewEditorMode = true}"><span>View editor</span></a>
-                    <hr class="dropdown-divider">
-                    <p class="dropdown-item heading is-size-7">Download</p>
-                    <a class="dropdown-item">CSV</a>
-                    <a class="dropdown-item">JSON</a>
                   </div>
                 </div>
               </div>
@@ -363,7 +363,7 @@ export default {
       NUM_SPACES: NUM_SPACES,
       PANELS: PANELS,
       VIEW_TYPES: VIEW_TYPES,
-      
+
       // give some components keys to force refresh
       calendarComponentMounted: 'calendar' + Date.now(),
       cardsComponentMounted: 'cards' + Date.now(),
