@@ -199,6 +199,7 @@ html, body {
   border-radius: 4px;
   position : relative;
   margin-right: 10px;
+  display: inline-block;
 
   &.is-active::after {
     content: '';

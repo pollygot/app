@@ -6,13 +6,13 @@
       <nav class="level is-mobile p-lg m-none">
         <div class="level-left">
           <!--START Generic fields -->
-          <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.JOINS)" :class="{'is-dark': visiblePanel === PANELS.JOINS}">
+          <!-- <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.JOINS)" :class="{'is-dark': visiblePanel === PANELS.JOINS}">
             <span class="icon is-small"><i class="fas fa-link"></i></span>
             <span>Joins</span>
-          </a>
+          </a> -->
           <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.COLUMNS)" :class="{'is-dark': visiblePanel === PANELS.COLUMNS}">
             <span class="icon is-small"><i class="fas fa-table"></i></span>
-            <span>Columns</span>
+            <span>{{visibleColumns.length + ' columns'}}</span>
           </a>
           <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.FILTERS)" :class="{'is-dark': visiblePanel === PANELS.FILTERS}">
             <span class="icon is-small"><i class="fas fa-filter"></i></span>
@@ -255,13 +255,13 @@
 
   </div>
 
-  <!-- <PostgrestColumnsPanel
-    :allTables="allTables"
-    :base="resourceKey"
+  <ColumnsPanel
+    :columns="viewParams.columns"
     :key="columnsComponentMounted"
     :isVisible="visiblePanel === PANELS.COLUMNS"
+    @onApply="updateColumns"
     @onHidePanel="() => { visiblePanel = null }"
-  /> -->
+  />
   <PostgrestFilterPanel
     :allColumns="viewParams.columns"
     :isVisible="visiblePanel === PANELS.FILTERS"
@@ -297,6 +297,7 @@ import Calendar                 from '~/components/Calendar.vue'
 import CardList                 from '~/components/CardList.vue'
 import Kanban                   from '~/components/Kanban.vue'
 import Pagination               from '~/components/Pagination.vue'
+import ColumnsPanel             from '~/components/hummingbird/ColumnsPanel.vue'
 import PostgrestFilterPanel     from '~/components/PostgrestFilterPanel.vue'
 import PostgrestJoinPanel       from '~/components/PostgrestJoinPanel.vue'
 import PostgrestSortPanel       from '~/components/PostgrestSortPanel.vue'
@@ -408,6 +409,9 @@ export default {
       let sorting = this.postgrestParams.order.split(',')
       return sorting.map(x => ({ key: x.split('.')[0], sort: x.split('.')[1] }))
     },
+    visibleColumns () {
+      return this.viewParams.columns.filter(x => !x.hidden)
+    }
   },
   methods: {
     applyManualParams (type, params) {
@@ -494,6 +498,10 @@ export default {
         this.sortColumns(newSorting)
       }
     },
+    updateColumns (columns) {
+      this.visiblePanel = null
+      this.pushEncodedQuery('v', { ...this.viewParams, columns: columns })
+    },
     updateLimit (newSize) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
     },
@@ -506,7 +514,7 @@ export default {
   // View handlers
   layout: 'hummingbird',
   watchQuery: ['q', 'v'],
-  components: { Calendar, CardList, Kanban, Pagination, PostgrestFilterPanel, PostgrestJoinPanel, PostgrestSortPanel, Table },
+  components: { Calendar, CardList, ColumnsPanel, Kanban, Pagination, PostgrestFilterPanel, PostgrestJoinPanel, PostgrestSortPanel, Table },
 }
 </script>
 

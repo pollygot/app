@@ -11,7 +11,7 @@
                 <label for="exampleCheckbox" class="p-r-none"></label>
               </div>
             </th>
-            <th v-for="(column, i) in columns" :key="'col-h'+i">
+            <th v-for="(column, i) in columns" :key="'col-h'+i"  v-if="!column.hidden">
               <a
                 @click="$emit('onHeaderClicked', column.key)"
                 :class="{
@@ -32,11 +32,11 @@
                 <label :for="'check-'+index" class="p-r-none"></label>
               </div>
             </td>
-            <td v-for="(column, i) in columnKeys" :key="'col-td'+i"  @click="$emit('onRecordClicked', record)" >
+            <td v-for="(column, i) in columns" :key="'col-td'+i"  @click="$emit('onRecordClicked', record)" v-if="!column.hidden">
               <span>
                 {{
-                  record[`${column}`]
-                  || (record[`${column}`]) ? record[`${column}`].toString() : '&nbsp;'
+                  record[`${column.key}`]
+                  || (record[`${column.key}`]) ? record[`${column.key}`].toString() : '&nbsp;'
                 }}
               </span>
             </td>
