@@ -43,106 +43,164 @@
     </div>
   </nav>
 
-  <div class="m-lg box has-corners">
-      <template v-for="field in formattedFields">
 
-        <div class="field is-horizontal" v-if="field.format === 'SELECT'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
+
+  <div class="p-lg columns">
+    <div class="column">
+      <h3 class="title is-3 is-capitalized">{{Helpers.cleanseTableName(resourceKey)}}</h3>
+
+      <div class="box has-corners">
+        <template v-for="field in formattedFields">
+
+          <!-- SELECT -->
+          <div class="field" v-if="field.format === 'SELECT'" :key="field.key">
+            <nav class="level m-b-sm">
+              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-right" v-show="field.fk">
+                <a class="button is-small is-white">
+                  <span class="is-capitalized">{{field.fk_table}}</span>
+                  <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </div>
+            </nav>
+            <div class="control is-expanded">
               <div class="control select is-fullwidth">
-                <select v-model="field.value">
-                  <option
-                    v-for="(e, i) in field.enum"
-                    :key="field.key + 'enum' + i"
-                  >{{e}}</option>
+                <select v-model="field.modifiedValue">
+                  <option v-for="(e, i) in field.enum" :key="field.key + 'enum' + i">{{e}}</option>
                 </select>
               </div>
             </div>
+            <p class="help">&nbsp;</p>
           </div>
-        </div>
 
-        <div class="field is-horizontal" v-else-if="field.format === 'NUMBER'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label is-capitalized">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded">
-                <input class="input is-fullwidth" type="number" :placeholder="field.value" v-model="field.value">
-              </p>
+          <!-- NUMBER -->
+          <div class="field" v-else-if="field.format === 'NUMBER'" :key="field.key">
+            <nav class="level m-b-sm">
+              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-right" v-show="field.fk">
+                <a class="button is-small is-white" @click="joinTable(field, true)">
+                  <span class="is-capitalized">{{field.fk_table}}</span>
+                  <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </div>
+            </nav>
+            <div class="control is-expanded">
+              <input class="input is-fullwidth" type="number" :placeholder="field.modifiedValue" v-model="field.modifiedValue">
             </div>
+            <p class="help">&nbsp;</p>
           </div>
-        </div>
 
-        <div class="field is-horizontal" v-else-if="field.format === 'CHECKBOX'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label is-capitalized">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field p-t-sm">
-              <input class="is-checkradio" :id="'chk'+field.key" type="checkbox" :name="'chk'+field.key"  v-model="field.value">
-              <label :for="'chk'+field.key" class="m-none"></label>
+          <!-- CHECKBOX -->
+          <div class="field" v-else-if="field.format === 'CHECKBOX'" :key="field.key">
+            <nav class="level m-b-sm">
+              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-right" v-show="field.fk">
+                <a class="button is-small is-white">
+                  <span class="is-capitalized">{{field.fk_table}}</span>
+                  <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </div>
+            </nav>
+            <div class="control is-expanded">
+                <input class="is-checkradio" :id="'chk'+field.key" type="checkbox" :name="'chk'+field.key"  v-model="field.modifiedValue">
+                <label :for="'chk'+field.key" class="m-none"></label>
             </div>
+            <p class="help">&nbsp;</p>
           </div>
-        </div>
 
-        <div class="field is-horizontal" v-else-if="field.format === 'DATETIME'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label is-capitalized">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p>
-                <input class="input is-fullwidth" type="datetime-local" :placeholder="field.value" v-model="field.value">
-              </p>
+          <!-- DATETIME -->
+          <div class="field" v-else-if="field.format === 'DATETIME'" :key="field.key">
+            <nav class="level m-b-sm">
+              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-right" v-show="field.fk">
+                <a class="button is-small is-white">
+                  <span class="is-capitalized">{{field.fk_table}}</span>
+                  <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </div>
+            </nav>
+            <div class="control is-expanded">
+              <div class="columns">
+                <div class="column"><datepicker class="input is-fullwidth" type="date" :placeholder="field.dateString" v-model="field.dateString"></datepicker></div>
+                <div class="column"><input class="input is-fullwidth" type="input" :placeholder="field.timeString" v-model="field.timeString"></div>
+              </div>
+              <!-- <input class="input is-fullwidth" type="datetime-local" :placeholder="field.modifiedValue" v-model="field.modifiedValue"> -->
             </div>
+            <p class="help">&nbsp;</p>
           </div>
-        </div>
 
-        <div class="field is-horizontal" v-else-if="field.format === 'TEXTAREA'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label is-capitalized">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded">
-                <textarea class="textarea is-fullwidth" :placeholder="field.value" v-model="field.value" rows="2"></textarea>
-              </p>
+          <!-- TEXTAREA -->
+          <div class="field" v-else-if="field.format === 'TEXTAREA'" :key="field.key">
+            <nav class="level m-b-sm">
+              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-right" v-show="field.fk">
+                <a class="button is-small is-white">
+                  <span class="is-capitalized">{{field.fk_table}}</span>
+                  <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </div>
+            </nav>
+            <div class="control is-expanded">
+              <textarea class="textarea is-fullwidth" :placeholder="field.modifiedValue" v-model="field.modifiedValue" rows="2"></textarea>
             </div>
+            <p class="help">&nbsp;</p>
           </div>
-        </div>
-
-        <div class="field is-horizontal" v-else-if="field.format === 'TEXT'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label is-capitalized">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded">
-                <input class="input is-fullwidth" type="text" :placeholder="field.value" v-model="field.value">
-              </p>
+          
+          <!-- TEXT -->
+          <div class="field" v-else-if="field.format === 'TEXT'" :key="field.key">
+            <nav class="level m-b-sm">
+              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-right" v-show="field.fk">
+                <a class="button is-small is-white">
+                  <span class="is-capitalized">{{field.fk_table}}</span>
+                  <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </div>
+            </nav>
+            <div class="control is-expanded">
+              <input class="input is-fullwidth" type="text" :placeholder="field.modifiedValue" v-model="field.modifiedValue">
             </div>
+            <p class="help">&nbsp;</p>
           </div>
-        </div>
 
-        <div class="field is-horizontal" v-else-if="field.format === 'DATE'" :key="field.key">
-          <div class="field-label is-normal">
-            <label class="label is-capitalized">{{field.label}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p>
-                <datepicker class="input is-fullwidth" type="date" :placeholder="field.value" v-model="field.value"></datepicker>
-              </p>
+          <!-- DATE -->
+          <div class="field" v-else-if="field.format === 'DATE'" :key="field.key">
+            <nav class="level m-b-sm">
+              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-right" v-show="field.fk">
+                <a class="button is-small is-white">
+                  <span class="is-capitalized">{{field.fk_table}}</span>
+                  <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </div>
+            </nav>
+            <div class="control is-expanded">
+              <datepicker class="input is-fullwidth" type="date" :placeholder="field.modifiedValue" v-model="field.modifiedValue"></datepicker>
             </div>
+            <p class="help">&nbsp;</p>
           </div>
-        </div>
 
-      </template>
+        </template>
+      </div>
+    </div>
+
+    <div class="joins column is-5" v-if="joins.length">
+      <h5 class="title is-5 is-capitalized">Joins</h5>
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+          <li :class="{'is-active': (i + 1) === joins.length}" v-for="(join, i) in joins" :key="i">
+            <a class="is-capitalized" @click="goToJoinHistory(i + 1)">
+              {{Helpers.cleanseTableName(join['fk_table'])}}
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="box">
+        <ReadOnlyCard :columns="activeJoin.columns" :record="activeJoin.data" @onShowJoin="joinTable" />
+      </div>
+    </div>
   </div>
+
 
   <ModalConfirm
     :icon="'fa-times'"
@@ -165,38 +223,52 @@
 </template>
 
 <script>
-import * as Helpers from '~/lib/helpers'
-import * as PostgrestHelpers from '~/lib/postgrestHelpers'
-import Datepicker from '~/components/Datepicker.vue'
-import ModalConfirm from '~/components/ModalConfirm.vue'
+import * as Helpers             from '~/lib/helpers'
+import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
+import Datepicker               from '~/components/Datepicker.vue'
+import ModalConfirm             from '~/components/ModalConfirm.vue'
+import ReadOnlyCard             from '~/components/hummingbird/ReadOnlyCard.vue'
+
+var getRecord = function (context, appId, resourceKey, selector) {
+  const proxyUrlBase = `/api/postgrest/${appId}/${resourceKey}`
+  const headers = { 'headers': { 'accept': 'application/vnd.pgrst.object+json' } }
+  return context.$axios.get(`${proxyUrlBase}?q=${selector}`, headers)
+}
+
 export default {
   async asyncData ({ app, params, query, route, store }) {
     let { appId, resourceKey } = params
     let isCreated = (params.method === 'edit') ? true : false
-    const proxyUrlBase = `/api/postgrest/${appId}/${resourceKey}`
     let record = {}
     if (isCreated) {
-      let { data:response } = await app.$axios.get(`${proxyUrlBase}?q=${query.q}`, {
-        'headers': { 'accept': 'application/vnd.pgrst.object+json' }
-      })
+      let { data:response } = await getRecord(app, appId, resourceKey, query.q)
       record = response.data
     }
     let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
     let formattedFields = availableFields
-      // .map(x => PostgrestHelpers.calulateDisplayTypeFromSwaggerInfo(x)) // try figure out how each field should be displayed
-      .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) // add the current value to each field
+      // .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) 
+      .map(x => ({...x, value: record[`${x.key}`], modifiedValue: record[`${x.key}`] })) // add the current value to each field
       .map(x => PostgrestHelpers.enrichValues(x)) // add useful data to each field. eg, add Date() to timestamp strings
     return {
       appId: appId,
       availableFields: availableFields,
       confirmDeleteModalVisible: false,
       formattedFields: formattedFields,
+      joins: [], // the user can page through foreign keys
       isCreated: isCreated,
       pageTitle: resourceKey.replace(/_/g, ' '),
       primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
-      proxyUrlBase: proxyUrlBase,
+      proxyUrlBase: `/api/postgrest/${appId}/${resourceKey}`,
       record: record,
       resourceKey: resourceKey
+    }
+  },
+  computed: {
+    Helpers: { // expose all Helpers to the page
+      get() { return Helpers }
+    },
+    activeJoin () {
+      return this.joins[(this.joins.length - 1)]
     }
   },
   methods: {
@@ -209,8 +281,8 @@ export default {
       let self = this
       let data = {} // the object to be sent to the database
       this.formattedFields
-        .filter(x => x.value) // get fields that have been filled out
-        .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
+        .filter(x => x.modifiedValue) // get fields that have been filled out
+        .forEach(x => { data[x.key] = x.modifiedValue }) // populate the object to be sent to the database
       let url = `${this.proxyUrlBase}`
       return this.$axios.post(this.proxyUrlBase, data).catch(this.handleErrorResponse)
     },
@@ -237,6 +309,21 @@ export default {
       this.$toast.error(details, { duration: 4000 })
       return { data: null }
     },
+    goToJoinHistory (index) {
+      this.joins = this.joins.slice(0, index)
+    },
+    joinTable: async function (fieldInfo, resetArray) {
+      let joins = resetArray ? [] : this.joins
+      let field = {...fieldInfo}
+      let selector = `${field['fk_col']}=eq.${field.value}`
+      let q = encodeURIComponent(Helpers.encrypt(selector))
+      let { data:response } = await getRecord(this, this.appId, field['fk_table'], q)
+      let availableFields = this.$store.getters['hummingbird/columnsForResource'](field['fk_table'])
+      field.columns = availableFields
+      field.data = response.data
+      joins.push(field)
+      this.joins = joins
+    },
     save: async function () {
       let { data:proxyResponse } = (this.isCreated) ? await this.updateRecord() : await this.createRecord()
       if (proxyResponse && proxyResponse.data) {
@@ -249,19 +336,19 @@ export default {
     },
     // update the database. This uses PATCH so only the data that is passed will be updated
     updateRecord: async function () {
-      let data = {} // the object to be sent to the database
-      let selector = this.getUniqueSelector(this.record)
-      let url = `${this.proxyUrlBase}?${selector}`
+      let selector = Helpers.encrypt(this.getUniqueSelector(this.record))
+      let url = `${this.proxyUrlBase}?q=${encodeURIComponent(selector)}`
       if (!selector) {
         this.$toast.error('Couldn\'t find a primary key', { duration: 4000 })
         return null
       } else if (!await this.verifyUrlReturnsUnique(url)) {
-        this.$toast.error('Couldn\'t get a unique selector', { duration: 4000 })
+        this.$toast.error('Couldn\'t get a unique selector. This would cause multiple updates to the database.', { duration: 4000 })
         return null
       } else {
+        let data = {} // the object to be sent to the database
         this.formattedFields
           .filter(x => PostgrestHelpers.hasDataChanged(x)) // get only modified fields
-          .forEach(x => { data[x.key] = x.value }) // populate the object to be sent to the database
+          .forEach(x => { data[x.key] = x.modifiedValue }) // populate the object to be sent to the database
         return this.$axios.patch(url, data).catch(this.handleErrorResponse)
       }
     },
@@ -273,7 +360,7 @@ export default {
 
   // View handlers
   layout: 'hummingbird',
-  components: { Datepicker, ModalConfirm },
+  components: { Datepicker, ModalConfirm, ReadOnlyCard },
   watchQuery: ['q'],
   beforeRouteEnter (to, from, next) {
     next(vm => { vm.fromRoute = from }) // for the "back" function
@@ -293,6 +380,12 @@ export default {
 
   .links {
     padding-top: 15px;
+  }
+
+  .joins {
+    .box {
+      overflow: hidden;
+    }
   }
 }
 </style>

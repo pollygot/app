@@ -291,6 +291,7 @@
 
 <script>
 import axios                    from 'axios'
+import flat                     from 'flat'
 import json2csv                 from 'json2csv'
 import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
@@ -320,10 +321,10 @@ export default {
     let newParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
     let viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
     let allTables = store.getters['hummingbird/tables']
-    if (!viewParams.columns.length) viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
-    
-    // let val = function (val) { return val.replace('.net/', '.net/100t/') }
-    // console.log('val.toString()', val.toString())
+    if (!viewParams.columns.length) {
+      // we should get all joined table here
+      viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
+    }
 
     // Convert the newParms into a query string for PostgREST
     let postgrestQueryString = ''
