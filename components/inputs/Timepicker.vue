@@ -1,7 +1,7 @@
 <template>
 <div class="TimePicker">
   <div class="control has-icons-left">
-    <input class="input" type="input" :class="(inputClass) ? inputClass : ''" :placeholder="placeholder">
+    <input class="input" type="time" :class="(inputClass) ? inputClass : ''" :placeholder="placeholder" :value="value" @change="onChange($event.target.value)" data-input>
     <span class="icon is-left"><i class="fas fa-clock"></i></span>
   </div>
 </div>
@@ -20,6 +20,9 @@ export default {
     return {}
   },
   methods: {
+    onChange (value) {
+      this.$emit('onChange', value)
+    }
   }
 }
 </script>

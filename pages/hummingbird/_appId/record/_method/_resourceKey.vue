@@ -120,16 +120,7 @@
               </div>
             </nav>
             <div class="control is-expanded">
-              <div class="columns">
-                <div class="column">
-                  <datepicker :placeholder="field.dateString" v-model="field.dateString"></datepicker>
-                </div>
-                <div class="column">
-                  <timepicker :placeholder="field.timeString" v-model="field.timeString"></timepicker>
-                  <!-- <input class="input is-fullwidth" type="input" :placeholder="field.timeString" v-model="field.timeString"> -->
-                </div>
-              </div>
-              <!-- <input class="input is-fullwidth" type="datetime-local" :placeholder="field.modifiedValue" v-model="field.modifiedValue"> -->
+              <datetimepicker :placeholder="field.dateString" :value="field.modifiedValue" @onChange="v => field.modifiedValue = v"></datetimepicker>
             </div>
             <p class="help">&nbsp;</p>
           </div>
@@ -231,6 +222,7 @@
 import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
 import Datepicker               from '~/components/inputs/Datepicker.vue'
+import Datetimepicker           from '~/components/inputs/Datetimepicker.vue'
 import Timepicker               from '~/components/inputs/Timepicker.vue'
 import ModalConfirm             from '~/components/ModalConfirm.vue'
 import ReadOnlyCard             from '~/components/hummingbird/ReadOnlyCard.vue'
@@ -253,10 +245,7 @@ export default {
       record = response.data
     }
     let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
-    let formattedFields = availableFields
-      // .map(x => (Object.assign({ value:record[`${x.key}`] }, x))) 
-      .map(x => ({...x, value: record[`${x.key}`], modifiedValue: record[`${x.key}`] })) // add the current value to each field
-      .map(x => PostgrestHelpers.enrichValues(x)) // add useful data to each field. eg, add Date() to timestamp strings
+    let formattedFields = availableFields.map(x => ({...x, value: record[`${x.key}`], modifiedValue: record[`${x.key}`] })) // add the current value to each field
     return {
       appId: appId,
       availableFields: availableFields,
@@ -286,12 +275,12 @@ export default {
       else this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
     },
     createRecord () {
-      let self = this
       let data = {} // the object to be sent to the database
       this.formattedFields
         .filter(x => x.modifiedValue) // get fields that have been filled out
         .forEach(x => { data[x.key] = x.modifiedValue }) // populate the object to be sent to the database
       let url = `${this.proxyUrlBase}`
+      console.log('this.formattedFields', this.formattedFields)
       return this.$axios.post(this.proxyUrlBase, data).catch(this.handleErrorResponse)
     },
     deleteRecord: async function () {
@@ -368,7 +357,7 @@ export default {
 
   // View handlers
   layout: 'hummingbird',
-  components: { Datepicker, Timepicker, ModalConfirm, ReadOnlyCard },
+  components: { Datepicker, Datetimepicker, Timepicker, ModalConfirm, ReadOnlyCard },
   watchQuery: ['q'],
   beforeRouteEnter (to, from, next) {
     next(vm => { vm.fromRoute = from }) // for the "back" function
