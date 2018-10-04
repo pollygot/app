@@ -1,10 +1,13 @@
+require('dotenv').config()
 const axios = require('axios')
 const express = require('express')
 const Pollygot = require('../lib/pollygot')
 const Helpers = require('../lib/commonjs/helpers')
+const jwt = require('express-jwt')
 
 const app = express()
 app.use(express.json())
+app.use(jwt({ secret: process.env.JWT_SECRET }))
 
 const PATCH_HEADERS = {
   'headers': { 'Accept': 'application/vnd.pgrst.object+json', 'Prefer': 'return=representation' }

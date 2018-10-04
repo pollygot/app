@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -14,7 +15,7 @@ app.use(bodyParser.json())
 // JWT middleware
 app.use(
   jwt({
-    secret: 'dummy'
+    secret: process.env.JWT_SECRET
   }).unless({
     path: '/api/auth/login'
   })
@@ -24,8 +25,10 @@ app.use(
 
 // [POST] /login
 app.post('/login', (req, res, next) => {
+
+  console.log('process.env.JWT_SECRET', process.env.JWT_SECRET)
   const { username, password } = req.body
-  const valid = username.length && password === 'admin'
+  const valid = username.length && password === process.env.ADMIN_PASSWORD // temporary!!!
 
   if (!valid) {
     throw new Error('Invalid username or password')
@@ -38,7 +41,7 @@ app.post('/login', (req, res, next) => {
       name: 'User ' + username,
       scope: ['test', 'user']
     },
-    'dummy'
+    process.env.JWT_SECRET
   )
 
   res.json({

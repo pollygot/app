@@ -62,8 +62,7 @@ export default {
       let all = []
       if (process.env.AUTH0_DOMAIN) all.push({ key: 'auth0', name: 'Auth0', color: '#ec5425' })
       return all
-    }
-    ,
+    },
     redirect() {
       return (
         this.$route.query.redirect &&
@@ -77,7 +76,7 @@ export default {
   methods: {
     async login() {
       this.error = null
-      return this.$auth
+      let response = await this.$auth
         .loginWith('local', {
           data: {
             username: this.username,
@@ -87,6 +86,7 @@ export default {
         .catch(e => {
           this.error = e + ''
         })
+      console.log('response', response)
     }
   }
 }
