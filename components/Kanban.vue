@@ -7,13 +7,17 @@
       <div class="lane" :class="{ 'm-r-lg': ((i+1) === stateNames.length)}" :key="'lane'+i">
         <div class="title is-6 is-capitalized m-sm has-text-centered">{{stateName.toLowerCase()}}</div>
 
-          <draggable :ref="stateName + '_element'" class="cards drag-container" v-model="states['' + stateName]" :options="{group:{ name:'states'}}" @add="stateChanged">
-            <a class="card box draggable-item" v-for="(card, i) in states['' + stateName]" :key="'card'+stateName+i" >
+          <draggable :ref="stateName + '_element'" :id="stateName" class="cards drag-container" v-model="states['' + stateName]" :options="{group:{ name:'states'}}" @add="stateChanged">
+            
+            <!-- Card -->
+            <a class="card box draggable-item" v-for="(card, i) in states['' + stateName]" :key="'card'+stateName+i" :target="JSON.stringify(card)">
+              <!-- Fields -->
               <div v-for="(column, j) in columns" :key="'col-td'+j" class="field" v-if="card[`${column.key}`] !== null && card[`${column.key}`] !== '' && column.key !== pivotKey">
                 <span class="heading has-text-grey-light m-b-none">{{ column.label }}</span>
                 <div class="value">{{ card[`${column.key}`].toString() || '&nbsp;' }}</div>
               </div>
             </a>
+
           </draggable>
           <a class="button m-t-xs footer-button">Load more</a>
       </div>
@@ -53,8 +57,14 @@ export default {
     }
   },
   methods: {
-    stateChanged (v) {
-      console.log('v', v)
+    stateChanged (event) {
+      let {id:newState} = event.to
+      let {target:record} = event.item // @TODO this is a huge hack tbh
+      this.$emit('onChange', {
+        record: JSON.parse(record),
+        column: this.pivotKey,
+        value: newState
+      })
     }
   },
 

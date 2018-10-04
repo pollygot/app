@@ -328,7 +328,7 @@ export default {
       return PostgrestHelpers.createRecord(this, this.appId, this.resourceKey, data).catch(this.handleErrorResponse)
     },
     deleteRecord: async function () {
-      let selector = Helpers.encrypt(this.getUniqueSelector(this.record))
+      let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, this.record))
       if (!selector) {
         this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
         return null
@@ -339,11 +339,6 @@ export default {
         let { data:deleteResponse } = await PostgrestHelpers.deleteRecord(this, this.appId, this.resourceKey, selector).catch(this.handleErrorResponse)
         if (deleteResponse) this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
       }
-    },
-    getUniqueSelector (record) {
-      let pkFilters = this.primaryKeys.map(x => (`${x}=eq.${record[x]}`))
-      if (!pkFilters.length) return null
-      else return pkFilters.join('&')
     },
     handleErrorResponse (e) {
       let { message } = e.response.data
@@ -370,14 +365,14 @@ export default {
       if (proxyResponse && proxyResponse.data) {
         let response = proxyResponse.data
         this.$toast.success('Saved!', { duration: 1000 })
-        let q = Helpers.encrypt(this.getUniqueSelector(response))
+        let q = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, response))
         let path = `/hummingbird/${this.appId}/record/edit/${this.resourceKey}?q=` + encodeURIComponent(q) // there is an occasional "+" appearing when not re-encoded. Not sure why..
         this.$router.replace({path: path})
       }
     },
     // update the database. This uses PATCH so only the data that is passed will be updated
     updateRecord: async function () {
-      let selector = Helpers.encrypt(this.getUniqueSelector(this.record))
+      let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, this.record))
       if (!selector) {
         this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
         return null

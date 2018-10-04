@@ -226,6 +226,7 @@
         :pivotKey="viewParams.pivot_key"
         :columns="viewParams.columns"
         :records="records"
+        @onChange="({ record, column, value }) => { this.updateRecordField(record, column, value) }"
       />
       <div v-show="!viewParams.pivot_key && enumColumns.length">
         <h3 class="title is-5 has-text-centered m-xl">Select a field you'd like to pivot on.</h3>
@@ -310,9 +311,14 @@ const DEFAULT_PAGINATION_SIZE       = 20 // Pagination
 const DEFAULT_POSTGREST_QUERY       = { select: '*', limit: DEFAULT_PAGINATION_SIZE }
 const VIEW_TYPES                    = { GRID: 'GRID', CALENDAR: 'CALENDAR', CARDS: 'CARDS', KANBAN: 'KANBAN' }
 const DEFAULT_VIEW_PARAMS           = { view: VIEW_TYPES.GRID, columns: [] } // columns added on load
+const DOWNLOAD_FORMATS              = { CSV: 'CSV', JSON: 'JSON' }
+const ERROR_MESSAGE_NO_PK           = 'Couldn\'t find a primary key'
+const ERROR_MESSAGE_NOT_UNIQUE      = 'Couldn\'t get a unique selector. This would cause multiple updates to the database.'
 const NUM_SPACES                    = 2 // for tabsToSpaces in text areas
 const PANELS                        = { COLUMNS: 'COLUMNS', JOINS: 'JOINS', FILTERS: 'FILTERS', SORTING: 'SORTING',  }
-const DOWNLOAD_FORMATS              = { CSV: 'CSV', JSON: 'JSON' }
+const SUCCESS_MESSAGE               = 'Saved!'
+const TOAST_ERROR_DURATION          = 4000
+const TOAST_SUCCESS_DURATION        = 1000
 
 export default {
   async asyncData ({ app, params, query, store }) {
@@ -348,6 +354,7 @@ export default {
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestParams: newParams,
+      primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
       queryEditorMode: false,
       records: response.data,
       resourceKey: params.resourceKey,
@@ -519,6 +526,10 @@ export default {
         this.sortColumns(newSorting)
       }
     },
+    toggleVisiblePanel (panelName) {
+      let visible = (this.visiblePanel === panelName) ? null : panelName
+      this.visiblePanel = visible
+    },
     updateColumns (columns) {
       this.visiblePanel = null
       this.pushEncodedQuery('v', { ...this.viewParams, columns: columns })
@@ -526,9 +537,21 @@ export default {
     updateLimit (newSize) {
       this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
     },
-    toggleVisiblePanel (panelName) {
-      let visible = (this.visiblePanel === panelName) ? null : panelName
-      this.visiblePanel = visible
+    updateRecordField: async function (record, column, value) { // updates an individual field
+      console.log('record', record)
+      console.log('column', column)
+      console.log('value', value)
+      let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, record))
+      console.log('selector', selector)
+      if (!selector) this.$toast.error(ERROR_MESSAGE_NO_PK, { duration: TOAST_ERROR_DURATION })
+      else if (!await PostgrestHelpers.verifySelectorReturnsUnique(this, this.appId, this.resourceKey, selector)) {
+        this.$toast.error(ERROR_MESSAGE_NOT_UNIQUE, { duration: TOAST_ERROR_DURATION })
+      } else {
+        let data = {}
+        data[`${column}`] = value
+        let {data:response} = await PostgrestHelpers.updateRecord(this, this.appId, this.resourceKey, selector, data).catch(this.handleErrorResponse)
+        if (response) this.$toast.success(SUCCESS_MESSAGE, { duration: TOAST_SUCCESS_DURATION })
+      }
     },
   },
 

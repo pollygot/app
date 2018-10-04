@@ -25,8 +25,6 @@ app.use(
 
 // [POST] /login
 app.post('/login', (req, res, next) => {
-
-  console.log('process.env.JWT_SECRET', process.env.JWT_SECRET)
   const { username, password } = req.body
   const valid = username.length && password === process.env.ADMIN_PASSWORD // temporary!!!
 
@@ -44,7 +42,7 @@ app.post('/login', (req, res, next) => {
     process.env.JWT_SECRET
   )
 
-  res.json({
+  return res.json({
     token: {
       accessToken
     }
