@@ -538,11 +538,7 @@ export default {
       this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
     },
     updateRecordField: async function (record, column, value) { // updates an individual field
-      console.log('record', record)
-      console.log('column', column)
-      console.log('value', value)
       let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, record))
-      console.log('selector', selector)
       if (!selector) this.$toast.error(ERROR_MESSAGE_NO_PK, { duration: TOAST_ERROR_DURATION })
       else if (!await PostgrestHelpers.verifySelectorReturnsUnique(this, this.appId, this.resourceKey, selector)) {
         this.$toast.error(ERROR_MESSAGE_NOT_UNIQUE, { duration: TOAST_ERROR_DURATION })
