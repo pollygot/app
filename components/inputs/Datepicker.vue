@@ -1,5 +1,8 @@
 <template>
-  <input class="input" :class="inputClass" type="text" :placeholder="placeholder" :value="value" data-input/>
+  <div class="control has-icons-left">
+    <input class="input" :class="inputClass" type="text" :placeholder="placeholder" :value="value" data-input/>
+    <span class="icon is-left"><i class="fas fa-calendar"></i></span>
+  </div>
 </template>
 
 <script>
@@ -11,7 +14,6 @@ import Flatpickr from 'flatpickr'
 
 export default {
   props: {
-    alignment: String,
     config: { type: Object, default: () => ({}) },
     placeholder: { type: String, default: 'Pick date' },
     inputClass: { type: [Object, Array], default: function() { return {} } },

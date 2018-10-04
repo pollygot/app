@@ -78,7 +78,7 @@
             <nav class="level m-b-sm">
               <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
               <div class="level-right" v-show="field.fk">
-                <a class="button is-small is-white" @click="joinTable(field, true)">
+                <a class="button is-small is-white" @click="joinTable(Object.assign({}, field, {value: field.modifiedValue}), true)">
                   <span class="is-capitalized">{{field.fk_table}}</span>
                   <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
                 </a>
@@ -121,8 +121,13 @@
             </nav>
             <div class="control is-expanded">
               <div class="columns">
-                <div class="column"><datepicker class="input is-fullwidth" type="date" :placeholder="field.dateString" v-model="field.dateString"></datepicker></div>
-                <div class="column"><input class="input is-fullwidth" type="input" :placeholder="field.timeString" v-model="field.timeString"></div>
+                <div class="column">
+                  <datepicker :placeholder="field.dateString" v-model="field.dateString"></datepicker>
+                </div>
+                <div class="column">
+                  <timepicker :placeholder="field.timeString" v-model="field.timeString"></timepicker>
+                  <!-- <input class="input is-fullwidth" type="input" :placeholder="field.timeString" v-model="field.timeString"> -->
+                </div>
               </div>
               <!-- <input class="input is-fullwidth" type="datetime-local" :placeholder="field.modifiedValue" v-model="field.modifiedValue"> -->
             </div>
@@ -175,7 +180,7 @@
               </div>
             </nav>
             <div class="control is-expanded">
-              <datepicker class="input is-fullwidth" type="date" :placeholder="field.modifiedValue" v-model="field.modifiedValue"></datepicker>
+              <datepicker :placeholder="field.modifiedValue" v-model="field.modifiedValue"></datepicker>
             </div>
             <p class="help">&nbsp;</p>
           </div>
@@ -225,9 +230,12 @@
 <script>
 import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
-import Datepicker               from '~/components/Datepicker.vue'
+import Datepicker               from '~/components/inputs/Datepicker.vue'
+import Timepicker               from '~/components/inputs/Timepicker.vue'
 import ModalConfirm             from '~/components/ModalConfirm.vue'
 import ReadOnlyCard             from '~/components/hummingbird/ReadOnlyCard.vue'
+
+const TOAST_ERROR_DURATION = 4000
 
 var getRecord = function (context, appId, resourceKey, selector) {
   const proxyUrlBase = `/api/postgrest/${appId}/${resourceKey}`
@@ -290,9 +298,9 @@ export default {
       let selector = this.getUniqueSelector(this.record)
       let url = `${this.proxyUrlBase}?q=` + encodeURIComponent(Helpers.encrypt(selector))
       if (!selector) {
-        this.$toast.error('Couldn\'t find a primary key', { duration: 4000 })
+        this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
       } else if (!await this.verifyUrlReturnsUnique(url)) {
-        this.$toast.error('Couldn\'t get a unique selector', { duration: 4000 })
+        this.$toast.error('Couldn\'t get a unique selector', { duration: TOAST_ERROR_DURATION })
         return null
       } else {
         let { data:deleteResponse } = await this.$axios.delete(url).catch(this.handleErrorResponse)
@@ -305,8 +313,8 @@ export default {
       else return pkFilters.join('&')
     },
     handleErrorResponse (e) {
-      let { details } = e.response.data
-      this.$toast.error(details, { duration: 4000 })
+      let { message } = e.response.data
+      this.$toast.error(`Error: ${message}`, { duration: TOAST_ERROR_DURATION })
       return { data: null }
     },
     goToJoinHistory (index) {
@@ -339,10 +347,10 @@ export default {
       let selector = Helpers.encrypt(this.getUniqueSelector(this.record))
       let url = `${this.proxyUrlBase}?q=${encodeURIComponent(selector)}`
       if (!selector) {
-        this.$toast.error('Couldn\'t find a primary key', { duration: 4000 })
+        this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
         return null
       } else if (!await this.verifyUrlReturnsUnique(url)) {
-        this.$toast.error('Couldn\'t get a unique selector. This would cause multiple updates to the database.', { duration: 4000 })
+        this.$toast.error('Couldn\'t get a unique selector. This would cause multiple updates to the database.', { duration: TOAST_ERROR_DURATION })
         return null
       } else {
         let data = {} // the object to be sent to the database
@@ -360,7 +368,7 @@ export default {
 
   // View handlers
   layout: 'hummingbird',
-  components: { Datepicker, ModalConfirm, ReadOnlyCard },
+  components: { Datepicker, Timepicker, ModalConfirm, ReadOnlyCard },
   watchQuery: ['q'],
   beforeRouteEnter (to, from, next) {
     next(vm => { vm.fromRoute = from }) // for the "back" function

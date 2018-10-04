@@ -54,11 +54,12 @@ app.patch('/:appId/:resourceKey', async (req, res, next) => {
  */
 app.post('/:appId/:resourceKey', async (req, res, next) => {
   if (!req.body) return res.status(422).json({ data: 'Must provide a payload' })
+  if (req.query && req.query.q) return res.status(422).json({ data: 'Use PATCH to make updates!' })
 
   const { appId, resourceKey } = req.params
   const payload = req.body
   let app = await Pollygot.getAppConfig(appId)
-  let fullUrl = `${app.config.url}/${resourceKey}` + `?${Helpers.decrypt(req.query.q.toString())}`
+  let fullUrl = `${app.config.url}/${resourceKey}`
   console.log('PostgREST POST: fullUrl', fullUrl)
   axios.post(fullUrl, payload, POST_HEADERS)
     .then(response => { return res.json({ data: response.data, headers: response.headers }) })
