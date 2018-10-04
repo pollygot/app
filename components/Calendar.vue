@@ -10,7 +10,14 @@
           <h2 class="title is-1">{{date.format('DD')}}</h2>
         </div>
         <div>
-
+          <a v-for="(record, i) in recordsForDate(date)" :key="'record'+i" @click="$emit('onRecordClicked', record)">
+            <div class="card has-corners m-sm p-sm is-size-7">
+              <div v-for="(column, j) in columns" :key="'col-td'+j" class="field" v-if="!column.hidden && record[`${column.key}`] !== null && record[`${column.key}`]">
+                <div class="heading has-text-grey-light m-b-none">{{ column.label }}</div>
+                <div class="value">{{ record[`${column.key}`].toString() || '&nbsp;' }}</div>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     </div>
@@ -25,12 +32,16 @@ import moment from 'moment'
 export default {
   name: 'Calendar',
   props: {
+    columns: { required: true, type: Array },
+    date: { type: String, required: true },
+    pivotKey: { type: String, required: false },
+    records: { type: Array, required: true },
   },
   data() {
     return {
       CALENDAR_TYPES: CALENDAR_TYPES,
       calendarType: CALENDAR_TYPES.WEEK,
-      selectedDate: moment()
+      selectedDate: moment(this.date)
     }
   },
   computed: {
@@ -44,6 +55,13 @@ export default {
     }
   },
   methods: {
+    recordsForDate (date) {
+      let day = moment(date)
+      return this.records.filter(x => {
+        let recordDate = moment(x[`${this.pivotKey}`])
+        return recordDate.isSame(day, 'd')
+      })
+    }
   }
 }
 </script>
@@ -66,6 +84,9 @@ export default {
         }
       }
     }
+  }
+  .card {
+    overflow: hidden;
   }
 }
 </style>

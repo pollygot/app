@@ -351,9 +351,11 @@ export default {
     joinTable: async function (fieldInfo, resetArray) {
       let joins = resetArray ? [] : this.joins
       let field = {...fieldInfo}
+      console.log('field', field)
       let selector = `${field['fk_col']}=eq.${field.value}`
-      let q = encodeURIComponent(Helpers.encrypt(selector))
-      let { data:response } = await getRecord(this, this.appId, field['fk_table'], q)
+      console.log('selector', selector)
+      let q = Helpers.encrypt(selector)
+      let { data:response } = await PostgrestHelpers.getRecord(this, this.appId, field['fk_table'], q)
       let availableFields = this.$store.getters['hummingbird/columnsForResource'](field['fk_table'])
       field.columns = availableFields
       field.data = response.data

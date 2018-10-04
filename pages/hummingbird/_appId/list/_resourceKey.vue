@@ -5,7 +5,6 @@
     <div class="top-level m-b-md">
       <nav class="level is-mobile p-lg m-none">
         <div class="level-left">
-          <!--START Generic fields -->
           <!-- <a class="level-item button is-small" @click="toggleVisiblePanel(PANELS.JOINS)" :class="{'is-dark': visiblePanel === PANELS.JOINS}">
             <span class="icon is-small"><i class="fas fa-link"></i></span>
             <span>Joins</span>
@@ -28,11 +27,50 @@
                 <div class="dropdown-trigger">
                   <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
                     <span class="icon is-small has-text-grey"><i class="fas fa-cog" aria-hidden="true"></i></span>
-                    <span>View</span>
+                    <span class="is-capitalized">{{currentViewType.toLowerCase()}}</span>
                   </button>
                 </div>
                 <div class="dropdown-menu" role="menu">
                   <div class="dropdown-content">
+
+                    <!-- CARD fields -->
+                    <div v-show="currentViewType === VIEW_TYPES.CARDS">
+                      <p class="dropdown-item heading is-size-7" v-show="potentialImageColumns.length">Set card image</p>
+                      <a class="dropdown-item" v-for="(col, i) in potentialImageColumns" :key="i" @click="changeCardImage(col.key)">
+                        <span :class="{'has-text-primary': col.key === viewParams.image_key}">{{col.label}}</span>
+                      </a>
+                      <a class="dropdown-item has-text-danger" 
+                        v-show="potentialImageColumns.length && viewParams.image_key"
+                        @click="changeCardImage(null)">Remove</a>
+                      <hr class="dropdown-divider">
+                    </div>
+                    <!-- CALENDAR fields -->
+                    <div v-show="currentViewType === VIEW_TYPES.CALENDAR">
+                      <p class="dropdown-item heading is-size-7">Pivot</p>
+                      <a class="dropdown-item" 
+                        v-for="column in dateColumns" 
+                        :key="column.key"
+                        @click="changeCalendarPivot(column.key)"
+                        :class="{'has-text-primary': column.key === viewParams.pivotKey}">
+                        {{column.label}}
+                      </a>
+                      <hr class="dropdown-divider">
+                    </div>
+                    <!-- KANBAN fields -->
+                    <div v-show="currentViewType === VIEW_TYPES.KANBAN">
+                      <div v-show="enumColumns.length">
+                        <p class="dropdown-item heading is-size-7">Pivot</p>
+                        <a class="dropdown-item" 
+                          v-for="column in enumColumns" 
+                          :key="column.key"
+                          @click="changeKanbanPivot(column.key)"
+                          :class="{'has-text-primary': column.key === viewParams.pivotKey}">
+                          {{column.label}}
+                        </a>
+                        <hr class="dropdown-divider">
+                      </div>
+                    </div>
+
                     <p class="dropdown-item heading is-size-7">Download</p>
                     <a class="dropdown-item" @click="downloadRecords(DOWNLOAD_FORMATS.CSV)">CSV</a>
                     <!-- <a class="dropdown-item">JSON</a> -->
@@ -49,65 +87,15 @@
               </div>
             </div>
           </div>
-          <!--END Generic fields -->
 
-          <!--START CARD fields -->
-          <div class="level-item field is-grouped" v-show="currentViewType === VIEW_TYPES.CARDS">
+          <!--START CALENDAR fields -->
+          <div class="level-item field is-grouped" v-show="currentViewType === VIEW_TYPES.CALENDAR">
             <div class="control">
-              <div class="dropdown is-hoverable  ">
-                <div class="dropdown-trigger">
-                  <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
-                    <span class="icon is-small has-text-grey"><i class="fas fa-th"></i></span>
-                    <span>Cards</span>
-                  </button>
-                </div>
-                <div class="dropdown-menu" role="menu">
-                  <div class="dropdown-content">
-                    <p class="dropdown-item heading is-size-7">Card size</p>
-                    <a class="dropdown-item"><span>Small</span></a>
-                    <a class="dropdown-item"><span>Medium</span></a>
-                    <a class="dropdown-item"><span>Large</span></a>
-                    <hr class="dropdown-divider" v-show="potentialImageColumns.length">
-                    <p class="dropdown-item heading is-size-7" v-show="potentialImageColumns.length">Set card image</p>
-                    <a class="dropdown-item" v-for="(col, i) in potentialImageColumns" :key="i" @click="changeCardImage(col.key)">
-                      <span :class="{'has-text-primary': col.key === viewParams.image_key}">{{col.label}}</span>
-                    </a>
-                    <a class="dropdown-item has-text-danger" 
-                      v-show="potentialImageColumns.length && viewParams.image_key"
-                      @click="changeCardImage(null)">Remove</a>
-                  </div>
-                </div>
-              </div>
+              <datepicker :inputClass="'is-small'" :value="viewParams.date" @onChange="changeCalendarDate"></datepicker>
             </div>
           </div>
-          <!--END CARD fields -->
+          <!--END CALENDAR fields -->
 
-          <!--START KANBAN fields -->
-          <div class="level-item field is-grouped" v-show="currentViewType === VIEW_TYPES.KANBAN">
-            <div class="control">
-              <div class="dropdown is-hoverable">
-                <div class="dropdown-trigger">
-                  <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu6">
-                    <span class="icon is-small has-text-grey"><i class="fas fa-columns"></i></span>
-                    <span>Kanban</span>
-                  </button>
-                </div>
-                <div class="dropdown-menu" role="menu">
-                  <div class="dropdown-content">
-                    <p class="dropdown-item heading is-size-7">Pivot</p>
-                    <a class="dropdown-item" 
-                      v-for="column in enumColumns" 
-                      :key="column.key"
-                      @click="changeKanbanPivot(column.key)"
-                      :class="{'has-text-primary': column.key === viewParams.pivot_key}">
-                      {{column.label}}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!--END KANBAN fields -->
 
         </div>
         <div class="level-right">
@@ -161,7 +149,12 @@
       </div>
     </div>
 
-    <div class="table-box box p-none m-md m-b-xxl" v-show="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
+
+    <div class="p-none m-md m-b-xl" v-if="!records.length">
+      <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
+    </div>
+
+    <div class="table-box box p-none m-md m-b-xxl" v-if="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
       <Table
         class=""
         :columns="viewParams.columns"
@@ -190,7 +183,7 @@
       </div>
     </div>
 
-    <div class="p-none m-md m-b-xxl" v-show="currentViewType === VIEW_TYPES.CARDS && records.length" :key="cardsComponentMounted">
+    <div class="p-none m-md m-b-xxl" v-if="currentViewType === VIEW_TYPES.CARDS && records.length" :key="cardsComponentMounted">
       <CardList
         :imageKey="viewParams.image_key"
         :columns="viewParams.columns"
@@ -216,42 +209,42 @@
       </div>
     </div>
 
-    <div class="" v-show="currentViewType === VIEW_TYPES.CALENDAR && records.length" :key="calendarComponentMounted">
-      <Calendar />
+    <div class="" v-if="currentViewType === VIEW_TYPES.CALENDAR" :key="calendarComponentMounted">
+      <Calendar 
+        v-if="viewParams.date && viewParams.pivotKey"
+        :date="viewParams.date"
+        :columns="viewParams.columns"
+        :pivotKey="viewParams.pivotKey"
+        :records="records"
+        @onChange="({ record, column, date }) => { this.updateRecordField(record, column, date) }"
+        @onRecordClicked="goToRecord"
+      />
+      <div v-show="dateColumns.length && (!viewParams.date || !viewParams.pivotKey)">
+        <h3 class="title is-5 has-text-centered m-t-xl">Pick a date and a pivot column</h3>
+        <p class="has-text-centered">Use the menu above to customise your view.</p>
+      </div>
+      <div v-show="!dateColumns.length">
+        <h3 class="title is-5 has-text-centered m-t-xl">There aren't any date columns in this table to pivot</h3>
+        <p class="has-text-centered">We need a date column to build the calendar view.</p>
+      </div>
     </div>
 
-    <div class="" v-show="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
+    <div class="" v-if="currentViewType === VIEW_TYPES.KANBAN && records.length" :key="kanbanComponentMounted">
       <Kanban
-        v-if="viewParams.pivot_key"
-        :pivotKey="viewParams.pivot_key"
+        v-if="viewParams.pivotKey"
+        :pivotKey="viewParams.pivotKey"
         :columns="viewParams.columns"
         :records="records"
         @onChange="({ record, column, value }) => { this.updateRecordField(record, column, value) }"
       />
-      <div v-show="!viewParams.pivot_key && enumColumns.length">
-        <h3 class="title is-5 has-text-centered m-xl">Select a field you'd like to pivot on.</h3>
-        <div class="field has-addons has-addons-centered">
-          <div class="control has-icons-left">
-            <div class="select">
-              <select class="definitely-has-corners" @change="(e) => {this.changeKanbanPivot(e.target.value)}">
-                <option :selected="!viewParams.pivot_key">Select field</option>
-                <option v-for="column in enumColumns" :value="column.key" :key="column.key" class="is-capitalized" :selected="column.key === viewParams.pivot_key">
-                  {{column.label}}
-                </option>
-              </select>
-            </div>
-            <div class="icon is-left"><i class="fas fa-columns"></i></div>
-          </div>
-        </div>
+      <div v-show="!viewParams.pivotKey && enumColumns.length">
+        <h3 class="title is-5 has-text-centered m-t-xl">Select a field you'd like to pivot on</h3>
+        <p class="has-text-centered">Use the menu above to customise your view.</p>
       </div>
       <div v-show="!enumColumns.length">
-        <h3 class="title is-5 has-text-centered m-t-xl">There aren't any columns in this table to pivot.</h3>
+        <h3 class="title is-5 has-text-centered m-t-xl">There aren't any columns in this table to pivot</h3>
         <p class="has-text-centered">You can only pivot on columns with pre-defined database types.. for now :)</p>
       </div>
-    </div>
-
-    <div class="p-none m-md m-b-xl" v-if="!records.length">
-      <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
     </div>
 
   </div>
@@ -293,12 +286,14 @@
 <script>
 import axios                    from 'axios'
 import flat                     from 'flat'
+import moment                   from 'moment'
 import json2csv                 from 'json2csv'
 import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
 import Calendar                 from '~/components/Calendar.vue'
 import CardList                 from '~/components/CardList.vue'
 import ColumnsPanel             from '~/components/hummingbird/ColumnsPanel.vue'
+import Datepicker               from '~/components/inputs/Datepicker.vue'
 import FilterPanel              from '~/components/hummingbird/FilterPanel.vue'
 import JoinPanel                from '~/components/hummingbird/JoinPanel.vue'
 import Kanban                   from '~/components/Kanban.vue'
@@ -306,11 +301,10 @@ import Pagination               from '~/components/Pagination.vue'
 import SortPanel                from '~/components/hummingbird/SortPanel.vue'
 import Table                    from '~/components/Table.vue'
 
+
+const CALENDAR_TYPES                = { WEEK: 'week', MONTH: 'month' }
 const DEFAULT_OFFSET                = 0 // Pagination
 const DEFAULT_PAGINATION_SIZE       = 20 // Pagination
-const DEFAULT_POSTGREST_QUERY       = { select: '*', limit: DEFAULT_PAGINATION_SIZE }
-const VIEW_TYPES                    = { GRID: 'GRID', CALENDAR: 'CALENDAR', CARDS: 'CARDS', KANBAN: 'KANBAN' }
-const DEFAULT_VIEW_PARAMS           = { view: VIEW_TYPES.GRID, columns: [] } // columns added on load
 const DOWNLOAD_FORMATS              = { CSV: 'CSV', JSON: 'JSON' }
 const ERROR_MESSAGE_NO_PK           = 'Couldn\'t find a primary key'
 const ERROR_MESSAGE_NOT_UNIQUE      = 'Couldn\'t get a unique selector. This would cause multiple updates to the database.'
@@ -319,19 +313,44 @@ const PANELS                        = { COLUMNS: 'COLUMNS', JOINS: 'JOINS', FILT
 const SUCCESS_MESSAGE               = 'Saved!'
 const TOAST_ERROR_DURATION          = 4000
 const TOAST_SUCCESS_DURATION        = 1000
+const TODAY                         = moment()
+const VIEW_TYPES                    = { GRID: 'GRID', CALENDAR: 'CALENDAR', CARDS: 'CARDS', KANBAN: 'KANBAN' }
+
+// Dependencies on the constants above
+const DEFAULT_QUERY = { 
+  select: '*', 
+  limit: DEFAULT_PAGINATION_SIZE 
+}
+const DEFAULT_VIEW_PARAMS = { 
+  view: VIEW_TYPES.GRID, 
+  columns: [] 
+} 
+const DEFAULT_VIEW_PARAMS_CALENDAR  = { 
+  view: VIEW_TYPES.CALENDAR, 
+  type: CALENDAR_TYPES.WEEK, 
+  date: TODAY.format('YYYY-MM-DD'), 
+  pivotKey: null, 
+  columns: [] 
+}
+const DEFAULT_VIEW_PARAMS_KANBAN  = { 
+  view: VIEW_TYPES.KANBAN, 
+  pivotKey: null, 
+  columns: [] 
+}
 
 export default {
   async asyncData ({ app, params, query, store }) {
     let { appId, resourceKey } = params
     let { q, v } = query
-    let newParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_POSTGREST_QUERY
+    let newParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_QUERY
     let viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
     let allTables = store.getters['hummingbird/tables']
-    if (!viewParams.columns.length) {
-      // we should get all joined table here
-      viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
+    if (!viewParams.columns.length) viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
+    if (viewParams.view === VIEW_TYPES.CALENDAR && viewParams.date) {
+      console.log('viewParams', viewParams)
+      console.log('newParams', newParams)
+      // we need to get the all records within a certain week. Perhaps this should be done when the dates are changed in the view (??)
     }
-
     // Convert the newParms into a query string for PostgREST
     let postgrestQueryString = ''
     let mutatedParams = {...newParams}
@@ -351,6 +370,7 @@ export default {
       allTables: allTables,
       appId: appId,
       currentRangeEnd: rangeData.rangeEnd || 0,
+      calendarDateKey: null,
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestParams: newParams,
@@ -370,7 +390,7 @@ export default {
       // expose constants
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
-      DEFAULT_POSTGREST_QUERY: DEFAULT_POSTGREST_QUERY,
+      DEFAULT_QUERY: DEFAULT_QUERY,
       DOWNLOAD_FORMATS: DOWNLOAD_FORMATS,
       NUM_SPACES: NUM_SPACES,
       PANELS: PANELS,
@@ -393,6 +413,9 @@ export default {
     },
     currentViewType () { // GRID, CALENDAR etc
       return this.viewParams.view
+    },
+    dateColumns () {
+      return this.viewParams.columns.filter(x => (x.format === 'DATE' || x.format === 'DATETIME')) || []
     },
     enumColumns () { // Used for pivoting to a Kanban view. Only let the user pivot on predefined database Enums (for now)
       return this.viewParams.columns.filter(x => ('enum' in x)) || []
@@ -427,18 +450,46 @@ export default {
   methods: {
     applyManualParams (type, params) {
       if (Helpers.isValidJsonObject(params)) {
-        this.pushEncodedQuery(type, JSON.parse(params))
+        let query = {}
+        query[`${type}`] = JSON.parse(params)
+        this.pushEncodedQuery(query)
       }
     },
+    calendarSettingsChanged (pivot, dateString) {
+      if (pivot && dateString) {
+        const DATE_FORMAT = 'YYYY-MM-DD'
+        let baseDate = moment(dateString, DATE_FORMAT)
+        let rangeStart = baseDate.clone().startOf(this.viewParams.type).format(DATE_FORMAT)
+        let rangeEnd = baseDate.clone().endOf(this.viewParams.type).format(DATE_FORMAT)
+        let newCriteria = this.generateFilterString([
+          { andOr: 'and', key: pivot, is: true, criteria: 'gte', filterString: rangeStart },
+          { andOr: 'and', key: pivot, is: true, criteria: 'lt', filterString: rangeEnd },
+        ])
+        let newPostgrestParams = { ...this.postgrestParam, criteria: newCriteria } // Not a huge fan of this because it removes previous criteria/filters
+        delete newPostgrestParams.limit
+        this.pushEncodedQuery({
+          'v': { ...this.viewParams, date: dateString, pivotKey: pivot },
+          'q': newPostgrestParams
+        })
+      }
+    },
+    changeCalendarDate (dateString) {
+      this.viewParams.date = dateString
+      this.calendarSettingsChanged(this.viewParams.pivotKey, this.viewParams.date)
+    },
+    changeCalendarPivot (key) {
+      this.viewParams.pivotKey = key
+      this.calendarSettingsChanged(this.viewParams.pivotKey, this.viewParams.date)
+    },
     changeKanbanPivot (key) {
-      this.pushEncodedQuery('v', { ...this.viewParams, pivot_key: key })
+      this.pushEncodedQuery({'v': { ...this.viewParams, pivotKey: key }})
     },
     changeCardImage (columnKey) {
-      if (columnKey) this.pushEncodedQuery('v', { ...this.viewParams, image_key: columnKey }) 
+      if (columnKey) this.pushEncodedQuery({'v': { ...this.viewParams, image_key: columnKey }}) 
       else {
         let mutatedParams = { ...this.viewParams }
         delete mutatedParams.image_key
-        this.pushEncodedQuery('v', mutatedParams)
+        this.pushEncodedQuery({'v': mutatedParams})
       }
     },
     downloadRecords (format) {
@@ -457,23 +508,27 @@ export default {
       if (!columns.length) {
         let mutatedParams = { ...this.postgrestParams }
         delete mutatedParams.criteria
-        this.pushEncodedQuery('q', mutatedParams)
+        this.pushEncodedQuery({'q': mutatedParams})
       } else {
-        let ors = []
-        let ands = []
-        columns.forEach(col => {
-          if (col.andOr === 'and') {
-            ands.push(col)
-          } else {
-            ors.push(ands)
-            ands = [col]
-          }
-        })
-        ors.push(ands)
-        let criteria = PostgrestHelpers.generateFilterString(ors)
+        let criteria = this.generateFilterString(columns)
         console.log('criteria', criteria)
-        this.pushEncodedQuery('q', { ...this.postgrestParams, criteria: criteria })
+        this.pushEncodedQuery({'q': { ...this.postgrestParams, criteria: criteria }})
       }
+    },
+    generateFilterString (columns) {
+      console.log('columns', columns)
+      let ors = []
+      let ands = []
+      columns.forEach(col => {
+        if (col.andOr === 'and') {
+          ands.push(col)
+        } else {
+          ors.push(ands)
+          ands = [col]
+        }
+      })
+      ors.push(ands)
+      return PostgrestHelpers.generateFilterString(ors)
     },
     goToRecord (record) {
       try {
@@ -491,26 +546,40 @@ export default {
       }
     },
     goToView (viewType) {
-      this.pushEncodedQuery('v', { ...this.viewParams, view: viewType })
+      let query = {}
+      if (viewType === VIEW_TYPES.CALENDAR) {
+        let newViewParams = Object.assign({...DEFAULT_VIEW_PARAMS_CALENDAR}, {columns: this.viewParams.columns})
+        query = {'v': newViewParams}
+      }
+      else if (viewType === VIEW_TYPES.KANBAN) {
+        let newViewParams = Object.assign({...DEFAULT_VIEW_PARAMS_KANBAN}, {columns: this.viewParams.columns}) 
+        query = {'v': newViewParams}
+      }
+      else query = {'v': Object.assign({}, {view: viewType}, {columns: this.viewParams.columns})} // only keep the column config
+      this.pushEncodedQuery(query)
     },
     paginate (start) {
-      this.pushEncodedQuery('q', { ...this.postgrestParams, offset: start })
+      this.pushEncodedQuery({'q': { ...this.postgrestParams, offset: start }})
     },
-    pushEncodedQuery (queryKey, newParams) { // stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
+    // stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
+    // eg: @param newParams = { 'v': {...someViewParams} } OR newParams = { 'v': {...someViewParams}, 'q': {...someQueryParams} } 
+    pushEncodedQuery (newParams) { 
       let query = {...this.$route.query} || {}
-      if (Object.keys(newParams).length) query[`${queryKey}`] = Helpers.encrypt(JSON.stringify(newParams))
-      else delete query[`${queryKey}`]
+      Object.keys(newParams).forEach(queryKey => {
+        if (Object.keys(newParams).length) query[`${queryKey}`] = Helpers.encrypt(JSON.stringify(newParams[`${queryKey}`]))
+        else delete query[`${queryKey}`]
+      })
       this.$router.push({ path: this.$route.path, query: query })
     },
     sortColumns (columns) {
       this.visiblePanel = null
       if (columns.length) {
         let ordering = columns.map(x => ( `${x.key}.${x.sort}`)).join(',')
-        this.pushEncodedQuery('q', { ...this.postgrestParams, order: ordering })
+        this.pushEncodedQuery({'q': { ...this.postgrestParams, order: ordering }})
       } else {
         let newParams = { ...this.postgrestParams }
         delete newParams.order
-        this.pushEncodedQuery('q', newParams)
+        this.pushEncodedQuery({'q': newParams})
       }
     },
     tableHeaderClicked (key) {
@@ -532,10 +601,10 @@ export default {
     },
     updateColumns (columns) {
       this.visiblePanel = null
-      this.pushEncodedQuery('v', { ...this.viewParams, columns: columns })
+      this.pushEncodedQuery({'v': { ...this.viewParams, columns: columns }})
     },
     updateLimit (newSize) {
-      this.pushEncodedQuery('q', { ...this.postgrestParams, limit: newSize })
+      this.pushEncodedQuery({'q': { ...this.postgrestParams, limit: newSize }})
     },
     updateRecordField: async function (record, column, value) { // updates an individual field
       let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, record))
@@ -554,7 +623,18 @@ export default {
   // View handlers
   layout: 'hummingbird',
   watchQuery: ['q', 'v'],
-  components: { Calendar, CardList, ColumnsPanel, FilterPanel, JoinPanel, Kanban, Pagination, SortPanel, Table },
+  components: { 
+    Calendar, 
+    CardList, 
+    ColumnsPanel, 
+    Datepicker, 
+    FilterPanel, 
+    JoinPanel, 
+    Kanban, 
+    Pagination, 
+    SortPanel, 
+    Table 
+  },
 }
 </script>
 

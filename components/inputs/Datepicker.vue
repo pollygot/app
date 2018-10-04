@@ -16,7 +16,7 @@ export default {
   props: {
     config: { type: Object, default: () => ({}) },
     placeholder: { type: String, default: 'Pick date' },
-    inputClass: { type: [Object, Array], default: function() { return {} } },
+    inputClass: { type: String, default: '' },
     value: String
   },
 
