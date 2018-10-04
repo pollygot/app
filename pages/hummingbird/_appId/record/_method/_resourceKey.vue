@@ -55,7 +55,13 @@
           <!-- SELECT -->
           <div class="field" v-if="field.format === 'SELECT'" :key="field.key">
             <nav class="level m-b-sm">
-              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-left">
+                <label class="label is-capitalized">
+                  <span>{{field.label}} </span>
+                  <span class="has-text-grey-lighter" v-show="field.pk">(Primary Key) </span>
+                  <span class="has-text-grey-lighter" v-show="field.fk">(Foreign Key) </span>
+                </label>
+              </div>
               <div class="level-right" v-show="field.fk">
                 <a class="button is-small is-white">
                   <span class="is-capitalized">{{field.fk_table}}</span>
@@ -76,7 +82,13 @@
           <!-- NUMBER -->
           <div class="field" v-else-if="field.format === 'NUMBER'" :key="field.key">
             <nav class="level m-b-sm">
-              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-left">
+                <label class="label is-capitalized">
+                  <span>{{field.label}} </span>
+                  <span class="has-text-grey-lighter" v-show="field.pk">(Primary Key) </span>
+                  <span class="has-text-grey-lighter" v-show="field.fk">(Foreign Key) </span>
+                </label>
+              </div>
               <div class="level-right" v-show="field.fk">
                 <a class="button is-small is-white" @click="joinTable(Object.assign({}, field, {value: field.modifiedValue}), true)">
                   <span class="is-capitalized">{{field.fk_table}}</span>
@@ -85,7 +97,14 @@
               </div>
             </nav>
             <div class="control is-expanded">
-              <input class="input is-fullwidth" type="number" :placeholder="field.modifiedValue" v-model="field.modifiedValue">
+              <!-- <input class="input is-fullwidth" type="number" :placeholder="field.modifiedValue" v-model="field.modifiedValue"> -->
+              <numeric-input 
+                type="number" 
+                :placeholder="field.modifiedValue" 
+                :value="field.modifiedValue"
+                :hasSafetyLock="field.pk"
+                @onChange="v => field.modifiedValue = v">
+              </numeric-input>
             </div>
             <p class="help">&nbsp;</p>
           </div>
@@ -93,7 +112,13 @@
           <!-- CHECKBOX -->
           <div class="field" v-else-if="field.format === 'CHECKBOX'" :key="field.key">
             <nav class="level m-b-sm">
-              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-left">
+                <label class="label is-capitalized">
+                  <span>{{field.label}} </span>
+                  <span class="has-text-grey-lighter" v-show="field.pk">(Primary Key) </span>
+                  <span class="has-text-grey-lighter" v-show="field.fk">(Foreign Key) </span>
+                </label>
+              </div>
               <div class="level-right" v-show="field.fk">
                 <a class="button is-small is-white">
                   <span class="is-capitalized">{{field.fk_table}}</span>
@@ -111,7 +136,13 @@
           <!-- DATETIME -->
           <div class="field" v-else-if="field.format === 'DATETIME'" :key="field.key">
             <nav class="level m-b-sm">
-              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-left">
+                <label class="label is-capitalized">
+                  <span>{{field.label}} </span>
+                  <span class="has-text-grey-lighter" v-show="field.pk">(Primary Key) </span>
+                  <span class="has-text-grey-lighter" v-show="field.fk">(Foreign Key) </span>
+                </label>
+              </div>
               <div class="level-right" v-show="field.fk">
                 <a class="button is-small is-white">
                   <span class="is-capitalized">{{field.fk_table}}</span>
@@ -128,7 +159,13 @@
           <!-- TEXTAREA -->
           <div class="field" v-else-if="field.format === 'TEXTAREA'" :key="field.key">
             <nav class="level m-b-sm">
-              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-left">
+                <label class="label is-capitalized">
+                  <span>{{field.label}} </span>
+                  <span class="has-text-grey-lighter" v-show="field.pk">(Primary Key) </span>
+                  <span class="has-text-grey-lighter" v-show="field.fk">(Foreign Key) </span>
+                </label>
+              </div>
               <div class="level-right" v-show="field.fk">
                 <a class="button is-small is-white">
                   <span class="is-capitalized">{{field.fk_table}}</span>
@@ -145,7 +182,13 @@
           <!-- TEXT -->
           <div class="field" v-else-if="field.format === 'TEXT'" :key="field.key">
             <nav class="level m-b-sm">
-              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-left">
+                <label class="label is-capitalized">
+                  <span>{{field.label}} </span>
+                  <span class="has-text-grey-lighter" v-show="field.pk">(Primary Key) </span>
+                  <span class="has-text-grey-lighter" v-show="field.fk">(Foreign Key) </span>
+                </label>
+              </div>
               <div class="level-right" v-show="field.fk">
                 <a class="button is-small is-white">
                   <span class="is-capitalized">{{field.fk_table}}</span>
@@ -162,7 +205,13 @@
           <!-- DATE -->
           <div class="field" v-else-if="field.format === 'DATE'" :key="field.key">
             <nav class="level m-b-sm">
-              <div class="level-left"><label class="label is-capitalized">{{field.label}} </label></div>
+              <div class="level-left">
+                <label class="label is-capitalized">
+                  <span>{{field.label}} </span>
+                  <span class="has-text-grey-lighter" v-show="field.pk">(Primary Key) </span>
+                  <span class="has-text-grey-lighter" v-show="field.fk">(Foreign Key) </span>
+                </label>
+              </div>
               <div class="level-right" v-show="field.fk">
                 <a class="button is-small is-white">
                   <span class="is-capitalized">{{field.fk_table}}</span>
@@ -171,7 +220,7 @@
               </div>
             </nav>
             <div class="control is-expanded">
-              <datepicker :placeholder="field.modifiedValue" v-model="field.modifiedValue"></datepicker>
+              <datepicker :placeholder="field.modifiedValue" :value="field.modifiedValue" @onChange="v => field.modifiedValue = v"></datepicker>
             </div>
             <p class="help">&nbsp;</p>
           </div>
@@ -223,17 +272,12 @@ import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
 import Datepicker               from '~/components/inputs/Datepicker.vue'
 import Datetimepicker           from '~/components/inputs/Datetimepicker.vue'
+import NumericInput             from '~/components/inputs/Numeric.vue'
 import Timepicker               from '~/components/inputs/Timepicker.vue'
 import ModalConfirm             from '~/components/ModalConfirm.vue'
 import ReadOnlyCard             from '~/components/hummingbird/ReadOnlyCard.vue'
 
 const TOAST_ERROR_DURATION = 4000
-
-var getRecord = function (context, appId, resourceKey, selector) {
-  const proxyUrlBase = `/api/postgrest/${appId}/${resourceKey}`
-  const headers = { 'headers': { 'accept': 'application/vnd.pgrst.object+json' } }
-  return context.$axios.get(`${proxyUrlBase}?q=${selector}`, headers)
-}
 
 export default {
   async asyncData ({ app, params, query, route, store }) {
@@ -241,7 +285,7 @@ export default {
     let isCreated = (params.method === 'edit') ? true : false
     let record = {}
     if (isCreated) {
-      let { data:response } = await getRecord(app, appId, resourceKey, query.q)
+      let { data:response } = await PostgrestHelpers.getRecord(app, appId, resourceKey, query.q)
       record = response.data
     }
     let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
@@ -281,18 +325,18 @@ export default {
         .forEach(x => { data[x.key] = x.modifiedValue }) // populate the object to be sent to the database
       let url = `${this.proxyUrlBase}`
       console.log('this.formattedFields', this.formattedFields)
-      return this.$axios.post(this.proxyUrlBase, data).catch(this.handleErrorResponse)
+      return PostgrestHelpers.createRecord(this, this.appId, this.resourceKey, data).catch(this.handleErrorResponse)
     },
     deleteRecord: async function () {
-      let selector = this.getUniqueSelector(this.record)
-      let url = `${this.proxyUrlBase}?q=` + encodeURIComponent(Helpers.encrypt(selector))
+      let selector = Helpers.encrypt(this.getUniqueSelector(this.record))
       if (!selector) {
         this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
-      } else if (!await this.verifyUrlReturnsUnique(url)) {
-        this.$toast.error('Couldn\'t get a unique selector', { duration: TOAST_ERROR_DURATION })
+        return null
+      } else if (!await PostgrestHelpers.verifySelectorReturnsUnique(this, this.appId, this.resourceKey, selector)) {
+        this.$toast.error('Couldn\'t get a unique selector. This would cause multiple deletions to the database.', { duration: TOAST_ERROR_DURATION })
         return null
       } else {
-        let { data:deleteResponse } = await this.$axios.delete(url).catch(this.handleErrorResponse)
+        let { data:deleteResponse } = await PostgrestHelpers.deleteRecord(this, this.appId, this.resourceKey, selector).catch(this.handleErrorResponse)
         if (deleteResponse) this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
       }
     },
@@ -334,11 +378,10 @@ export default {
     // update the database. This uses PATCH so only the data that is passed will be updated
     updateRecord: async function () {
       let selector = Helpers.encrypt(this.getUniqueSelector(this.record))
-      let url = `${this.proxyUrlBase}?q=${encodeURIComponent(selector)}`
       if (!selector) {
         this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
         return null
-      } else if (!await this.verifyUrlReturnsUnique(url)) {
+      } else if (!await PostgrestHelpers.verifySelectorReturnsUnique(this, this.appId, this.resourceKey, selector)) {
         this.$toast.error('Couldn\'t get a unique selector. This would cause multiple updates to the database.', { duration: TOAST_ERROR_DURATION })
         return null
       } else {
@@ -346,18 +389,14 @@ export default {
         this.formattedFields
           .filter(x => PostgrestHelpers.hasDataChanged(x)) // get only modified fields
           .forEach(x => { data[x.key] = x.modifiedValue }) // populate the object to be sent to the database
-        return this.$axios.patch(url, data).catch(this.handleErrorResponse)
+        return PostgrestHelpers.updateRecord(this, this.appId, this.resourceKey, selector, data).catch(this.handleErrorResponse)
       }
     },
-    verifyUrlReturnsUnique: async function (url) {
-      let { data:proxyResponse } = await this.$axios.get(url).catch(this.handleErrorResponse)
-      return (proxyResponse && proxyResponse.data && proxyResponse.data.length === 1) ? true : false
-    }
   },
 
   // View handlers
   layout: 'hummingbird',
-  components: { Datepicker, Datetimepicker, Timepicker, ModalConfirm, ReadOnlyCard },
+  components: { Datepicker, Datetimepicker, Timepicker, ModalConfirm, NumericInput, ReadOnlyCard },
   watchQuery: ['q'],
   beforeRouteEnter (to, from, next) {
     next(vm => { vm.fromRoute = from }) // for the "back" function
