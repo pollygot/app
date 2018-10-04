@@ -10,6 +10,7 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "loc": "cloc --vcs=git --exclude-ext=json .",
     "precommit": "npm run lint"
   },
   "dependencies": {
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
+    "cloc": "^2.3.4",
     "eslint": "^4.15.0",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
