@@ -1,7 +1,7 @@
 <template>
-<div class="PostgrestJoinPanel">
+<div class="HummingbirdJoinPanel">
 
-  <div id="PostgrestJoinPanel" class="quickview" :class="{ 'is-active': isVisible }">
+  <div id="HummingbirdJoinPanel" class="quickview" :class="{ 'is-active': isVisible }">
     <div class="quickview-body">
       <div class="quickview-block p-md">
         <div class="buttons is-right header-buttons">
@@ -9,13 +9,13 @@
           <span class="button is-dark is-outlined is-rounded is-small" @click="apply()">Apply</span>
         </div>
 
-        <PostgrestJoinMenu
+        <JoinMenu
           :allTables="allTables"
           :nodes="tree.nodes" 
           :depth="0"   
           :label="tree.key"
           :selected="tree.selected" 
-          ></PostgrestJoinMenu>
+          ></JoinMenu>
         
       </div>
     </div>
@@ -28,17 +28,17 @@
 
 
 <script>
-import PostgrestJoinMenu from './PostgrestJoinMenu'
+import JoinMenu from './JoinMenu'
 import { mapGetters } from "vuex";
 
 export default {
-  name: 'PostgrestJoinPanel',
+  name: 'HummingbirdJoinPanel',
   props: {
     allTables: { required: true, type: Array },
     base: { required: true, type: String },
     isVisible: { required: true, type: Boolean }
   },
-  components: {PostgrestJoinMenu},
+  components: {JoinMenu},
   computed: {
     ...mapGetters({
       tree: ['hummingbird/joinTree']

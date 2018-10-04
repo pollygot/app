@@ -1,5 +1,5 @@
 <template>
-<div class="PostgrestColumnSelector">
+<div class="PidgeonColumnSelector">
 
   <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul v-show="breadcrumbs.length > 1">
@@ -40,7 +40,7 @@
 <script>
 import { mapGetters } from 'vuex'
 export default {
-  name: 'PostgrestColumnSelector',
+  name: 'PidgeonColumnSelector',
   props: {
     baseTable: { required: true, type: String },
     selectString: { required: true, type: String },

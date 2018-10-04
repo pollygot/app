@@ -1,7 +1,7 @@
 <template>
-<div class="PostgrestFilterPanel">
+<div class="HummingbirdFilterPanel">
 
-  <div id="PostgrestFilterPanel" class="quickview" :class="{ 'is-active': isVisible }">
+  <div id="HummingbirdFilterPanel" class="quickview" :class="{ 'is-active': isVisible }">
     <div class="quickview-body">
       <div class="quickview-block p-md">
 
@@ -82,7 +82,7 @@
 <script>
 import draggable from 'vuedraggable'
 export default {
-  name: 'PostgrestFilterPanel',
+  name: 'HummingbirdFilterPanel',
   props: {
     allColumns: { required: true, type: Array },
     isVisible: { required: true, type: Boolean },
@@ -145,7 +145,7 @@ export default {
 }
 </script>
 <style lang="scss">
-.PostgrestFilterPanel {
+.HummingbirdFilterPanel {
   .header-buttons {
     position: absolute;
     top: 18px;

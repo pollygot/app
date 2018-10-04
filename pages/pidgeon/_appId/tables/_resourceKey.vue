@@ -95,7 +95,7 @@
           </div>
 
           <div v-show="optionsTab === 'COLUMNS'">
-            <PostgrestColumnSelector
+            <ColumnSelector
               :baseTable="resourceKey"
               :selectString="queryParams.select"
               @onUpdated="(newString) => queryParams.select = newString"
@@ -159,12 +159,12 @@ const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 const DEFAULT_HEADERS = { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
 import axios from 'axios'
-import PostgrestColumnSelector from '~/components/PostgrestColumnSelector'
+import ColumnSelector from '~/components/pidgeon/ColumnSelector'
 import * as Helpers from '~/lib/helpers'
 import { mapGetters } from 'vuex'
 export default {
   layout: 'pidgeon',
-  components: { PostgrestColumnSelector },
+  components: { ColumnSelector },
 
   // Initialise defaults and empty state for page
   async asyncData ({ app, params, query, store }) {

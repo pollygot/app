@@ -263,7 +263,7 @@
     @onApply="updateColumns"
     @onHidePanel="() => { visiblePanel = null }"
   />
-  <PostgrestFilterPanel
+  <FilterPanel
     :allColumns="viewParams.columns"
     :isVisible="visiblePanel === PANELS.FILTERS"
     :existingFilters="filteredColumns"
@@ -271,14 +271,14 @@
     @onFilter="filterColumns"
     @onHidePanel="() => { visiblePanel = null }"
   />
-  <PostgrestJoinPanel
+  <JoinPanel
     :allTables="allTables"
     :base="resourceKey"
     :key="joinComponentMounted"
     :isVisible="visiblePanel === PANELS.JOINS"
     @onHidePanel="() => { visiblePanel = null }"
   />
-  <PostgrestSortPanel
+  <SortPanel
     :allColumns="viewParams.columns"
     :isVisible="visiblePanel === PANELS.SORTING"
     :sortedColumns="sortedColumns"
@@ -298,12 +298,12 @@ import * as Helpers             from '~/lib/helpers'
 import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
 import Calendar                 from '~/components/Calendar.vue'
 import CardList                 from '~/components/CardList.vue'
+import ColumnsPanel             from '~/components/hummingbird/ColumnsPanel.vue'
+import FilterPanel              from '~/components/hummingbird/FilterPanel.vue'
+import JoinPanel                from '~/components/hummingbird/JoinPanel.vue'
 import Kanban                   from '~/components/Kanban.vue'
 import Pagination               from '~/components/Pagination.vue'
-import ColumnsPanel             from '~/components/hummingbird/ColumnsPanel.vue'
-import PostgrestFilterPanel     from '~/components/PostgrestFilterPanel.vue'
-import PostgrestJoinPanel       from '~/components/PostgrestJoinPanel.vue'
-import PostgrestSortPanel       from '~/components/PostgrestSortPanel.vue'
+import SortPanel                from '~/components/hummingbird/SortPanel.vue'
 import Table                    from '~/components/Table.vue'
 
 const DEFAULT_OFFSET                = 0 // Pagination
@@ -554,7 +554,7 @@ export default {
   // View handlers
   layout: 'hummingbird',
   watchQuery: ['q', 'v'],
-  components: { Calendar, CardList, ColumnsPanel, Kanban, Pagination, PostgrestFilterPanel, PostgrestJoinPanel, PostgrestSortPanel, Table },
+  components: { Calendar, CardList, ColumnsPanel, FilterPanel, JoinPanel, Kanban, Pagination, SortPanel, Table },
 }
 </script>
 

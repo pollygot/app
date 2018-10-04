@@ -1,5 +1,5 @@
 <template>
-  <div class="PostgrestJoinMenu">
+  <div class="HummingbirdJoinMenu">
     
         <div class="label-wrapper" @click="toggleTable">
           <div :style="indent" class="button">
@@ -8,7 +8,7 @@
           </div>
         </div>
 
-        <PostgrestJoinMenu
+        <HummingbirdJoinMenu
           :allTables="allTables"
           v-for="(node, i) in nodes" 
           :key="i"
@@ -17,7 +17,7 @@
           :label="node.key"
           :depth="depth + 1"   
         >
-        </PostgrestJoinMenu>
+        </HummingbirdJoinMenu>
       </div>
 
 </template>
@@ -25,7 +25,7 @@
 <script>
 // Recursive component
 export default {
-  name: 'PostgrestJoinMenu',
+  name: 'HummingbirdJoinMenu',
   props: [ 'allTables', 'nodes', 'label', 'depth', 'selected' ],
   data() {
     return {
@@ -68,7 +68,7 @@ export default {
 </script>
 
 <style lang="scss">
-.PostgrestJoinMenu {
+.HummingbirdJoinMenu {
   .label-wrapper {
     
     .button {
