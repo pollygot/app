@@ -132,11 +132,11 @@ export default {
         }
       }
     }
-    a.sort-down:after {
-    content: ' ▾';
+    a.sort-asc:after {
+      content: ' ▾';
     }
-    a.sort-up:after {
-    content: ' ▴';
+    a.sort-desc:after {
+      content: ' ▴';
     }
     .switch-field  {
       padding-top: 3px;

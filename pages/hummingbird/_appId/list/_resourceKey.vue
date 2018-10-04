@@ -591,15 +591,6 @@ export default {
     overflow: auto;
     overflow-y: hidden;
     font-size: 0.9rem;
-    td:hover {
-      cursor: pointer;
-    }
-    a.sort-asc:after {
-    content: ' ▾';
-    }
-    a.sort-desc:after {
-    content: ' ▴';
-    }
   }
   .definitely-has-corners {
     border-radius: 5px !important;
