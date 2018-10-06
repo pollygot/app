@@ -268,8 +268,8 @@
 </template>
 
 <script>
-import * as Helpers             from '~/lib/helpers'
-import * as PostgrestHelpers    from '~/lib/postgrestHelpers'
+import * as Helpers             from '~/lib/common/helpers'
+import * as PostgrestHelpers    from '~/lib/common/postgrestHelpers'
 import Datepicker               from '~/components/inputs/Datepicker.vue'
 import Datetimepicker           from '~/components/inputs/Datetimepicker.vue'
 import NumericInput             from '~/components/inputs/Numeric.vue'

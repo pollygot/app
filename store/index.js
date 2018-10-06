@@ -1,6 +1,6 @@
 import axios from 'axios'
 import config from '../config/default'
-import constants from '../lib/constants'
+import constants from '../lib/common/constants'
 export const state = () => ({
   apps: constants.apps, // all the Pollygot Apps that are available on Pollygot
   tenants: config.tenants || [] // all the tenants for this user, which should include the apps for each tenant

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import * as PostgrestHelpers from '../lib/postgrestHelpers'
+import * as PostgrestHelpers from '../lib/common/postgrestHelpers'
 
 import flat from 'flat'
 
@@ -39,6 +39,10 @@ export const state = () => ({
 })
 
 export const mutations = {
+  setCustomViews (state, views) {
+    state.customViews = views
+  },
+
   setSwagger (state, swaggerDefinition) {
     state.swagger = swaggerDefinition
   },
@@ -65,6 +69,9 @@ export const mutations = {
 }
 
 export const getters = {
+
+  customViews: state => state.customViews,
+
   // Returns an array of columns for a given table in the database (resourceKey is the table name)
   columnsForResource: state => (resourceKey) => {
     let tableDefinition = state.swagger.definitions[`${resourceKey}`]

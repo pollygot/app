@@ -1,4 +1,4 @@
-import * as PostgrestHelpers from '~/lib/postgrestHelpers'
+import * as PostgrestHelpers from '~/lib/common/postgrestHelpers'
 
 export const state = () => ({
   baseUrl: '',

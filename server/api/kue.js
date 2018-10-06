@@ -2,7 +2,7 @@ const axios = require('axios')
 const express = require('express')
 const jwt = require('express-jwt')
 
-const Pollygot = require('../lib/pollygot')
+const Pollygot = require('../common/pollygot')
 
 const app = express()
 app.use(jwt({ secret: process.env.JWT_SECRET }))

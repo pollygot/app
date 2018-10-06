@@ -41,8 +41,8 @@
 
 <script>
 import axios from 'axios'
-import config from '@/config/default'
-import * as S3Helpers from '@/lib/s3'
+import config from '~/config/default'
+import * as S3Helpers from '~/lib/common/s3'
 var AWS = require('aws-sdk')
 export default {
   layout: 'squirrel',

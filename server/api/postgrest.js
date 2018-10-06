@@ -1,8 +1,8 @@
 require('dotenv').config()
 const axios = require('axios')
 const express = require('express')
-const Pollygot = require('../lib/pollygot')
-const Helpers = require('../lib/commonjs/helpers')
+const Pollygot = require('../common/pollygot')
+const Helpers = require('../common/helpers')
 const jwt = require('express-jwt')
 
 const app = express()

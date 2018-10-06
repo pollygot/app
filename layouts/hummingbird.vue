@@ -2,18 +2,26 @@
   <div class="columns is-gapless full-height">
     <SideBar>
       <aside class="menu" v-show="tables.length">
+        <p class="menu-label">Views</p>
+        <ul class="menu-list">
+          <li v-for="(link, i) in customViews" :key="i">
+            <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/view/${link.id}`" :class="{ 'is-active': link.isActive }">
+              {{link.label}}
+            </nuxt-link>
+          </li>
+        </ul>
         <p class="menu-label">Resources</p>
         <ul class="menu-list">
           <li v-for="(link, i) in resourceList" :key="i">
-            <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
+            <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/list/${link.resource}`" :class="{ 'is-active': link.isActive }">
               {{link.label}}
             </nuxt-link>
           </li>
         </ul>
         <p class="menu-label">Read Only</p>
         <ul class="menu-list">
-          <li v-for="(link, i) in viewOnlyList" :key="i">
-            <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
+          <li v-for="(link, i) in readOnlyList" :key="i">
+            <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/list/${link.resource}`" :class="{ 'is-active': link.isActive }">
               {{link.label}}
             </nuxt-link>
           </li>
@@ -39,6 +47,7 @@ export default {
   computed: {
     ...mapGetters({
       tables: 'hummingbird/tables',
+      customViews: 'hummingbird/customViews',
     }),
     // Get all database tables from the swagger definition and format them for the sidebar menu
     resourceList () {
@@ -52,7 +61,7 @@ export default {
       }))
     },
     // Get all database views from the swagger definition and format them for the sidebar menu
-    viewOnlyList () {
+    readOnlyList () {
       return this.tables
       .filter(x => x.isViewOnly)
       .map(x => ({
@@ -61,7 +70,7 @@ export default {
         label: x.key.replace(/_/g, ' '),
         isActive: (x.key === this.$route.params.resourceKey)
       }))
-    }
+    },
   },
 }
 </script>

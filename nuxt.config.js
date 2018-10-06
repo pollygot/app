@@ -20,9 +20,10 @@ module.exports = {
   },
   // we need to run most the functionality on the server since there are private jets associated with most tenants' apps
   serverMiddleware: [
-    './api/auth',
-    './api/kue',
-    './api/postgrest',
+    './server/api/auth',
+    './server/api/kue',
+    './server/api/pollygot',
+    './server/api/postgrest',
   ],
   router: {
     middleware: ['auth']

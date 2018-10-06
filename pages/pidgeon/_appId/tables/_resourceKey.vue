@@ -154,13 +154,12 @@
 </template>
 
 <script>
-// const Helpers = require('~/lib/helpers2.js')
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
 const DEFAULT_HEADERS = { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
 import axios from 'axios'
 import ColumnSelector from '~/components/pidgeon/ColumnSelector'
-import * as Helpers from '~/lib/helpers'
+import * as Helpers from '~/lib/common/helpers'
 import { mapGetters } from 'vuex'
 export default {
   layout: 'pidgeon',
