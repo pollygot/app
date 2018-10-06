@@ -2,17 +2,17 @@
   <div class="columns is-gapless full-height">
     <SideBar>
       <aside class="menu" v-show="tables.length">
-        <p class="menu-label">Tables</p>
+        <p class="menu-label">Resources</p>
         <ul class="menu-list">
-          <li v-for="(link, i) in tableList" :key="i">
+          <li v-for="(link, i) in resourceList" :key="i">
             <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
               {{link.label}}
             </nuxt-link>
           </li>
         </ul>
-        <p class="menu-label">Views</p>
+        <p class="menu-label">View Only</p>
         <ul class="menu-list">
-          <li v-for="(link, i) in viewList" :key="i">
+          <li v-for="(link, i) in viewOnlyList" :key="i">
             <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
               {{link.label}}
             </nuxt-link>
@@ -41,7 +41,7 @@ export default {
       tables: 'hummingbird/tables',
     }),
     // Get all database tables from the swagger definition and format them for the sidebar menu
-    tableList () {
+    resourceList () {
       return this.tables
       .filter(x => !x.isViewOnly)
       .map(x => ({
@@ -52,7 +52,7 @@ export default {
       }))
     },
     // Get all database views from the swagger definition and format them for the sidebar menu
-    viewList () {
+    viewOnlyList () {
       return this.tables
       .filter(x => x.isViewOnly)
       .map(x => ({
