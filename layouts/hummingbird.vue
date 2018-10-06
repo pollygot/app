@@ -10,7 +10,7 @@
             </nuxt-link>
           </li>
         </ul>
-        <p class="menu-label">View Only</p>
+        <p class="menu-label">Read Only</p>
         <ul class="menu-list">
           <li v-for="(link, i) in viewOnlyList" :key="i">
             <nuxt-link tag="a" :to="`/hummingbird/${$route.params.appId}/${link.type}/${link.resource}`" :class="{ 'is-active': link.isActive }">
