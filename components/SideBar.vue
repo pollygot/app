@@ -184,7 +184,9 @@ export default {
         float: right;
         margin-right: 0px;
       }
-
+    }
+    .menu-list {
+      margin-bottom: 30px;
     }
   }
   .top-padding {

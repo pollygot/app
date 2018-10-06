@@ -26,6 +26,7 @@
         </div>
 
         <div class="buttons is-right header-buttons">
+          <span class="button is-outlined is-rounded is-small " @click="clear()">Remove all</span>
           <span class="button is-outlined is-rounded is-small " @click="cancel()">Cancel</span>
           <span class="button is-dark is-outlined is-rounded is-small" @click="applyFilters()">Apply</span>
         </div>
@@ -123,6 +124,9 @@ export default {
       this.newFilters = this.newFilters.filter(x => (x.filterString.length))
       if (this.newFilters.length) {this.newFilters[0].andOr = 'and'}
       this.$emit('onFilter', this.newFilters)
+    },
+    clear () {
+      this.newFilters = []
     },
     cancel () {
       this.newFilters = [...this.existingFilters]

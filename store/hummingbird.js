@@ -87,9 +87,11 @@ export const getters = {
       .map(x => x.key) // only the column name
   },
 
-  // Returns a list of Database tables exposed to PostgREST, adding additional data to the columns for each table.
+  // Returns a list of Database tables/views exposed to PostgREST, adding additional data to the columns for each table 
+  // and the operations that are allowed on the table data
   tables: state =>  {
     if (!state.swagger.definitions) return []
+    // let paths = Object.entries(state.swagger.paths) // we will use this to determine which operations each table allow
     return Object.entries(state.swagger.definitions)
       .map(([k, v]) => (Object.assign({ ...v, key: k }, v)))
       .map(table => {
@@ -97,7 +99,9 @@ export const getters = {
           .map(([k, v]) => (Object.assign({ ...v, key: k, resource: table.key }, v)))
           .map(x => PostgrestHelpers.enrich(x))
           .map(x => PostgrestHelpers.cleanse(x))
-        return { ...table, properties: columnArray }
+        let operations = Object.keys(state.swagger.paths[`/${table.key}`]) // what operations are allowed on the table? {'get', 'post', 'patch', 'delete'}
+        let isViewOnly = !(operations.includes('post') || operations.includes('patch') || operations.includes('delete'))
+        return { ...table, properties: columnArray, operations: operations, isViewOnly: isViewOnly }
       })
   }
 }

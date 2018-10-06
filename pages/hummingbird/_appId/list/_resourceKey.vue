@@ -99,7 +99,7 @@
 
         </div>
         <div class="level-right">
-          <div class="m-r-none level-item">
+          <div class="m-r-none level-item" v-if="!currentResource.isViewOnly">
             <router-link tag="a"
               class="super-button button is-medium is-primary is-rounded"
               :to="`/hummingbird/${appId}/record/new/${resourceKey}`">
@@ -370,6 +370,7 @@ export default {
       allTables: allTables,
       appId: appId,
       currentRangeEnd: rangeData.rangeEnd || 0,
+      currentResource: allTables.find(x => (x.key === resourceKey)),
       calendarDateKey: null,
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
@@ -531,6 +532,7 @@ export default {
       return PostgrestHelpers.generateFilterString(ors)
     },
     goToRecord (record) {
+      if (this.currentResource.isViewOnly) return null
       try {
         let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
         let selectors = primaryKeys.map(x => {
