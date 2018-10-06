@@ -48,7 +48,7 @@ export default {
     currentWeek () {
       let dates = []
       for (let index = 0; index < 7; index++) {
-        var date = this.selectedDate.clone().startOf('isoWeek').add(index, 'days')
+        var date = this.selectedDate.clone().startOf('week').add(index, 'days')
         dates.push(date)
       }
       return dates
