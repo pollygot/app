@@ -99,8 +99,8 @@
 
         </div>
         <div class="level-right">
-          <div class="m-r-none level-item" v-if="!currentResource.isViewOnly">
-            <router-link tag="a"
+          <div class="m-r-none level-item">
+            <router-link tag="a" v-show="!currentResource.isViewOnly"
               class="super-button button is-medium is-primary is-rounded"
               :to="`/hummingbird/${appId}/record/new/${resourceKey}`">
               <span>New</span>
@@ -108,6 +108,9 @@
                 <i class="fas fa-fw fa-arrow-right"></i>
               </span>
             </router-link>
+            <a v-show="currentResource.isViewOnly" class="button is-dark is-rounded is-outlined is-small" >
+              <span>READ ONLY</span>
+            </a>
           </div>
         </div>
       </nav>
@@ -340,20 +343,35 @@ const DEFAULT_VIEW_PARAMS_KANBAN  = {
 
 export default {
   async asyncData ({ app, params, query, store }) {
-    let { appId, resourceKey } = params
+    let { appId, type, resourceKey } = params
     let { q, v } = query
-    let newParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : DEFAULT_QUERY
-    let viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : DEFAULT_VIEW_PARAMS
+    let queryParams = DEFAULT_QUERY
+    let viewParams = DEFAULT_VIEW_PARAMS
     let allTables = store.getters['hummingbird/tables']
-    if (!viewParams.columns.length) viewParams = {...viewParams, columns: store.getters['hummingbird/columnsForResource'](resourceKey)}
-    if (viewParams.view === VIEW_TYPES.CALENDAR && viewParams.date) {
-      console.log('viewParams', viewParams)
-      console.log('newParams', newParams)
-      // we need to get the all records within a certain week. Perhaps this should be done when the dates are changed in the view (??)
+
+    if (type === 'list') {
+      if (typeof q !== 'undefined') queryParams = JSON.parse(Helpers.decrypt(q))
+      if (typeof v !== 'undefined') viewParams = JSON.parse(Helpers.decrypt(v))
+      if (!viewParams.columns.length) {
+        let columns = store.getters['hummingbird/columnsForResource'](resourceKey)
+        viewParams = {...viewParams, columns: [...columns]}
+      }
+    } else if (type === 'view') { // custom view 
+      let customView = store.getters['hummingbird/customView'](resourceKey)
+      queryParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : {...customView.queryParams}
+      viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : {...customView.viewParams}
+      resourceKey = customView.resourceKey // transfer ownership of the resource key
     }
-    // Convert the newParms into a query string for PostgREST
+
+    // Check if the view overrides any of the query params
+    if (viewParams.query) {
+      if (viewParams.query.limit) queryParams.limit = viewParams.query.limit
+      if (viewParams.query.criteria) queryParams.criteria = viewParams.query.criteria // Just make this an "AND" instead of overide?
+    }
+    
+    // Convert the newParams into a query string for PostgREST
     let postgrestQueryString = ''
-    let mutatedParams = {...newParams}
+    let mutatedParams = {...queryParams}
     if (mutatedParams.criteria) {
       mutatedParams.or = mutatedParams.criteria
       delete mutatedParams.criteria
@@ -374,13 +392,13 @@ export default {
       calendarDateKey: null,
       kanbanPivotKey: null,
       pageTitle: params.resourceKey.replace(/_/g, ' '),
-      postgrestParams: newParams,
+      postgrestParams: queryParams,
       primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
       queryEditorMode: false,
       records: response.data,
       resourceKey: params.resourceKey,
       totalRecords: rangeData.totalRecords,
-      userModifiedPostgrestParams: JSON.stringify({...newParams}, null, NUM_SPACES),
+      userModifiedPostgrestParams: JSON.stringify({...queryParams}, null, NUM_SPACES),
       userModifiedPostgrestParamsError: false,
       userModifiedViewParams: JSON.stringify({...viewParams}, null, NUM_SPACES),
       userModifiedViewParamsError: false,
@@ -466,11 +484,9 @@ export default {
           { andOr: 'and', key: pivot, is: true, criteria: 'gte', filterString: rangeStart },
           { andOr: 'and', key: pivot, is: true, criteria: 'lt', filterString: rangeEnd },
         ])
-        let newPostgrestParams = { ...this.postgrestParam, criteria: newCriteria } // Not a huge fan of this because it removes previous criteria/filters
-        delete newPostgrestParams.limit
+        let queryOveride = { limit: '*', criteria: newCriteria }
         this.pushEncodedQuery({
-          'v': { ...this.viewParams, date: dateString, pivotKey: pivot },
-          'q': newPostgrestParams
+          'v': { ...this.viewParams, date: dateString, pivotKey: pivot, query: queryOveride }
         })
       }
     },

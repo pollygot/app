@@ -70,6 +70,7 @@ export const mutations = {
 
 export const getters = {
 
+  customView: state => viewId => state.customViews.find(view => (view.id == viewId)),
   customViews: state => state.customViews,
 
   // Returns an array of columns for a given table in the database (resourceKey is the table name)

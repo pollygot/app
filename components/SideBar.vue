@@ -186,7 +186,7 @@ export default {
       }
     }
     .menu-list {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
   }
   .top-padding {
