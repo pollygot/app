@@ -65,9 +65,9 @@ export default {
       return this.columns.map(x => x.key)
     }
   },
-  // created () {
-  //   console.log(' records.map(x => FlattenObject(x))',  this.records.map(x => FlattenObject(x)))
-  // },
+  created () {
+    console.log(' records.map(x => FlattenObject(x))',  this.records.map(x => FlattenObject(x)))
+  },
   methods: {
     getDateAndTime (dateString) {
       if (!dateString) return null

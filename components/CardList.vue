@@ -14,7 +14,7 @@
             </figure>
           </div>
           <div class="card-content">
-            <div v-for="(column, j) in columns" :key="'col-td'+j" class="field" v-if="card[`${column.key}`] !== null && card[`${column.key}`]">
+            <div v-for="(column, j) in columns" :key="'col-td'+j" class="field" v-if="!column.hidden && card[`${column.key}`] !== null && card[`${column.key}`]">
               <span class="heading has-text-grey-light m-b-none">{{ column.label }}</span>
               <div class="value">{{ card[`${column.key}`].toString() || '&nbsp;' }}</div>
             </div>

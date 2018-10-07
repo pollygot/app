@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     viewsInCategory (categoryName) {
-      return this.customViews.filter(x => x.category === categoryName)
+      return this.customViews.filter(x => x.category === categoryName).map(x => ({...x, isActive: (x.id.toString() === this.$route.params.resourceKey)}))
     }
   }
 }

@@ -12,7 +12,7 @@
             <!-- Card -->
             <a class="card box draggable-item" v-for="(card, i) in states['' + stateName]" :key="'card'+stateName+i" :target="JSON.stringify(card)">
               <!-- Fields -->
-              <div v-for="(column, j) in columns" :key="'col-td'+j" class="field" v-if="card[`${column.key}`] !== null && card[`${column.key}`] !== '' && column.key !== pivotKey">
+              <div v-for="(column, j) in columns" :key="'col-td'+j" class="field" v-if="!column.hidden && card[`${column.key}`] !== null && card[`${column.key}`] !== '' && column.key !== pivotKey">
                 <span class="heading has-text-grey-light m-b-none">{{ column.label }}</span>
                 <div class="value">{{ card[`${column.key}`].toString() || '&nbsp;' }}</div>
               </div>

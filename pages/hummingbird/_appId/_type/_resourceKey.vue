@@ -108,7 +108,7 @@
                 <i class="fas fa-fw fa-arrow-right"></i>
               </span>
             </router-link>
-            <a v-show="currentResource.isViewOnly" class="button is-dark is-rounded is-outlined is-small" >
+            <a v-show="currentResource.isViewOnly" class="button is-dark is-rounded is-outlined is-small" @click="$toast.show(READ_ONLY_MESSAGE, { duration: TOAST_DURATION })">
               <span>READ ONLY</span>
             </a>
           </div>
@@ -313,7 +313,9 @@ const ERROR_MESSAGE_NO_PK           = 'Couldn\'t find a primary key'
 const ERROR_MESSAGE_NOT_UNIQUE      = 'Couldn\'t get a unique selector. This would cause multiple updates to the database.'
 const NUM_SPACES                    = 2 // for tabsToSpaces in text areas
 const PANELS                        = { COLUMNS: 'COLUMNS', JOINS: 'JOINS', FILTERS: 'FILTERS', SORTING: 'SORTING',  }
+const READ_ONLY_MESSAGE             = 'This resource doesn\'t allow updates'
 const SUCCESS_MESSAGE               = 'Saved!'
+const TOAST_DURATION                = 4000
 const TOAST_ERROR_DURATION          = 4000
 const TOAST_SUCCESS_DURATION        = 1000
 const TODAY                         = moment()
@@ -413,6 +415,8 @@ export default {
       DOWNLOAD_FORMATS: DOWNLOAD_FORMATS,
       NUM_SPACES: NUM_SPACES,
       PANELS: PANELS,
+      READ_ONLY_MESSAGE: READ_ONLY_MESSAGE,
+      TOAST_DURATION: TOAST_DURATION,
       VIEW_TYPES: VIEW_TYPES,
 
       // give some components keys to force refresh
