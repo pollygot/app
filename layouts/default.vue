@@ -11,19 +11,19 @@
             </nuxt-link>
           </li>
           <li>
-            <nuxt-link tag="a" :to="`/`" class="has-icon">
+            <nuxt-link tag="a" :to="`/account/profile`" class="has-icon">
               <span class="icon"><i class="fas fa-user"></i></span>
               Profile
             </nuxt-link>
           </li>
-          <li>
+          <!-- <li>
             <nuxt-link tag="a" :to="`/`" class="has-icon">
               <span class="icon"><i class="fas fa-gift"></i></span>
               Invites
             </nuxt-link>
-          </li>
+          </li> -->
           <li>
-            <nuxt-link tag="a" :to="`/`" class="has-icon">
+            <nuxt-link tag="a" :to="`/account/settings`" class="has-icon">
               <span class="icon"><i class="fas fa-cog"></i></span>
               Settings
             </nuxt-link>

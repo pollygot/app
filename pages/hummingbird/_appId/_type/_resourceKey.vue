@@ -304,7 +304,6 @@ import Pagination               from '~/components/Pagination.vue'
 import SortPanel                from '~/components/hummingbird/SortPanel.vue'
 import Table                    from '~/components/Table.vue'
 
-
 const CALENDAR_TYPES                = { WEEK: 'week', MONTH: 'month' }
 const DEFAULT_OFFSET                = 0 // Pagination
 const DEFAULT_PAGINATION_SIZE       = 20 // Pagination

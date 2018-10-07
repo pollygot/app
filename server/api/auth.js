@@ -5,6 +5,16 @@ const cookieParser = require('cookie-parser')
 const jwt = require('express-jwt')
 const jsonwebtoken = require('jsonwebtoken')
 
+const JWT_SECRET = process.env.JWT_SECRET
+const STORE = process.env.DATA_STORE 
+
+// Using a local DB
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const location = process.env.LOCAL_DATA_STORE
+const adapter = new FileSync(location)
+const db = low(adapter)
+
 // Create app
 const app = express()
 
@@ -26,26 +36,24 @@ app.use(
 // [POST] /login
 app.post('/login', (req, res, next) => {
   const { username, password } = req.body
-  const valid = username.length && password === process.env.ADMIN_PASSWORD // temporary!!!
-
-  if (!valid) {
-    throw new Error('Invalid username or password')
+  
+  let user = null
+  if (STORE === 'LOCAL') {
+    let valid = db.get('users')
+      .filter({ username: username, password: password })
+      .value()
+    console.log('valid', valid)
+    if (!valid.length) return res.status(404).json({ message: 'Invalid username or password' })
+    else user = valid[0]
+  }
+  else {
+    return res.status(500).json({ message: 'No datastore initialised' })
   }
 
-  const accessToken = jsonwebtoken.sign(
-    {
-      username,
-      picture: 'https://github.com/nuxt.png',
-      name: 'User ' + username,
-      scope: ['test', 'user']
-    },
-    process.env.JWT_SECRET
-  )
+  const accessToken = jsonwebtoken.sign(user, JWT_SECRET)
 
   return res.json({
-    token: {
-      accessToken
-    }
+    token: { accessToken }
   })
 })
 

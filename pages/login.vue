@@ -83,10 +83,11 @@ export default {
             password: this.password
           }
         })
-        .catch(e => {
-          this.error = e + ''
-        })
-      console.log('response', response)
+        .catch(e => { 
+          console.log('e', e)
+          this.error = e + '' })
+      if (this.response && this.redirect) this.$router.push({ path: this.redirect })
+      else if (this.response) this.$router.push({ path: '/' })
     }
   }
 }
