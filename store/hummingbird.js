@@ -1,6 +1,4 @@
-import Vue from 'vue'
 import * as PostgrestHelpers from '../lib/common/postgrestHelpers'
-
 import flat from 'flat'
 
 export const state = () => ({

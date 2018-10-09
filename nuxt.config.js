@@ -18,9 +18,11 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }
     ]
   },
-  // we need to run most the functionality on the server since there are private jets associated with most tenants' apps
+  // we need to run most the functionality on the server since there are private setting associated with most tenants' apps
+  // also overcomes CORs 
   serverMiddleware: [
     './server/api/auth',
+    './server/api/bumblebee',
     './server/api/kue',
     './server/api/pollygot',
     './server/api/postgrest',
