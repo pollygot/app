@@ -59,7 +59,7 @@
         </div>
     </div>
 
-  <div class="" :class="{'top-padding': currentTenant}">
+  <div class="">
     <slot></slot>
   </div>
 
@@ -189,12 +189,9 @@ export default {
       margin-bottom: 20px;
     }
   }
-  .top-padding {
-    padding-top: 80px;
-  }
   .tenant-dropdown {
     width: 260px;
-    position: fixed;
+    position: relative;
     top: 0px;
     left: 0px;
     .dropdown-trigger {

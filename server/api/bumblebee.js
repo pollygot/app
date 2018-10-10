@@ -30,13 +30,14 @@ app.get('/:appId/apps/:appKey/jobs', async (req, res) => {
     .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
 
-// generic
-app.get('/:appId/:path', async (req, res, next) => {
-  let { appId, path } = req.params
+// Create a new Job
+app.post('/:appId/jobs', async (req, res) => {
+  let { appId } = req.params // @TODO: implement single via appKey
   let app = await Pollygot.getAppConfig(appId)
-  let fullUrl = `${app.config.url}/${path}`
-  console.log('Bumblebee GET: fullUrl', fullUrl)
-  axios.get(fullUrl)
+  let fullUrl = `${app.config.url}/v1/jobs`
+  const payload = req.body
+  console.log('Bumblebee POST: fullUrl', fullUrl)
+  axios.post(fullUrl, payload)
     .then(response => { return res.json(response.data) })
     .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
