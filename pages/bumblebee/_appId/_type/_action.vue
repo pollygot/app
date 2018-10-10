@@ -144,6 +144,7 @@ export default {
   watchQuery: ['key'],
   components: { JobCard },
   beforeDestroy () {
+    clearInterval(this.interval)
     this.interval = null
   }
 }
