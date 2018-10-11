@@ -437,10 +437,14 @@ export default {
       return this.viewParams.view
     },
     dateColumns () {
-      return this.viewParams.columns.filter(x => (x.format === 'DATE' || x.format === 'DATETIME')) || []
+      return this.viewParams.columns
+        .filter(x => (x.resource === this.resourceKey)) // only allow the current resource (for now)
+        .filter(x => (x.format === 'DATE' || x.format === 'DATETIME')) || []
     },
     enumColumns () { // Used for pivoting to a Kanban view. Only let the user pivot on predefined database Enums (for now)
-      return this.viewParams.columns.filter(x => ('enum' in x)) || []
+      return this.viewParams.columns
+      .filter(x => (x.resource === this.resourceKey)) // only allow the current resource (for now)
+      .filter(x => ('enum' in x)) || []
     },
     filteredColumns () {
       if (!this.isFiltered) return []
