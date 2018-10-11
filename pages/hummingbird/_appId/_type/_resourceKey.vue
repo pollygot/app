@@ -80,8 +80,8 @@
                     <a class="dropdown-item"><span>Overwite current view</span></a>
                     <hr class="dropdown-divider"> -->
                     <p class="dropdown-item heading is-size-7">Advanced</p>
-                    <a class="dropdown-item" @click="() => {this.queryEditorMode = true}"><span>Query editor</span></a>
-                    <a class="dropdown-item" @click="() => {this.viewEditorMode = true}"><span>View editor</span></a>
+                    <a class="dropdown-item" @click="editCode('q', postgrestParams)"><span>Query editor</span></a>
+                    <a class="dropdown-item" @click="editCode('v', viewParams)"><span>View editor</span></a>
                   </div>
                 </div>
               </div>
@@ -123,35 +123,6 @@
         </ul>
       </div>
     </div>
-
-    <div class="box m-md" v-show="queryEditorMode">
-      <textarea class="textarea has-text-mono" v-model="userModifiedPostgrestParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>
-      <p class="help is-danger"><span v-show="!Helpers.isValidJsonObject(userModifiedPostgrestParams)">There is an error in your syntax.</span>&nbsp;</p>
-      <div class="buttons is-right m-t-md">
-        <span class="button is-rounded is-outlined is-small"
-          @click="() => { this.queryEditorMode = false }">Hide</span>
-        <span class="button is-rounded is-outlined is-small"
-          @click="() => { this.userModifiedPostgrestParams = JSON.stringify(this.postgrestParams, null, 2) }">Revert changes</span>
-        <span class="button is-rounded is-small is-outlined"
-          :class="[ Helpers.isValidJsonObject(userModifiedPostgrestParams) ? 'is-dark' : 'is-danger' ]"
-          @click="() => {this.applyManualParams('q', this.userModifiedPostgrestParams)}">Apply</span>
-      </div>
-    </div>
-
-    <div class="box m-md " v-show="viewEditorMode">
-      <textarea class="textarea has-text-mono" v-model="userModifiedViewParams" @keydown="(e) => Helpers.tabsToSpaces(e, NUM_SPACES)"></textarea>
-      <p class="help is-danger"><span v-show="!Helpers.isValidJsonObject(userModifiedViewParams)">There is an error in your syntax.</span>&nbsp;</p>
-      <div class="buttons is-right m-t-md">
-        <span class="button is-rounded is-outlined is-small"
-          @click="() => { this.viewEditorMode = false }">Hide</span>
-        <span class="button is-rounded is-outlined is-small"
-          @click="() => { this.userModifiedViewParams = JSON.stringify(this.viewParams, null, 2) }">Revert changes</span>
-        <span class="button is-rounded is-small is-outlined"
-          :class="[ Helpers.isValidJsonObject(userModifiedViewParams) ? 'is-dark' : 'is-danger' ]"
-          @click="() => {this.applyManualParams('v', this.userModifiedViewParams)}">Apply</span>
-      </div>
-    </div>
-
 
     <div class="p-none m-md m-b-xl" v-if="!records.length">
       <h3 class="title is-5 has-text-centered m-xl">No records found</h3>
@@ -282,6 +253,14 @@
     @onSort="sortColumns"
     @onHidePanel="() => { visiblePanel = null }"
   />
+  <CodeModal
+    v-if="codeEditorVisible"
+    :code="codeBeingModified"
+    :key="codeEditorMounted"
+    type="JSON"
+    @onConfirm="(code) => { applyManualParams(this.paramBeingModified, code) }"
+    @onCancel="() => { codeEditorVisible = false }"
+  />
 
 </div>
 </template>
@@ -295,6 +274,7 @@ import * as Helpers             from '~/lib/common/helpers'
 import * as PostgrestHelpers    from '~/lib/common/postgrestHelpers'
 import Calendar                 from '~/components/Calendar.vue'
 import CardList                 from '~/components/CardList.vue'
+import CodeModal                from '~/components/ModalCodeEditor.vue'
 import ColumnsPanel             from '~/components/hummingbird/ColumnsPanel.vue'
 import Datepicker               from '~/components/inputs/Datepicker.vue'
 import FilterPanel              from '~/components/hummingbird/FilterPanel.vue'
@@ -359,7 +339,6 @@ export default {
       }
     } else if (type === 'view') { // custom view 
       let customView = store.getters['hummingbird/customView'](resourceKey)
-      console.log('customView', customView)
       queryParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : {...customView.queryParams}
       viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : {...customView.viewParams}
       resourceKey = customView.resourceKey // transfer ownership of the resource key
@@ -389,10 +368,13 @@ export default {
     return {
       allTables: allTables,
       appId: appId,
+      calendarDateKey: null,
       currentRangeEnd: rangeData.rangeEnd || 0,
       currentResource: allTables.find(x => (x.key === resourceKey)),
-      calendarDateKey: null,
+      codeBeingModified: '',
+      codeEditorVisible: false,
       kanbanPivotKey: null,
+      paramBeingModified: '',
       postgrestParams: queryParams,
       primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
       queryEditorMode: false,
@@ -421,6 +403,7 @@ export default {
       // give some components keys to force refresh
       calendarComponentMounted: 'calendar' + Date.now(),
       cardsComponentMounted: 'cards' + Date.now(),
+      codeEditorMounted: 'code' + Date.now(),
       columnsComponentMounted: 'columns' + Date.now(),
       filterComponentMounted: 'filters' + Date.now(),
       joinComponentMounted: 'joins' + Date.now(),
@@ -484,6 +467,7 @@ export default {
   },
   methods: {
     applyManualParams (type, params) {
+      this.codeEditorVisible = false
       if (Helpers.isValidJsonObject(params)) {
         let query = {}
         query[`${type}`] = JSON.parse(params)
@@ -535,6 +519,11 @@ export default {
         case DOWNLOAD_FORMATS.JSON:
           return null
       }
+    },
+    editCode (paramToModify, codeToModify) {
+      this.paramBeingModified = paramToModify
+      this.codeBeingModified = JSON.stringify(codeToModify, null, 2)
+      this.codeEditorVisible = true
     },
     filterColumns (columns) {
       this.visiblePanel = null
@@ -660,6 +649,7 @@ export default {
   components: { 
     Calendar, 
     CardList, 
+    CodeModal,
     ColumnsPanel, 
     Datepicker, 
     FilterPanel, 

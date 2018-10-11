@@ -150,6 +150,7 @@ export default {
   .menu {
     p { // headers
       padding: 20px 20px 0 30px;
+      color: lighten($grey, 40%);
     }
     a { //links
       padding: 12px 20px;
