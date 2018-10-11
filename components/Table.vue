@@ -62,11 +62,9 @@ export default {
   },
   computed: {
     flattenedColumns () {
-      console.log('flat Columns', this.columns)
       return this.columns
     },
     flattenedRecords () {
-      console.log('flat Columns', this.columns)
       return this.records.map(x => FlattenObject(x))
     }
   },
