@@ -161,7 +161,7 @@
       <Table
         class=""
         :columns="visibleColumns"
-        :records="records"
+        :records="flattenedRecords"
         :sortedColumns="sortedColumns"
         tableSize="LARGE"
         @onHeaderClicked="tableHeaderClicked"
@@ -189,8 +189,8 @@
     <div class="p-none m-md m-b-xxl" v-if="currentViewType === VIEW_TYPES.CARDS && records.length" :key="cardsComponentMounted">
       <CardList
         :imageKey="viewParams.image_key"
-        :columns="viewParams.columns"
-        :records="records"
+        :columns="visibleColumns"
+        :records="flattenedRecords"
         @onRecordClicked="goToRecord"
       />
       <div class="pagination-section" v-show="totalRecords > paginationSize">
@@ -214,15 +214,15 @@
 
     <div class="" v-if="currentViewType === VIEW_TYPES.CALENDAR" :key="calendarComponentMounted">
       <Calendar 
-        v-if="viewParams.date && viewParams.pivotKey"
-        :date="viewParams.date"
-        :columns="viewParams.columns"
+        v-if="viewParams.pivotKey"
+        :date="viewParams.date || currentDate"
+        :columns="visibleColumns"
         :pivotKey="viewParams.pivotKey"
-        :records="records"
+        :records="flattenedRecords"
         @onChange="({ record, column, date }) => { this.updateRecordField(record, column, date) }"
         @onRecordClicked="goToRecord"
       />
-      <div v-show="dateColumns.length && (!viewParams.date || !viewParams.pivotKey)">
+      <div v-show="dateColumns.length && (!viewParams.pivotKey)">
         <h3 class="title is-5 has-text-centered m-t-xl">Pick a date and a pivot column</h3>
         <p class="has-text-centered">Use the menu above to customise your view.</p>
       </div>
@@ -236,8 +236,8 @@
       <Kanban
         v-if="viewParams.pivotKey"
         :pivotKey="viewParams.pivotKey"
-        :columns="viewParams.columns"
-        :records="records"
+        :columns="visibleColumns"
+        :records="flattenedRecords"
         @onChange="({ record, column, value }) => { this.updateRecordField(record, column, value) }"
       />
       <div v-show="!viewParams.pivotKey && enumColumns.length">
@@ -288,7 +288,7 @@
 
 <script>
 import axios                    from 'axios'
-import flat                     from 'flat'
+import FlattenObject            from 'flat'
 import moment                   from 'moment'
 import json2csv                 from 'json2csv'
 import * as Helpers             from '~/lib/common/helpers'
@@ -436,6 +436,9 @@ export default {
     currentViewType () { // GRID, CALENDAR etc
       return this.viewParams.view
     },
+    currentDate () {
+      return moment().format('YYYY-MM-DD')
+    },
     dateColumns () {
       return this.viewParams.columns
         .filter(x => (x.resource === this.resourceKey)) // only allow the current resource (for now)
@@ -450,6 +453,9 @@ export default {
       if (!this.isFiltered) return []
       let param = this.postgrestParams.criteria
       return PostgrestHelpers.parseFilterString(param.substring(1, param.length -1))
+    },
+    flattenedRecords () {
+      return this.records.map(x => FlattenObject(x))
     },
     isFiltered () {
       return !!this.postgrestParams.criteria

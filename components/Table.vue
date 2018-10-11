@@ -11,7 +11,7 @@
                 <label for="exampleCheckbox" class="p-r-none"></label>
               </div>
             </th>
-            <th v-for="(column, i) in flattenedColumns" :key="'col-h'+i"  v-if="!column.hidden">
+            <th v-for="(column, i) in columns" :key="'col-h'+i"  v-if="!column.hidden">
               <a
                 @click="$emit('onHeaderClicked', column.key)"
                 :class="{
@@ -25,7 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(record, index) in flattenedRecords" :key="'record-'+index">
+          <tr v-for="(record, index) in records" :key="'record-'+index">
             <td class="p-r-none">
               <div class="field">
                 <input class="is-checkradio is-small" :id="'check-'+index" type="checkbox" :name="'check-'+index">
@@ -50,7 +50,6 @@
 
 <script>
 import moment from 'moment'
-import FlattenObject from 'flat'
 import PerfectScrollbar from 'perfect-scrollbar'
 export default {
   name: 'Table',
@@ -61,12 +60,6 @@ export default {
     tableSize: { required: false, type: String, default: 'SMALL' } // how large the text / cell size is
   },
   computed: {
-    flattenedColumns () {
-      return this.columns
-    },
-    flattenedRecords () {
-      return this.records.map(x => FlattenObject(x))
-    }
   },
   methods: {
     getDateAndTime (dateString) {
