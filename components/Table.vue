@@ -11,7 +11,7 @@
                 <label for="exampleCheckbox" class="p-r-none"></label>
               </div>
             </th>
-            <th v-for="(column, i) in columns" :key="'col-h'+i"  v-if="!column.hidden">
+            <th v-for="(column, i) in flattenedColumns" :key="'col-h'+i"  v-if="!column.hidden">
               <a
                 @click="$emit('onHeaderClicked', column.key)"
                 :class="{
@@ -25,7 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(record, index) in records" :key="'record-'+index">
+          <tr v-for="(record, index) in flattenedRecords" :key="'record-'+index">
             <td class="p-r-none">
               <div class="field">
                 <input class="is-checkradio is-small" :id="'check-'+index" type="checkbox" :name="'check-'+index">
@@ -61,12 +61,14 @@ export default {
     tableSize: { required: false, type: String, default: 'SMALL' } // how large the text / cell size is
   },
   computed: {
-    columnKeys () {
-      return this.columns.map(x => x.key)
+    flattenedColumns () {
+      console.log('flat Columns', this.columns)
+      return this.columns
+    },
+    flattenedRecords () {
+      console.log('flat Columns', this.columns)
+      return this.records.map(x => FlattenObject(x))
     }
-  },
-  created () {
-    console.log(' records.map(x => FlattenObject(x))',  this.records.map(x => FlattenObject(x)))
   },
   methods: {
     getDateAndTime (dateString) {

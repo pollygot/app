@@ -160,7 +160,7 @@
     <div class="table-box box p-none m-md m-b-xxl" v-if="currentViewType === VIEW_TYPES.GRID && records.length" :key="tableComponentMounted">
       <Table
         class=""
-        :columns="viewParams.columns"
+        :columns="visibleColumns"
         :records="records"
         :sortedColumns="sortedColumns"
         tableSize="LARGE"
@@ -359,6 +359,7 @@ export default {
       }
     } else if (type === 'view') { // custom view 
       let customView = store.getters['hummingbird/customView'](resourceKey)
+      console.log('customView', customView)
       queryParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : {...customView.queryParams}
       viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : {...customView.viewParams}
       resourceKey = customView.resourceKey // transfer ownership of the resource key
@@ -392,12 +393,11 @@ export default {
       currentResource: allTables.find(x => (x.key === resourceKey)),
       calendarDateKey: null,
       kanbanPivotKey: null,
-      pageTitle: params.resourceKey.replace(/_/g, ' '),
       postgrestParams: queryParams,
       primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
       queryEditorMode: false,
       records: response.data,
-      resourceKey: params.resourceKey,
+      resourceKey: resourceKey,
       totalRecords: rangeData.totalRecords,
       userModifiedPostgrestParams: JSON.stringify({...queryParams}, null, NUM_SPACES),
       userModifiedPostgrestParamsError: false,
@@ -466,7 +466,10 @@ export default {
       return sorting.map(x => ({ key: x.split('.')[0], sort: x.split('.')[1] }))
     },
     visibleColumns () {
-      return this.viewParams.columns.filter(x => !x.hidden)
+      return this.viewParams.columns.filter(x => !x.hidden).map(x => {
+        if (x.resource != this.resourceKey) return {...x, key: `${x.resource}.${x.key}`} // this need to have a smarter way of flattening (recursively)
+        else return x
+      })
     }
   },
   methods: {
