@@ -3,7 +3,7 @@
     
         <div class="label-wrapper" @click="toggleTable">
           <div :style="indent" class="button">
-            <span class="nice-checkbox" :class="{'is-active': selected }"></span>
+            <span class="nice-checkbox is-active"></span>
             <span>{{label}}</span>
           </div>
         </div>

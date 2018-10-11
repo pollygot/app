@@ -1,7 +1,7 @@
 <template>
 <div class="HummingbirdJoinPanel">
 
-  <div id="HummingbirdJoinPanel" class="quickview" :class="{ 'is-active': isVisible }">
+  <div id="HummingbirdJoinPanel" class="quickview is-active">
     <div class="quickview-body">
       <div class="quickview-block p-md">
         <div class="buttons is-right header-buttons">

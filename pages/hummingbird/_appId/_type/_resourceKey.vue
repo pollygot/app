@@ -224,30 +224,30 @@
   </div>
 
   <ColumnsPanel
+    v-if="visiblePanel === PANELS.COLUMNS"
     :columns="viewParams.columns"
     :key="columnsComponentMounted"
-    :isVisible="visiblePanel === PANELS.COLUMNS"
     @onApply="updateColumns"
     @onHidePanel="() => { visiblePanel = null }"
   />
   <FilterPanel
+    v-if="visiblePanel === PANELS.FILTERS"
     :allColumns="viewParams.columns"
-    :isVisible="visiblePanel === PANELS.FILTERS"
     :existingFilters="filteredColumns"
     :key="filterComponentMounted"
     @onFilter="filterColumns"
     @onHidePanel="() => { visiblePanel = null }"
   />
   <JoinPanel
+    v-if="visiblePanel === PANELS.JOINS"
     :allTables="allTables"
     :base="resourceKey"
     :key="joinComponentMounted"
-    :isVisible="visiblePanel === PANELS.JOINS"
     @onHidePanel="() => { visiblePanel = null }"
   />
   <SortPanel
+    v-if="visiblePanel === PANELS.SORTING"
     :allColumns="viewParams.columns"
-    :isVisible="visiblePanel === PANELS.SORTING"
     :sortedColumns="sortedColumns"
     :key="sortComponentMounted"
     @onSort="sortColumns"
@@ -401,15 +401,15 @@ export default {
       VIEW_TYPES: VIEW_TYPES,
 
       // give some components keys to force refresh
-      calendarComponentMounted: 'calendar' + Date.now(),
-      cardsComponentMounted: 'cards' + Date.now(),
-      codeEditorMounted: 'code' + Date.now(),
-      columnsComponentMounted: 'columns' + Date.now(),
-      filterComponentMounted: 'filters' + Date.now(),
-      joinComponentMounted: 'joins' + Date.now(),
-      kanbanComponentMounted: 'kanban' + Date.now(),
-      sortComponentMounted: 'sorts' + Date.now(),
-      tableComponentMounted: 'records' + Date.now()
+      calendarComponentMounted: params.resourceKey + 'calendar' + Date.now(),
+      cardsComponentMounted: params.resourceKey + 'cards' + Date.now(),
+      codeEditorMounted: params.resourceKey + 'code' + Date.now(),
+      columnsComponentMounted: params.resourceKey + 'columns' + Date.now(),
+      filterComponentMounted: params.resourceKey + 'filters' + Date.now(),
+      joinComponentMounted: params.resourceKey + 'joins' + Date.now(),
+      kanbanComponentMounted: params.resourceKey + 'kanban' + Date.now(),
+      sortComponentMounted: params.resourceKey + 'sorts' + Date.now(),
+      tableComponentMounted: params.resourceKey + 'records' + Date.now()
     }
   },
   computed: {
@@ -551,7 +551,7 @@ export default {
       return PostgrestHelpers.generateFilterString(ors)
     },
     goToRecord (record) {
-      if (this.currentResource.isViewOnly) return null
+      if (this.currentResource.isViewOnly) return this.$toast.show(READ_ONLY_MESSAGE, { duration: TOAST_DURATION })
       try {
         let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
         let selectors = primaryKeys.map(x => {

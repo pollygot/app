@@ -1,7 +1,7 @@
 <template>
 <div class="HummingbirdFilterPanel">
 
-  <div id="HummingbirdFilterPanel" class="quickview" :class="{ 'is-active': isVisible }">
+  <div id="HummingbirdFilterPanel" class="quickview is-active" >
     <div class="quickview-body">
       <div class="quickview-block p-md">
 
@@ -86,7 +86,6 @@ export default {
   name: 'HummingbirdFilterPanel',
   props: {
     allColumns: { required: true, type: Array },
-    isVisible: { required: true, type: Boolean },
     existingFilters: { required: true, type: Array }
   },
   components: { draggable },

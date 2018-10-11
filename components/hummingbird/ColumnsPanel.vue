@@ -1,7 +1,7 @@
 <template>
 <div class="HummingbirdColumnsPanel">
 
-  <div id="HummingbirdColumnsPanel" class="quickview" :class="{ 'is-active': isVisible }">
+  <div id="HummingbirdColumnsPanel" class="quickview is-active">
     <div class="quickview-body">
       <div class="quickview-block p-md">
         <div class="buttons is-right header-buttons">
@@ -33,8 +33,7 @@ import draggable from 'vuedraggable'
 export default {
   name: 'HummingbirdColumnsPanel',
   props: {
-    columns: { required: true, type: Array },
-    isVisible: { required: true, type: Boolean }
+    columns: { required: true, type: Array }
   },
   components: { draggable },
   data() {

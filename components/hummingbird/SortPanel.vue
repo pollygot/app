@@ -1,7 +1,7 @@
 <template>
 <div class="HummingbirdSortPanel">
 
-  <div id="HummingbirdSortPanel" class="quickview" :class="{ 'is-active': isVisible }">
+  <div id="HummingbirdSortPanel" class="quickview is-active">
     <div class="quickview-body">
       <div class="quickview-block p-md">
 
@@ -54,7 +54,6 @@ export default {
   name: 'HummingbirdSortPanel',
   props: {
     allColumns: { required: true, type: Array },
-    isVisible: { required: true, type: Boolean },
     sortedColumns: { required: true, type: Array }
   },
   components: { draggable },
