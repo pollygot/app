@@ -16,6 +16,7 @@ db
   tenants: [], 
 
   // HummingBird
-  hummingbird_views: [] // custom views (table joins etc)
+  hummingbird_views: [], // custom views (table joins etc)
+  hummingbird_history: [] // save every record CRUD
 })
 .write()

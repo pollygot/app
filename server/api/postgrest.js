@@ -44,10 +44,15 @@ app.patch('/:appId/:resourceKey', async (req, res, next) => {
   const { appId, resourceKey } = req.params
   const payload = req.body
   let app = await Pollygot.getAppConfig(appId)
-  let fullUrl = `${app.config.url}/${resourceKey}` + `?${Helpers.decrypt(req.query.q.toString())}`
+  let identifier = Helpers.decrypt(req.query.q.toString())
+  let fullUrl = `${app.config.url}/${resourceKey}` + `?${identifier}`
   console.log('PostgREST PATCH: fullUrl', fullUrl)
   axios.patch(fullUrl, payload, PATCH_HEADERS)
-    .then(response => { return res.json({ data: response.data, headers: response.headers }) })
+    .then(response => {
+      let user = (req.user && req.user.username) ? req.user.username : ''
+      saveRecordHistory(appId, resourceKey, identifier, 'UPDATE', payload, user)
+      return res.json({ data: response.data, headers: response.headers }) 
+    })
     .catch(e => { return res.status(e.response.status).json(e.response.data) })
 })
 
@@ -105,4 +110,30 @@ const _attachHeaders = (reqeustHeaders) => {
 module.exports = {
   path: '/api/postgrest',
   handler: app
+}
+
+
+
+//
+//
+// mocking out an API calls to Pollygot Core
+//
+const shortid = require('shortid')
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const adapter = new FileSync(process.env.LOCAL_DATA_STORE)
+const db = low(adapter)
+
+const saveRecordHistory = (appId, resourceKey, identifier, action, payload, userIdentifier) => {
+  return db.get('hummingbird_history')
+    .push({ 
+      id: shortid.generate(), 
+      app_id: appId,
+      resource_key: resourceKey,
+      identifier: identifier,
+      action: action,
+      payload: payload,
+      author: userIdentifier, // user in this case, but could be anything - API, system, app etc.
+      inserted: new Date()
+    }).write().id
 }

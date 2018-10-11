@@ -3,11 +3,14 @@
 
   <nav class="top-level level is-mobile p-lg">
     <div class="level-left">
-      <div class="level ">
+      <div class="level-item ">
         <a class="button" @click="back()">
-          <span class="icon">
-            <i class="fas fa-arrow-left"></i>
-          </span>
+          <span class="icon"><i class="fas fa-arrow-left"></i></span>
+        </a>
+      </div>
+      <div class="level-item ">
+        <a class="button" @click="recordHistoryVisible = !recordHistoryVisible" :class="{'is-dark': recordHistoryVisible}">
+          <span class="icon"><i class="far fa-list-alt"></i></span>
         </a>
       </div>
     </div>
@@ -246,6 +249,11 @@
     </div>
   </div>
 
+  <RecordHistoryPanel
+    v-if="recordHistoryVisible"
+    :history="history"
+    @onHidePanel="() => { recordHistoryVisible = false }"
+  />
 
   <ModalConfirm
     :icon="'fa-times'"
@@ -276,6 +284,7 @@ import NumericInput             from '~/components/inputs/Numeric.vue'
 import Timepicker               from '~/components/inputs/Timepicker.vue'
 import ModalConfirm             from '~/components/ModalConfirm.vue'
 import ReadOnlyCard             from '~/components/hummingbird/ReadOnlyCard.vue'
+import RecordHistoryPanel       from '~/components/hummingbird/RecordHistoryPanel.vue'
 
 const TOAST_ERROR_DURATION = 4000
 
@@ -284,23 +293,29 @@ export default {
     let { appId, resourceKey } = params
     let isCreated = (params.method === 'edit') ? true : false
     let record = {}
+    let history = []
     if (isCreated) {
       let { data:response } = await PostgrestHelpers.getRecord(app, appId, resourceKey, query.q)
+      let identifier = Helpers.decrypt(query.q)
+      history = await app.$axios.$get(`/api/pollygot/hummingbird/history/${appId}/${resourceKey}/${identifier}`)
       record = response.data
     }
     let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
     let formattedFields = availableFields.map(x => ({...x, value: record[`${x.key}`], modifiedValue: record[`${x.key}`] })) // add the current value to each field
+    
     return {
       appId: appId,
       availableFields: availableFields,
       confirmDeleteModalVisible: false,
       formattedFields: formattedFields,
+      history: history,
       joins: [], // the user can page through foreign keys
       isCreated: isCreated,
       pageTitle: resourceKey.replace(/_/g, ' '),
       primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
       proxyUrlBase: `/api/postgrest/${appId}/${resourceKey}`,
       record: record,
+      recordHistoryVisible: false,
       resourceKey: resourceKey
     }
   },
@@ -393,7 +408,7 @@ export default {
 
   // View handlers
   layout: 'hummingbird',
-  components: { Datepicker, Datetimepicker, Timepicker, ModalConfirm, NumericInput, ReadOnlyCard },
+  components: { Datepicker, Datetimepicker, Timepicker, ModalConfirm, NumericInput, ReadOnlyCard, RecordHistoryPanel },
   watchQuery: ['q'],
   beforeRouteEnter (to, from, next) {
     next(vm => { vm.fromRoute = from }) // for the "back" function
