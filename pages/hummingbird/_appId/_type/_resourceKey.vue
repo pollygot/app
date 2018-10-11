@@ -538,9 +538,7 @@ export default {
       }
     },
     generateFilterString (columns) {
-      console.log('columns', columns)
-      let ors = []
-      let ands = []
+      let ors, ands = []
       columns.forEach(col => {
         if (col.andOr === 'and') {
           ands.push(col)
