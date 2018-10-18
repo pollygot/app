@@ -13,7 +13,7 @@ module.exports = {
       {
         hid: 'description',
         name: 'description',
-        content: 'Manage your business',
+        content: 'Manage your start up',
       },
     ],
     link: [
@@ -29,15 +29,10 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
     ],
   },
-  // we need to run most the functionality on the server since there are private setting associated with most tenants' apps
-  // also overcomes CORs
-  serverMiddleware: [
-    './server/api/auth',
-    './server/api/bumblebee',
-    './server/api/kue',
-    './server/api/pollygot',
-    './server/api/postgrest',
-  ],
+  /**
+   * Routes
+   */
+  serverMiddleware: ['~/server/index.js'],
   router: {
     middleware: ['auth'],
   },
@@ -45,11 +40,34 @@ module.exports = {
   ** Modules
   */
   modules: [
-    '@nuxtjs/auth',
-    '@nuxtjs/axios',
+    [
+      '@nuxtjs/auth',
+      {
+        strategies: {
+          local: {
+            endpoints: {
+              login: { propertyName: 'token.accessToken' },
+            },
+          },
+        },
+      },
+    ],
+    [
+      '@nuxtjs/axios',
+      {
+        baseURL: process.env.API_URL || 'http://localhost:3000',
+        proxy: false,
+        proxyHeaders: false,
+      },
+    ],
     '@nuxtjs/dotenv',
     '@nuxtjs/proxy',
-    '@nuxtjs/toast',
+    [
+      '@nuxtjs/toast',
+      {
+        position: 'bottom-right',
+      },
+    ],
   ],
   /*
   ** Global CSS
@@ -68,8 +86,7 @@ module.exports = {
         'process.VERSION': require('./package.json').version,
       }),
     ],
-    transpile: ['./lib/**/*', './server/**/*'],
-    watch: ['./server/**/*'],
+    watch: ['server'],
     vendor: [
       'axios',
       'flat',
@@ -98,29 +115,5 @@ module.exports = {
         'postcss-custom-properties': false,
       },
     },
-  },
-  /*
-  ** Module config
-  */
-  auth: {
-    strategies: {
-      local: {
-        endpoints: {
-          login: { propertyName: 'token.accessToken' },
-        },
-      },
-      auth0: {
-        domain: process.env.AUTH0_DOMAIN,
-        client_id: process.env.AUTH0_CLIENT_ID,
-      },
-    },
-  },
-  axios: {
-    baseURL: process.env.API_URL || 'http://localhost:3000',
-    proxy: false,
-    proxyHeaders: false,
-  },
-  toast: {
-    position: 'bottom-right',
   },
 }

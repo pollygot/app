@@ -1,13 +1,9 @@
 require('dotenv').config()
 const axios = require('axios')
-const express = require('express')
 const Pollygot = require('../common/pollygot')
 const Helpers = require('../common/helpers')
-const jwt = require('express-jwt')
-
-const app = express()
-app.use(express.json())
-app.use(jwt({ secret: process.env.JWT_SECRET }))
+const { Router } = require('express')
+const router = Router()
 
 const PATCH_HEADERS = {
   headers: {
@@ -26,7 +22,7 @@ const POST_HEADERS = {
  * Get records
  * https://postgrest.org/en/v5.0/api.html#horizontal-filtering-rows
  */
-app.get('/:appId/:resourceKey?', async (req, res, next) => {
+router.get('/:appId/:resourceKey?', async (req, res, next) => {
   let { appId, resourceKey } = req.params
   let app = await Pollygot.getAppConfig(appId)
   let fullUrl = `${app.config.url}`
@@ -49,7 +45,7 @@ app.get('/:appId/:resourceKey?', async (req, res, next) => {
  * Update the database. This uses PATCH so only the data that is passed will be updated
  * https://postgrest.org/en/v5.0/api.html#insertions-updates
  */
-app.patch('/:appId/:resourceKey', async (req, res, next) => {
+router.patch('/:appId/:resourceKey', async (req, res, next) => {
   if (!req.query)
     return res.status(422).json({ data: 'Must provide a selector' })
   if (!req.body) return res.status(422).json({ data: 'Must provide a payload' })
@@ -76,7 +72,7 @@ app.patch('/:appId/:resourceKey', async (req, res, next) => {
  * Create or update.
  * https://postgrest.org/en/v5.0/api.html#insertions-updates
  */
-app.post('/:appId/:resourceKey', async (req, res, next) => {
+router.post('/:appId/:resourceKey', async (req, res, next) => {
   if (!req.body) return res.status(422).json({ data: 'Must provide a payload' })
   if (req.query && req.query.q)
     return res.status(422).json({ data: 'Use PATCH to make updates!' })
@@ -100,7 +96,7 @@ app.post('/:appId/:resourceKey', async (req, res, next) => {
  * Delete
  * https://postgrest.org/en/v5.0/api.html#deletions
  */
-app.delete('/:appId/:resourceKey', async (req, res, next) => {
+router.delete('/:appId/:resourceKey', async (req, res, next) => {
   if (!req.query)
     return res.status(422).json({ data: 'Must provide a selector' })
 
@@ -121,7 +117,7 @@ app.delete('/:appId/:resourceKey', async (req, res, next) => {
 })
 
 // Error handler
-app.use((err, req, res, next) => {
+router.use((err, req, res, next) => {
   console.error(err) // eslint-disable-line no-console
   res.status(401).send(err + '')
 })
@@ -140,11 +136,7 @@ const _attachHeaders = reqeustHeaders => {
   return headers
 }
 
-// -- export app --
-module.exports = {
-  path: '/api/postgrest',
-  handler: app,
-}
+module.exports = router
 
 //
 //

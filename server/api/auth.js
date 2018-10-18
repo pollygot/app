@@ -1,28 +1,11 @@
 require('dotenv').config()
-const express = require('express')
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
-const jwt = require('express-jwt')
+const { Router } = require('express')
+const router = Router()
 const jsonwebtoken = require('jsonwebtoken')
 const db = require('../db')
 
-/**
- * Set up app @todo: refactor this into an index.js, with the routes in a subfolder
- */
-const JWT_SECRET = process.env.JWT_SECRET
-const app = express()
-app.use(cookieParser())
-app.use(bodyParser.json())
-app.use(
-  jwt({ secret: process.env.JWT_SECRET }).unless({
-    path: '/api/auth/login',
-  })
-)
-
-// -- Routes --
-
 // [POST] /login
-app.post('/login', async (req, res) => {
+router.post('/auth/login', async (req, res) => {
   const { username, password } = req.body
   let user = await db.getUserByUsernameAndPassword(username, password)
   console.log('user', user)
@@ -37,23 +20,13 @@ app.post('/login', async (req, res) => {
 })
 
 // [GET] /user
-app.get('/user', (req, res, next) => {
+router.get('/auth/user', (req, res, next) => {
   res.json({ user: req.user })
 })
 
 // [POST] /logout
-app.post('/logout', (req, res, next) => {
+router.post('/auth/logout', (req, res, next) => {
   res.json({ status: 'OK' })
 })
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err) // eslint-disable-line no-console
-  res.status(401).send(err + '')
-})
-
-// -- export app --
-module.exports = {
-  path: '/api/auth',
-  handler: app,
-}
+module.exports = router

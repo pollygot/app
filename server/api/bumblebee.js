@@ -1,15 +1,11 @@
 require('dotenv').config()
 const axios = require('axios')
-const express = require('express')
 const Pollygot = require('../common/pollygot')
-const jwt = require('express-jwt')
-
-const app = express()
-app.use(express.json())
-app.use(jwt({ secret: process.env.JWT_SECRET }))
+const { Router } = require('express')
+const router = Router()
 
 // Get all apps
-app.get('/:appId/apps/:appKey?', async (req, res) => {
+router.get('/bumblebee/:appId/apps/:appKey?', async (req, res) => {
   let { appId, appKey } = req.params // @TODO: implement single via appKey
   let app = await Pollygot.getAppConfig(appId)
   let fullUrl = `${app.config.url}/v1/admin/apps/`
@@ -25,7 +21,7 @@ app.get('/:appId/apps/:appKey?', async (req, res) => {
 })
 
 // Get jobs for an app
-app.get('/:appId/apps/:appKey/jobs', async (req, res) => {
+router.get('/bumblebee/:appId/apps/:appKey/jobs', async (req, res) => {
   let { appId, appKey } = req.params // @TODO: implement single via appKey
   let app = await Pollygot.getAppConfig(appId)
   let fullUrl = `${app.config.url}/v1/apps/${appKey}/jobs`
@@ -41,7 +37,7 @@ app.get('/:appId/apps/:appKey/jobs', async (req, res) => {
 })
 
 // Create a new Job
-app.post('/:appId/jobs', async (req, res) => {
+router.post('/bumblebee/:appId/jobs', async (req, res) => {
   let { appId } = req.params // @TODO: implement single via appKey
   let app = await Pollygot.getAppConfig(appId)
   let fullUrl = `${app.config.url}/v1/jobs`
@@ -57,14 +53,4 @@ app.post('/:appId/jobs', async (req, res) => {
     })
 })
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err) // eslint-disable-line no-console
-  res.status(401).send(err + '')
-})
-
-// -- export app --
-module.exports = {
-  path: '/api/bumblebee',
-  handler: app,
-}
+module.exports = router

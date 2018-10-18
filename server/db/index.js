@@ -16,6 +16,7 @@ Sentry.init({ dsn: process.env.SENTRY_DSN })
 // At the moment I'm using sheetmetal.io while I prototype
 const METAL_URL = process.env.SHEET_METAL_POLLYGOT
 const METAL_KEY = process.env.SHEET_METAL_KEY
+const METAL_USER = process.env.SHEET_METAL_USER
 
 /**
  * Exported methods
@@ -40,7 +41,7 @@ const getUserByUsernameAndPassword = (exports.getUserByUsernameAndPassword = asy
   password
 ) => {
   try {
-    const url = `${METAL_URL}/users!A1:C50?key=${METAL_KEY}`
+    const url = `${METAL_URL}/users!A1:C50?key=${METAL_KEY}&user=${METAL_USER}`
     console.log('url', url)
     let { data: users } = (await axios.get(url)) || []
     return (
@@ -57,7 +58,7 @@ const getUserByUsernameAndPassword = (exports.getUserByUsernameAndPassword = asy
  * Private helpers
  */
 
-const _handleAxiosError = function(err) {
+const _handleAxiosError = function(error) {
   let e = null
   if (error.response) {
     // The request was made and the server responded with a status code

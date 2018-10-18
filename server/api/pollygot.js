@@ -1,13 +1,9 @@
 require('dotenv').config()
-const express = require('express')
-const jwt = require('express-jwt')
-
-const app = express()
-app.use(express.json())
-app.use(jwt({ secret: process.env.JWT_SECRET }))
+const { Router } = require('express')
+const router = Router()
 
 // get all the config for a specific app
-app.get('/app/:appId/', async (req, res) => {
+router.get('/pollygot/app/:appId/', async (req, res) => {
   let { appId } = req.params
   let pollyApp = getApp(appId)
   console.log('pollyApp', pollyApp)
@@ -16,7 +12,7 @@ app.get('/app/:appId/', async (req, res) => {
 })
 
 // get all the custom views for a specific app
-app.get('/app/:appId/views', async (req, res) => {
+router.get('/pollygot/app/:appId/views', async (req, res) => {
   let { appId } = req.params
   let pollyApp = getApp(appId)
   if (!pollyApp) return res.status(404).send('Not Found.')
@@ -26,9 +22,8 @@ app.get('/app/:appId/views', async (req, res) => {
   }
 })
 
-// get all the config for a specific app
-app.get(
-  '/hummingbird/history/:appId/:resourceKey/:identifier',
+router.get(
+  '/pollygot/hummingbird/history/:appId/:resourceKey/:identifier',
   async (req, res) => {
     let { appId, resourceKey, identifier } = req.params
     let history =
@@ -37,17 +32,7 @@ app.get(
   }
 )
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err) // eslint-disable-line no-console
-  res.status(401).send(err + '')
-})
-
-// -- export app --
-module.exports = {
-  path: '/api/pollygot',
-  handler: app,
-}
+module.exports = router
 
 //
 // mocking out an API calls to Pollygot Core
