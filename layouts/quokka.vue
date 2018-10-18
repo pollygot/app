@@ -54,17 +54,16 @@
 import SideBar from '../components/SideBar.vue'
 export default {
   components: { SideBar },
-  data () {
-    return { }
+  data() {
+    return {}
   },
   computed: {
-    currentState () {
+    currentState() {
       return this.$route.params.state
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-
 </style>

@@ -13,7 +13,8 @@
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "loc": "cloc --vcs=git --exclude-ext=json .",
     "precommit": "npm run lint",
-    "start": "nuxt start"
+    "start": "nuxt start",
+    "pretty": "prettier --write \"./**/*.{js,json,yml,md,vue,css,scss}\""
   },
   "dependencies": {
     "@nuxtjs/auth": "^4.5.1",
@@ -61,5 +62,10 @@
     "pretty-quick": "^1.8.0",
     "sass-loader": "^7.1.0",
     "vue-style-loader": "^4.1.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }

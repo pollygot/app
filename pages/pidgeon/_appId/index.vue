@@ -14,13 +14,10 @@
 <script>
 export default {
   layout: 'pidgeon',
-  computed: {
-  },
-  methods: {
-  }
+  computed: {},
+  methods: {},
 }
 </script>
 
 <style>
-
 </style>

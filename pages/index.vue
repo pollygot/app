@@ -14,21 +14,21 @@
 <script>
 export default {
   computed: {
-    apps () {
+    apps() {
       return this.$store.getters['apps']
     },
-    tenants () {
+    tenants() {
       return this.$store.getters['tenants']
-    }
+    },
   },
   methods: {
-    appName (appId) {
+    appName(appId) {
       return this.apps[`${appId}`].name
     },
-    appDescription (appId) {
+    appDescription(appId) {
       return this.apps[`${appId}`].description
-    }
-  }
+    },
+  },
 }
 </script>
 

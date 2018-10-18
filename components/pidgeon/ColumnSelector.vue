@@ -45,37 +45,36 @@ export default {
     baseTable: { required: true, type: String },
     selectString: { required: true, type: String },
   },
-  data () {
+  data() {
     return {
-      breadcrumbs: [ this.baseTable ],
+      breadcrumbs: [this.baseTable],
       currentTable: this.baseTable,
-      tableString: this.selectString.replace("select=")
+      tableString: this.selectString.replace('select='),
     }
   },
   computed: {
     ...mapGetters({
-      columnsForResource: 'pidgeon/columnsForResource'
+      columnsForResource: 'pidgeon/columnsForResource',
     }),
   },
   methods: {
-    addColumn (table, columnName) {
+    addColumn(table, columnName) {
       this.$emit('onUpdated', 'id')
     },
-    isColumnSelected (table, columnName) {
+    isColumnSelected(table, columnName) {
       let selected = this.tableString.split(',')
       return selected.some(x => x === columnName)
     },
-    showTable (resourceKey) {
+    showTable(resourceKey) {
       console.log('resourceKey', resourceKey)
       this.breadcrumbs.push(resourceKey)
     },
-    columns (resourceKey) {
+    columns(resourceKey) {
       return this.columnsForResource(resourceKey)
     },
-  }
+  },
 }
 </script>
 
 <style lang="scss">
 </style>
-

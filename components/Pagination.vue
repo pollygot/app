@@ -41,57 +41,58 @@ export default {
     currentRangeStart: { required: true, type: Number },
     currentRangeEnd: { required: true, type: Number },
     paginationSize: { required: true, type: Number },
-    totalRecords: { required: true, type: Number }
+    totalRecords: { required: true, type: Number },
   },
   computed: {
-    currentPageNumber: function () {
+    currentPageNumber: function() {
       return Math.ceil(this.currentRangeEnd / this.paginationSize)
     },
-    isUserOnFirstPage: function () {
-      return (this.currentRangeStart === 0)
+    isUserOnFirstPage: function() {
+      return this.currentRangeStart === 0
     },
-    isUserOnLastPage: function () {
-      return (this.currentRangeEnd === (this.totalRecords - 1))
+    isUserOnLastPage: function() {
+      return this.currentRangeEnd === this.totalRecords - 1
     },
-    pages: function () {
+    pages: function() {
       let pages = []
       for (let i = 0; i < this.totalPages; i++) {
         let pageNumber = i + 1
         let rangeStart = i * this.paginationSize
-        let rangeEnd = (pageNumber * this.paginationSize) - 1
+        let rangeEnd = pageNumber * this.paginationSize - 1
         pages[i] = {
           number: pageNumber,
-          isCurrentPage: (this.currentRangeStart === rangeStart),
+          isCurrentPage: this.currentRangeStart === rangeStart,
           rangeStart: rangeStart,
-          rangeEnd: rangeEnd
+          rangeEnd: rangeEnd,
         }
       }
       return pages
     },
-    totalPages: function () {
-      return Math.ceil(this.totalRecords / (this.paginationSize))
+    totalPages: function() {
+      return Math.ceil(this.totalRecords / this.paginationSize)
     },
   },
   methods: {
-    emitNewRangeStart: function (rangeStart) {
+    emitNewRangeStart: function(rangeStart) {
       this.$emit('onNewRangeStart', rangeStart)
     },
-    goToPage: function (pageNumber) {
+    goToPage: function(pageNumber) {
       this.emitNewRangeStart((pageNumber - 1) * this.paginationSize)
     },
-    nextPage: function () {
+    nextPage: function() {
       this.emitNewRangeStart(this.currentRangeStart + this.paginationSize)
     },
-    previousPage: function () {
+    previousPage: function() {
       this.emitNewRangeStart(this.currentRangeStart - this.paginationSize)
-    }
-  }
+    },
+  },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.pagination-next, .pagination-previous {
+.pagination-next,
+.pagination-previous {
   min-width: 6rem;
 }
 </style>

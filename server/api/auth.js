@@ -14,9 +14,8 @@ const app = express()
 app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(
-  jwt({ secret: process.env.JWT_SECRET })
-  .unless({
-    path: '/api/auth/login'
+  jwt({ secret: process.env.JWT_SECRET }).unless({
+    path: '/api/auth/login',
   })
 )
 
@@ -27,9 +26,11 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body
   let user = await db.getUserByUsernameAndPassword(username, password)
   console.log('user', user)
-  if (!user) { // Invalid
+  if (!user) {
+    // Invalid
     return res.status(404).json({ message: 'Invalid username or password' })
-  } else { // Valid
+  } else {
+    // Valid
     const accessToken = jsonwebtoken.sign(user, JWT_SECRET)
     return res.json({ token: { accessToken } })
   }
@@ -54,5 +55,5 @@ app.use((err, req, res, next) => {
 // -- export app --
 module.exports = {
   path: '/api/auth',
-  handler: app
+  handler: app,
 }

@@ -2,7 +2,7 @@
 
 Common functions to be used across the codebase.
 
-*Important*
+_Important_
 
 These will be compiled from `./lib/common/` to `./server/common/` using `npm run compile:common`
 

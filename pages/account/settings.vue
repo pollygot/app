@@ -13,17 +13,15 @@
 
 <script>
 export default {
-  computed: {
-  },
+  computed: {},
   methods: {
-    logout: async function () {
+    logout: async function() {
       let logout = await this.$axios.$post('/api/auth/logout')
       let user = await this.$axios.$get('/api/auth/user')
       console.log('logout', logout)
       console.log('user', user)
       // this.$router.push({ path: '/login' })
-    }
-  }
+    },
+  },
 }
 </script>
-

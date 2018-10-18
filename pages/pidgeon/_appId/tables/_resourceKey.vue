@@ -156,7 +156,7 @@
 <script>
 const DEFAULT_OFFSET = 0
 const DEFAULT_PAGINATION_SIZE = 20
-const DEFAULT_HEADERS = { 'Range-Unit': 'items', 'Prefer': 'count=exact' }
+const DEFAULT_HEADERS = { 'Range-Unit': 'items', Prefer: 'count=exact' }
 import axios from 'axios'
 import ColumnSelector from '~/components/pidgeon/ColumnSelector'
 import * as Helpers from '~/lib/common/helpers'
@@ -166,14 +166,14 @@ export default {
   components: { ColumnSelector },
 
   // Initialise defaults and empty state for page
-  async asyncData ({ app, params, query, store }) {
+  async asyncData({ app, params, query, store }) {
     let { appId } = params
     return {
-      pollyAppId: appId
+      pollyAppId: appId,
     }
   },
 
-  data () {
+  data() {
     return {
       DEFAULT_OFFSET: DEFAULT_OFFSET,
       DEFAULT_PAGINATION_SIZE: DEFAULT_PAGINATION_SIZE,
@@ -184,44 +184,44 @@ export default {
       queryParams: {
         limit: DEFAULT_PAGINATION_SIZE,
         offset: DEFAULT_OFFSET,
-        select: '*'
-      }
+        select: '*',
+      },
     }
   },
-  created () {
+  created() {
     this.getRecords()
   },
   computed: {
     ...mapGetters({
-      baseUrl: 'pidgeon/baseUrl'
+      baseUrl: 'pidgeon/baseUrl',
     }),
     nextUrl: {
-      get () {
+      get() {
         console.log('queryString', this.queryParams)
         let queryString = Helpers.serialize(this.queryParams)
         console.log('queryString', queryString)
         return `${this.resourceUrl}?${queryString}`
       },
-      set () {
+      set() {
         return null
-      }
+      },
     },
-    resourceKey () {
+    resourceKey() {
       return this.$route.params.resourceKey
     },
-    resourceUrl () {
+    resourceUrl() {
       return `${this.baseUrl}/${this.resourceKey}`
-    }
+    },
   },
   methods: {
-    getRecords: async function () {
+    getRecords: async function() {
       let headers = DEFAULT_HEADERS
-      let { data:records } = await axios.get(this.nextUrl, {
-        'headers': this.headers
+      let { data: records } = await axios.get(this.nextUrl, {
+        headers: this.headers,
       })
       this.records = records
     },
-  }
+  },
 }
 </script>
 
@@ -237,5 +237,4 @@ export default {
     }
   }
 }
-
 </style>

@@ -35,51 +35,63 @@ export default {
   name: 'Kanban',
   props: {
     pivotKey: { required: true, type: String },
-    columns: { required: true, type: Array }, 
+    columns: { required: true, type: Array },
     records: { required: true, type: Array }, // the data to be displayed
   },
-  created () {
-    let pivotColumn = this.columns.find(x => (x.key === this.pivotKey))
+  created() {
+    let pivotColumn = this.columns.find(x => x.key === this.pivotKey)
     if (!pivotColumn) this.states = []
     else {
       // this.stateNames = [''].concat(pivotColumn.enum) // we may need to add an "UNCATEGORIZED" colum - tbd
       this.stateNames = [].concat(pivotColumn.enum)
       let states = {}
       this.stateNames.forEach(name => {
-        this.$set(this.states, name, this.records.filter(x => x[`${this.pivotKey}`] === name)) // use $set to preserve Vue reactivity
+        this.$set(
+          this.states,
+          name,
+          this.records.filter(x => x[`${this.pivotKey}`] === name)
+        ) // use $set to preserve Vue reactivity
       })
     }
   },
-  data () {
+  data() {
     return {
       states: {},
-      stateNames: []
+      stateNames: [],
     }
   },
   methods: {
-    stateChanged (event) {
-      let {id:newState} = event.to
-      let {target:record} = event.item // @TODO this is a huge hack tbh
+    stateChanged(event) {
+      let { id: newState } = event.to
+      let { target: record } = event.item // @TODO this is a huge hack tbh
       this.$emit('onChange', {
         record: JSON.parse(record),
         column: this.pivotKey,
-        value: newState
+        value: newState,
       })
-    }
+    },
   },
 
   // View handlers
   components: { draggable },
-  mounted () {
+  mounted() {
     this.scrollbars = []
     this.stateNames.forEach(s => {
       let vueEl = this.$refs[`${s}_element`]
       let nativeEl = vueEl[0].$el
-      if (nativeEl) this.scrollbars.push(new PerfectScrollbar(nativeEl, { maxScrollbarLength: 200, wheelPropagation: true }))
+      if (nativeEl)
+        this.scrollbars.push(
+          new PerfectScrollbar(nativeEl, {
+            maxScrollbarLength: 200,
+            wheelPropagation: true,
+          })
+        )
     })
   },
-  beforeDestroy () {
-    this.scrollbars.forEach(x => { x.destroy() })
+  beforeDestroy() {
+    this.scrollbars.forEach(x => {
+      x.destroy()
+    })
     this.scrollbars = null
   },
 }
@@ -117,7 +129,7 @@ export default {
           box-shadow: 0 0 2px 2px rgba($color: #000, $alpha: 0.15);
         }
         .value {
-          white-space: nowrap; 
+          white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }

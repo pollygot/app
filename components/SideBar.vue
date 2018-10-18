@@ -72,7 +72,7 @@ import { mapGetters } from 'vuex'
 import ClickOutside from 'vue-click-outside'
 import PerfectScrollbar from 'perfect-scrollbar'
 export default {
-  data () {
+  data() {
     return {
       dropdownActive: false,
       sidebarVisible: true,
@@ -83,33 +83,37 @@ export default {
       app: 'app',
       tenants: 'tenants',
     }),
-    currentApp () {
+    currentApp() {
       let { appId } = this.$route.params
       if (!appId) return null
       return this.app(appId)
     },
-    currentTenant () {
+    currentTenant() {
       let { appId } = this.$route.params
       if (!appId) return null
-      return this.tenants.find(t => t.apps.some(app => (app.id.toString() === appId)))
+      return this.tenants.find(t =>
+        t.apps.some(app => app.id.toString() === appId)
+      )
     },
-    otherTenants () {
-      return this.tenants.filter(x => (x.id !== this.currentTenant.id))
-    }
+    otherTenants() {
+      return this.tenants.filter(x => x.id !== this.currentTenant.id)
+    },
   },
   methods: {
-    toggleSidebar () {
+    toggleSidebar() {
       this.sidebarVisible = !this.sidebarVisible
-    }
+    },
   },
 
   // View handlers
   directives: { ClickOutside },
-  mounted () {
+  mounted() {
     let sidebarElement = this.$refs['sidebar']
-    this.sidebarScroll = new PerfectScrollbar(sidebarElement,{ wheelPropagation: true })
+    this.sidebarScroll = new PerfectScrollbar(sidebarElement, {
+      wheelPropagation: true,
+    })
   },
-  beforeDestroy () {
+  beforeDestroy() {
     if (this.sidebarScroll) this.sidebarScroll.destroy()
     this.sidebarScroll = null
   },
@@ -125,7 +129,7 @@ export default {
   transition: all 0.3s;
   overflow: auto;
   overflow-x: hidden;
-  box-shadow: 3px 0 5px 0px rgba(0,0,0,0.05);
+  box-shadow: 3px 0 5px 0px rgba(0, 0, 0, 0.05);
   z-index: 9;
   .navbar {
     border-bottom: 1px solid $light-grey;
@@ -148,32 +152,36 @@ export default {
     }
   }
   .menu {
-    p { // headers
+    p {
+      // headers
       padding: 20px 20px 0 30px;
       color: lighten($grey, 40%);
     }
-    a { //links
+    a {
+      //links
       padding: 12px 20px;
       margin: 8px 10px;
       text-transform: uppercase;
       font-size: 0.9rem;
       border-radius: 0;
-      border: 1px solid rgba(0,0,0,0);
-      &.is-active, &:hover, &.is-block {
+      border: 1px solid rgba(0, 0, 0, 0);
+      &.is-active,
+      &:hover,
+      &.is-block {
         -webkit-transition: all 0.2s ease;
         transition: all 0.2s ease;
         color: $grey;
         background: #fff;
         border-radius: 5px;
-        border: 1px solid rgba(0,0,0,0.1);
-        box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.04);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.04);
       }
       &.is-active {
         color: $primary;
         background: #fff;
       }
       &.has-icon {
-        padding-left:15px;
+        padding-left: 15px;
         .icon {
           margin-right: 10px;
         }
@@ -197,14 +205,14 @@ export default {
     left: 0px;
     .dropdown-trigger {
       width: 100%;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       background: #fff;
       a {
         display: block;
         padding: 10px 0 10px 20px;
         color: #484848;
         &:hover {
-          background: rgba(0,0,0,0.02);
+          background: rgba(0, 0, 0, 0.02);
         }
       }
     }
@@ -217,10 +225,9 @@ export default {
       top: 60px;
       left: 0px;
       .dropdown-content {
-        box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.1);
+        box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);
       }
     }
   }
 }
-
 </style>

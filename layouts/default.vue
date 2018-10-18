@@ -41,18 +41,13 @@
 import SideBar from '../components/SideBar.vue'
 export default {
   components: { SideBar },
-  data () {
-    return {
-    }
+  data() {
+    return {}
   },
-  computed: {
-
-  },
-  methods: {
-  }
+  computed: {},
+  methods: {},
 }
 </script>
 
 <style lang="scss">
-
 </style>

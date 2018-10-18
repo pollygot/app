@@ -10,13 +10,24 @@ module.exports = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Manage your business' }
+      {
+        hid: 'description',
+        name: 'description',
+        content: 'Manage your business',
+      },
     ],
     link: [
-      { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.2.0/css/all.css' },
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i' },
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }
-    ]
+      {
+        rel: 'stylesheet',
+        href: 'https://use.fontawesome.com/releases/v5.2.0/css/all.css',
+      },
+      {
+        rel: 'stylesheet',
+        href:
+          'https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i',
+      },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
+    ],
   },
   // we need to run most the functionality on the server since there are private setting associated with most tenants' apps
   // also overcomes CORs
@@ -28,7 +39,7 @@ module.exports = {
     './server/api/postgrest',
   ],
   router: {
-    middleware: ['auth']
+    middleware: ['auth'],
   },
   /*
   ** Modules
@@ -43,9 +54,7 @@ module.exports = {
   /*
   ** Global CSS
   */
-  css: [
-    { src: '@/assets/css/main.scss', lang: 'scss' },
-  ],
+  css: [{ src: '@/assets/css/main.scss', lang: 'scss' }],
   /*
   ** Customize the progress bar color
   */
@@ -56,11 +65,11 @@ module.exports = {
   build: {
     plugins: [
       new webpack.DefinePlugin({
-        'process.VERSION': require('./package.json').version
-      })
+        'process.VERSION': require('./package.json').version,
+      }),
     ],
-    transpile: [ './lib/**/*', './server/**/*' ],
-    watch: [ './server/**/*' ],
+    transpile: ['./lib/**/*', './server/**/*'],
+    watch: ['./server/**/*'],
     vendor: [
       'axios',
       'flat',
@@ -69,26 +78,26 @@ module.exports = {
       'perfect-scrollbar',
       'vue-click-outside',
       'vue-infinite-loading',
-      'vuedraggable'
+      'vuedraggable',
     ],
     /*
     ** Run ESLint on save
     */
-    extend (config, { isDev, isClient }) {
+    extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules)/
+          exclude: /(node_modules)/,
         })
       }
     },
     postcss: {
       plugins: {
-        'postcss-custom-properties': false
-      }
-    }
+        'postcss-custom-properties': false,
+      },
+    },
   },
   /*
   ** Module config
@@ -97,21 +106,21 @@ module.exports = {
     strategies: {
       local: {
         endpoints: {
-          login: { propertyName: 'token.accessToken' }
-        }
+          login: { propertyName: 'token.accessToken' },
+        },
       },
       auth0: {
         domain: process.env.AUTH0_DOMAIN,
-        client_id: process.env.AUTH0_CLIENT_ID
-      }
-    }
+        client_id: process.env.AUTH0_CLIENT_ID,
+      },
+    },
   },
   axios: {
     baseURL: process.env.API_URL || 'http://localhost:3000',
     proxy: false,
-    proxyHeaders: false
+    proxyHeaders: false,
   },
   toast: {
-    position: 'bottom-right'
-  }
+    position: 'bottom-right',
+  },
 }

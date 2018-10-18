@@ -13,40 +13,41 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       sidebarVisible: true,
     }
   },
   computed: {
     // Get all database tables from the swagger definition and format them for the sidebar menu
-    tables () {
+    tables() {
       return this.$store.getters['hummingbird/tables'].map(x => ({
         type: 'list',
         resource: x.key,
         label: x.label,
-        isActive: (x.key === this.$route.params.resourceKey)
+        isActive: x.key === this.$route.params.resourceKey,
       }))
-    }
+    },
   },
   methods: {
-    toggleSidebar () {
+    toggleSidebar() {
       this.sidebarVisible = !this.sidebarVisible
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
 @import '@/assets/css/vars.scss';
-html, body {
+html,
+body {
   overflow: hidden;
 }
 .columns.full-height {
   height: 100vh;
 }
 #content {
-  background: #F5F6FA;
+  background: #f5f6fa;
   border-left: 1px solid $light-grey;
   box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
   min-height: 100vh;

@@ -30,37 +30,39 @@ import { mapGetters } from 'vuex'
 export default {
   components: { SideBar },
   middleware: ['bumblebee'],
-  data () {
-    return { }
+  data() {
+    return {}
   },
   computed: {
     ...mapGetters({
       apps: 'bumblebee/apps',
     }),
-    activeApps () { // we only the name of one of
+    activeApps() {
+      // we only the name of one of
       return this.apps.reduce((acc, app) => {
         if (!acc.includes(app.type)) acc.push(app.type)
         return acc
       }, [])
       return []
-    }
+    },
   },
   methods: {
-    activeActions (appType) {
-      let actions = this.apps.filter(x => (x.type === appType)).reduce((acc, app) => {
-        let actionName = app.actions.map(x => x.action)
-        return acc.concat(actionName) 
-      }, [])
+    activeActions(appType) {
+      let actions = this.apps
+        .filter(x => x.type === appType)
+        .reduce((acc, app) => {
+          let actionName = app.actions.map(x => x.action)
+          return acc.concat(actionName)
+        }, [])
       let unique = Array.from(new Set(actions))
       return unique.sort((a, b) => {
         if (a > b) return a
         else return b
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-
 </style>

@@ -25,26 +25,25 @@ import { mapGetters } from 'vuex'
 export default {
   components: { SideBar },
   middleware: ['pidgeon'],
-  data () {
-    return { }
+  data() {
+    return {}
   },
   computed: {
     ...mapGetters({
       tables: 'pidgeon/tables',
     }),
     // Get all database tables from the swagger definition and format them for the sidebar menu
-    tableList () {
+    tableList() {
       return this.tables.map(x => ({
         type: 'list',
         resource: x.key,
         label: x.key.replace(/_/g, ' '),
-        isActive: (x.key === this.$route.params.resourceKey)
+        isActive: x.key === this.$route.params.resourceKey,
       }))
-    }
+    },
   },
 }
 </script>
 
 <style lang="scss">
-
 </style>

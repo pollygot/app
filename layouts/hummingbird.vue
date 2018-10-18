@@ -37,39 +37,42 @@ import { mapGetters } from 'vuex'
 export default {
   components: { SideBar },
   middleware: ['hummingbird'],
-  data () {
-    return { }
+  data() {
+    return {}
   },
   computed: {
     ...mapGetters({
       tables: 'hummingbird/tables',
       customViews: 'hummingbird/customViews',
     }),
-    customViewCategories () {
+    customViewCategories() {
       return this.customViews.reduce((acc, view) => {
         if (!acc.includes(view.category)) acc.push(view.category)
         return acc
       }, [])
     },
     // Get all database tables from the swagger definition and format them for the sidebar menu
-    resourceList () {
-      return this.tables
-      .map(x => ({
+    resourceList() {
+      return this.tables.map(x => ({
         type: 'list',
         resource: x.key,
         label: x.key.replace(/_/g, ' '),
-        isActive: (x.key === this.$route.params.resourceKey)
+        isActive: x.key === this.$route.params.resourceKey,
       }))
     },
   },
   methods: {
-    viewsInCategory (categoryName) {
-      return this.customViews.filter(x => x.category === categoryName).map(x => ({...x, isActive: (x.id.toString() === this.$route.params.resourceKey)}))
-    }
-  }
+    viewsInCategory(categoryName) {
+      return this.customViews
+        .filter(x => x.category === categoryName)
+        .map(x => ({
+          ...x,
+          isActive: x.id.toString() === this.$route.params.resourceKey,
+        }))
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-
 </style>

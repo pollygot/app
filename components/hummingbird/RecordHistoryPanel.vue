@@ -27,37 +27,35 @@
 </template>
 
 <script>
-import moment from "moment";
+import moment from 'moment'
 export default {
   name: 'RecordHistoryPanel',
   props: {
-    history: { required: true, type: Array }
+    history: { required: true, type: Array },
   },
-  data () {
-    return {
-    }
+  data() {
+    return {}
   },
   computed: {
-    sortedHistory () {
+    sortedHistory() {
       let h = [...this.history]
       return h.sort((a, b) => {
         if (a.inserted > b.inserted) return -1
         else if (a.inserted < b.inserted) return 1
         else return 0
       })
-    }
+    },
   },
   methods: {
-    getStringValue (s) {
+    getStringValue(s) {
       if (s == null) return 'null'
       else return s
     },
-    niceDate (date) {
+    niceDate(date) {
       return moment(date).fromNow()
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
 </style>
-

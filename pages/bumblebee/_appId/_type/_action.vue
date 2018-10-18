@@ -74,30 +74,36 @@
 import axios from 'axios'
 import JobCard from '~/components/bumblebee/JobCard.vue'
 
-const JOB_TYPES = { // keep these in display order
-  COMPLETED: { key: 'completed', label: 'Completed'},
-  ACTIVE: { key: 'active', label: 'Active'},
-  FAILED: { key: 'failed', label: 'Failed'},
-  DELAYED: { key: 'delayed', label: 'Delayed'},
-  WAITING: { key: 'waiting', label: 'Waiting'} 
+const JOB_TYPES = {
+  // keep these in display order
+  COMPLETED: { key: 'completed', label: 'Completed' },
+  ACTIVE: { key: 'active', label: 'Active' },
+  FAILED: { key: 'failed', label: 'Failed' },
+  DELAYED: { key: 'delayed', label: 'Delayed' },
+  WAITING: { key: 'waiting', label: 'Waiting' },
 }
 
 const getJobs = (context, appId, workerKey) => {
   return context.$axios.$get(`/api/bumblebee/${appId}/apps/${workerKey}/jobs`)
 }
 export default {
-  asyncData: async function ({ app, params, query, store }) {
+  asyncData: async function({ app, params, query, store }) {
     let { appId, type, action } = params
-    let { key } = query 
+    let { key } = query
     let allApps = store.getters['bumblebee/apps']
-    let defaultWorker = allApps.find(x => (x.type === type && x.isDefault)) || null
-    let worker = (key) ? allApps.find(x => (x.key === key)) : defaultWorker ? defaultWorker : allApps.find(x => (x.type === type))
+    let defaultWorker =
+      allApps.find(x => x.type === type && x.isDefault) || null
+    let worker = key
+      ? allApps.find(x => x.key === key)
+      : defaultWorker
+        ? defaultWorker
+        : allApps.find(x => x.type === type)
     let jobs = await getJobs(app, appId, worker.key)
-    let mutatableAction = worker.actions.find(x => (x.action === action)) || {}
-    let mutatableParams = mutatableAction.params.map(x => ({...x}))
+    let mutatableAction = worker.actions.find(x => x.action === action) || {}
+    let mutatableParams = mutatableAction.params.map(x => ({ ...x }))
     return {
       appId: appId,
-      action: {...mutatableAction},
+      action: { ...mutatableAction },
       jobs: jobs || [],
       interval: null,
       payload: {},
@@ -105,48 +111,54 @@ export default {
       selectedJobType: JOB_TYPES.COMPLETED.key,
       type: type,
       worker: worker,
-      workers: allApps.filter(x => (x.type === type)), // all workers of the same type
+      workers: allApps.filter(x => x.type === type), // all workers of the same type
 
       // expose constants
-      JOB_TYPES: JOB_TYPES
+      JOB_TYPES: JOB_TYPES,
     }
   },
-  mounted () {
+  mounted() {
     this.interval = setInterval(this.refreshJobs, 10000)
   },
   computed: {
-    visibleJobList () {
+    visibleJobList() {
       return this.jobs[`${this.selectedJobType}`]
-    }
+    },
   },
   methods: {
-    jobCount (type) {
+    jobCount(type) {
       return this.jobs[type].length
     },
-    refreshJobs: async function () {
+    refreshJobs: async function() {
       this.jobs = await getJobs(this, this.appId, this.worker.key)
     },
-    submit: async function () {
+    submit: async function() {
       let params = this.params
       let data = {
         appKey: this.worker.key,
         action: this.action.action,
-        payload: {}
+        payload: {},
       }
-      params.forEach(p => { data.payload[`${p.param}`] = p.value })
-      let response = await this.$axios.post(`/api/bumblebee/${this.appId}/jobs`, data).catch(e => { console.log(e) })
+      params.forEach(p => {
+        data.payload[`${p.param}`] = p.value
+      })
+      let response = await this.$axios
+        .post(`/api/bumblebee/${this.appId}/jobs`, data)
+        .catch(e => {
+          console.log(e)
+        })
       this.refreshJobs()
-    }
+    },
   },
-  
+
   // View handlers
   layout: 'bumblebee',
   watchQuery: ['key'],
   components: { JobCard },
-  beforeDestroy () {
+  beforeDestroy() {
     clearInterval(this.interval)
     this.interval = null
-  }
+  },
 }
 </script>
 

@@ -57,41 +57,43 @@ export default {
     columns: { required: true, type: Array },
     records: { required: true, type: Array }, // the data to be displayed
     sortedColumns: { required: false, type: Array },
-    tableSize: { required: false, type: String, default: 'SMALL' } // how large the text / cell size is
+    tableSize: { required: false, type: String, default: 'SMALL' }, // how large the text / cell size is
   },
-  computed: {
-  },
+  computed: {},
   methods: {
-    getDateAndTime (dateString) {
+    getDateAndTime(dateString) {
       if (!dateString) return null
       return moment(dateString).format('HH:mm - DD MMM YYYY')
     },
-    getDate (dateString) {
+    getDate(dateString) {
       if (!dateString) return null
       return moment(dateString).format('DD MMM YYYY')
     },
-    getValue (column, record) {
+    getValue(column, record) {
       let value = record[`${column.key}`]
       if (value && column.modifier) value = column.modifier(value)
       return value
     },
-    isSorted (columnName) {
+    isSorted(columnName) {
       if (!this.sortedColumns) return false
-      return this.sortedColumns.some(x => (x.key === columnName))
+      return this.sortedColumns.some(x => x.key === columnName)
     },
-    sortDirection (columnName) {
+    sortDirection(columnName) {
       if (!this.sortedColumns.length) return false
-      let col = this.sortedColumns.find(x => (x.key === columnName)) || {}
+      let col = this.sortedColumns.find(x => x.key === columnName) || {}
       return col.sort || 'asc'
-    }
+    },
   },
 
   // View handlers
-  mounted () {
+  mounted() {
     let tableElement = this.$refs['table_element']
-    if (tableElement) this.tableScroll = new PerfectScrollbar(tableElement, { wheelPropagation: true })
+    if (tableElement)
+      this.tableScroll = new PerfectScrollbar(tableElement, {
+        wheelPropagation: true,
+      })
   },
-  beforeDestroy () {
+  beforeDestroy() {
     if (this.tableScroll) this.tableScroll.destroy()
     this.tableScroll = null
   },
@@ -101,7 +103,6 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .TableComponent {
-    
   .box {
     padding: 0;
     position: relative;
@@ -113,13 +114,13 @@ export default {
       }
       td {
         cursor: pointer;
-        white-space:nowrap;
+        white-space: nowrap;
         figure {
-          box-shadow: 0px 0px 3px 2px rgba(0,0,0,0.1) !important;
+          box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.1) !important;
         }
       }
       th {
-        white-space:nowrap;
+        white-space: nowrap;
         a {
           color: #484848;
         }
@@ -131,20 +132,19 @@ export default {
     a.sort-desc:after {
       content: ' ▴';
     }
-    .switch-field  {
+    .switch-field {
       padding-top: 3px;
       margin-bottom: -3px;
     }
   }
 
   @media screen and (max-width: 800px) {
-
     .box {
       a.sort-down:after {
-      content: ' ▸';
+        content: ' ▸';
       }
       a.sort-up:after {
-      content: ' ◂';
+        content: ' ◂';
       }
     }
     .is-responsive {

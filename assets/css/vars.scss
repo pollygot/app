@@ -1,77 +1,77 @@
 @font-face {
-    font-family: 'Circular Std Book';
-    src: url('/fonts/circular/CircularStd-BookItalic.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-BookItalic.woff') format('woff');
-    font-weight: 400;
-    font-style: italic;
+  font-family: 'Circular Std Book';
+  src: url('/fonts/circular/CircularStd-BookItalic.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-BookItalic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Circular Std';
-    src: url('/fonts/circular/CircularStd-MediumItalic.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-MediumItalic.woff') format('woff');
-    font-weight: 500;
-    font-style: italic;
+  font-family: 'Circular Std';
+  src: url('/fonts/circular/CircularStd-MediumItalic.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-MediumItalic.woff') format('woff');
+  font-weight: 500;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Circular Std Book';
-    src: url('/fonts/circular/CircularStd-Book.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-Book.woff') format('woff');
-    font-weight: 400;
-    font-style: normal;
+  font-family: 'Circular Std Book';
+  src: url('/fonts/circular/CircularStd-Book.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-Book.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Circular Std';
-    src: url('/fonts/circular/CircularStd-Medium.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-Medium.woff') format('woff');
-    font-weight: 500;
-    font-style: normal;
+  font-family: 'Circular Std';
+  src: url('/fonts/circular/CircularStd-Medium.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Circular Std';
-    src: url('/fonts/circular/CircularStd-BlackItalic.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-BlackItalic.woff') format('woff');
-    font-weight: 900;
-    font-style: italic;
+  font-family: 'Circular Std';
+  src: url('/fonts/circular/CircularStd-BlackItalic.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-BlackItalic.woff') format('woff');
+  font-weight: 900;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Circular Std';
-    src: url('/fonts/circular/CircularStd-Bold.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-Bold.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
+  font-family: 'Circular Std';
+  src: url('/fonts/circular/CircularStd-Bold.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Circular Std';
-    src: url('/fonts/circular/CircularStd-Black.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-Black.woff') format('woff');
-    font-weight: 900;
-    font-style: normal;
+  font-family: 'Circular Std';
+  src: url('/fonts/circular/CircularStd-Black.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Circular Std';
-    src: url('/fonts/circular/CircularStd-BoldItalic.woff2') format('woff2'),
-        url('/fonts/circular/CircularStd-BoldItalic.woff') format('woff');
-    font-weight: bold;
-    font-style: italic;
+  font-family: 'Circular Std';
+  src: url('/fonts/circular/CircularStd-BoldItalic.woff2') format('woff2'),
+    url('/fonts/circular/CircularStd-BoldItalic.woff') format('woff');
+  font-weight: bold;
+  font-style: italic;
 }
-
-
 
 $light-grey: #f0f0f0;
 $blue: #0084ff;
-$green: #3F8D42;
+$green: #3f8d42;
 $black: #343434;
 $grey: #4a4a4a;
 
 $primary: $blue;
 $link: $blue;
-$family-sans-serif: 'Circular Std', BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+$family-sans-serif: 'Circular Std', BlinkMacSystemFont, -apple-system,
+  'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+  'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
 $title-weight: 800;
 $body-size: 14px;

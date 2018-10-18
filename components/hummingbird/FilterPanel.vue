@@ -86,17 +86,17 @@ export default {
   name: 'HummingbirdFilterPanel',
   props: {
     allColumns: { required: true, type: Array },
-    existingFilters: { required: true, type: Array }
+    existingFilters: { required: true, type: Array },
   },
   components: { draggable },
-  data () {
+  data() {
     return {
       newFilters: [...this.existingFilters],
       emptyFilter: {
         is: true,
         criteria: 'eq',
         filterString: '',
-        andOr: 'and'
+        andOr: 'and',
       },
       operators: [
         { value: 'eq', label: 'equal to ...', hint: '' },
@@ -105,46 +105,77 @@ export default {
         { value: 'lt', label: 'less than ...', hint: '' },
         { value: 'lte', label: 'less than or equal to ...', hint: '' },
         { value: 'neq', label: 'not equal ...', hint: '' },
-        { value: 'like', label: 'like ...', hint: 'LIKE operator (use * in place of %)' },
-        { value: 'ilike', label: 'like (insensitive) ...', hint: 'ILIKE operator (use * in place of %)' },
-        { value: 'in', label: 'in list ...', hint: 'e.g. id in ... (1,2,3) – supports commas like ("hi,there","yes,you")' },
-        { value: 'is', label: 'exactly ...', hint: 'checking for exact equality (null,true,false)' },
-        { value: 'cs', label: 'contain ...', hint: 'e.g. tags contain ... {example, new}' },
-        { value: 'cd', label: 'contained ...', hint: 'e.g. values contained ... {1,2,3}' },
-        { value: 'ov', label: 'overlap ...', hint: 'e.g. Period overlap ... [2017-01-01,2017-06-30]' }
-      ]
+        {
+          value: 'like',
+          label: 'like ...',
+          hint: 'LIKE operator (use * in place of %)',
+        },
+        {
+          value: 'ilike',
+          label: 'like (insensitive) ...',
+          hint: 'ILIKE operator (use * in place of %)',
+        },
+        {
+          value: 'in',
+          label: 'in list ...',
+          hint:
+            'e.g. id in ... (1,2,3) – supports commas like ("hi,there","yes,you")',
+        },
+        {
+          value: 'is',
+          label: 'exactly ...',
+          hint: 'checking for exact equality (null,true,false)',
+        },
+        {
+          value: 'cs',
+          label: 'contain ...',
+          hint: 'e.g. tags contain ... {example, new}',
+        },
+        {
+          value: 'cd',
+          label: 'contained ...',
+          hint: 'e.g. values contained ... {1,2,3}',
+        },
+        {
+          value: 'ov',
+          label: 'overlap ...',
+          hint: 'e.g. Period overlap ... [2017-01-01,2017-06-30]',
+        },
+      ],
     }
   },
   methods: {
-    addFilter (column) {
-      this.newFilters.push({...column, ...this.emptyFilter})
+    addFilter(column) {
+      this.newFilters.push({ ...column, ...this.emptyFilter })
     },
-    applyFilters () {
-      this.newFilters = this.newFilters.filter(x => (x.filterString.length))
-      if (this.newFilters.length) {this.newFilters[0].andOr = 'and'}
+    applyFilters() {
+      this.newFilters = this.newFilters.filter(x => x.filterString.length)
+      if (this.newFilters.length) {
+        this.newFilters[0].andOr = 'and'
+      }
       this.$emit('onFilter', this.newFilters)
     },
-    clear () {
+    clear() {
       this.newFilters = []
     },
-    cancel () {
+    cancel() {
       this.newFilters = [...this.existingFilters]
       this.$emit('onHidePanel')
     },
-    changeAndOr (filter, andOr) {
+    changeAndOr(filter, andOr) {
       filter.andOr = andOr
     },
-    remove (index) {
+    remove(index) {
       console.log('index', index)
       this.newFilters.splice(index, 1)
     },
-    sortBy (column, direction) {
+    sortBy(column, direction) {
       this.newFilters = [...this.newFilters].map(x => {
         if (x.key === column.key) x.sort = direction
         return x
       })
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
@@ -169,7 +200,7 @@ export default {
       right: 0.5rem;
     }
     &:hover {
-      background: rgba(0,0,0,0.03);
+      background: rgba(0, 0, 0, 0.03);
       border: 1px solid #fff;
     }
     .box:hover {
@@ -179,13 +210,13 @@ export default {
   .hidden {
     visibility: hidden;
   }
-  .sortable-chosen, .sortable-drag, .sortable-ghost {
-    background: rgba(0,0,0,0.03);
-    border: 1px solid rgba(0,0,0,0.1);
+  .sortable-chosen,
+  .sortable-drag,
+  .sortable-ghost {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     // background-image: linear-gradient(to right, rgba(0,0,0,0.1) , rgba(0,0,0,0.05));
     // box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
   }
- 
 }
 </style>
-

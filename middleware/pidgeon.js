@@ -1,5 +1,5 @@
 import axios from 'axios'
-export default async function ({params, store}) {
+export default async function({ params, store }) {
   let { appId } = params
   let app = store.getters['app'](appId)
   let baseUrl = app.config.url

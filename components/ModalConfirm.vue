@@ -44,18 +44,23 @@ export default {
     icon: { required: false, type: String, default: 'fa-arrow-right' },
     isVisible: { required: true, type: Boolean },
     message: { required: true, type: String },
-    primaryButtonClass: { required: false, type: String, default: 'is-primary' },
+    primaryButtonClass: {
+      required: false,
+      type: String,
+      default: 'is-primary',
+    },
     primaryButtonText: { required: false, type: String, default: 'Confirm' },
     secondaryButtonClass: { required: false, type: String, default: 'is-dark' },
     secondaryButtonText: { required: false, type: String, default: 'Cancel' },
-    submessage: { required: true, type: String }
-  }
+    submessage: { required: true, type: String },
+  },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.modal-card-head, .modal-card-foot {
+.modal-card-head,
+.modal-card-foot {
   background: #fff;
   border: none;
 }

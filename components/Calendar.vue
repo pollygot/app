@@ -41,28 +41,31 @@ export default {
     return {
       CALENDAR_TYPES: CALENDAR_TYPES,
       calendarType: CALENDAR_TYPES.WEEK,
-      selectedDate: moment(this.date)
+      selectedDate: moment(this.date),
     }
   },
   computed: {
-    currentWeek () {
+    currentWeek() {
       let dates = []
       for (let index = 0; index < 7; index++) {
-        var date = this.selectedDate.clone().startOf('week').add(index, 'days')
+        var date = this.selectedDate
+          .clone()
+          .startOf('week')
+          .add(index, 'days')
         dates.push(date)
       }
       return dates
-    }
+    },
   },
   methods: {
-    recordsForDate (date) {
+    recordsForDate(date) {
       let day = moment(date)
       return this.records.filter(x => {
         let recordDate = moment(x[`${this.pivotKey}`])
         return recordDate.isSame(day, 'd')
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -73,14 +76,14 @@ export default {
     .week {
       min-height: calc(100vh - 160px);
       .column {
-        border-right: 1px solid rgba(0,0,0,0.1);
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
         padding: 0;
         &:last-child {
           border-right: none;
         }
         .header {
           padding: 10px 15px;
-          border-bottom: 1px solid rgba(0,0,0,0.1);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
       }
     }

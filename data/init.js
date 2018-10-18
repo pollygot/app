@@ -7,16 +7,12 @@ const adapter = new FileSync(location)
 const db = low(adapter)
 
 // Set some defaults
-db
-.defaults({
+db.defaults({
   apps: [], // stores the apps for each tenant
-  users: [
-    { id: 1, username: 'admin', password: 'admin' }
-  ],
-  tenants: [], 
+  users: [{ id: 1, username: 'admin', password: 'admin' }],
+  tenants: [],
 
   // HummingBird
   hummingbird_views: [], // custom views (table joins etc)
-  hummingbird_history: [] // save every record CRUD
-})
-.write()
+  hummingbird_history: [], // save every record CRUD
+}).write()

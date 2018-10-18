@@ -54,13 +54,14 @@ export default {
     return {
       username: 'admin',
       password: '',
-      error: null
+      error: null,
     }
   },
   computed: {
     strategies: () => {
       let all = []
-      if (process.env.AUTH0_DOMAIN) all.push({ key: 'auth0', name: 'Auth0', color: '#ec5425' })
+      if (process.env.AUTH0_DOMAIN)
+        all.push({ key: 'auth0', name: 'Auth0', color: '#ec5425' })
       return all
     },
     redirect() {
@@ -71,7 +72,7 @@ export default {
     },
     isCallback() {
       return Boolean(this.$route.query.callback)
-    }
+    },
   },
   methods: {
     async login() {
@@ -80,21 +81,23 @@ export default {
         .loginWith('local', {
           data: {
             username: this.username,
-            password: this.password
-          }
+            password: this.password,
+          },
         })
-        .catch(e => { 
+        .catch(e => {
           console.log('e', e)
-          this.error = e + '' })
-      if (this.response && this.redirect) this.$router.push({ path: this.redirect })
+          this.error = e + ''
+        })
+      if (this.response && this.redirect)
+        this.$router.push({ path: this.redirect })
       else if (this.response) this.$router.push({ path: '/' })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style scoped>
 .login-button {
   border: 0;
-};
+}
 </style>

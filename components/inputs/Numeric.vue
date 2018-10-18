@@ -30,23 +30,22 @@ export default {
     iconClass: { required: false, type: String },
     placeholder: { required: false },
     value: { required: false },
-    hasSafetyLock: { required: false, type: Boolean }
+    hasSafetyLock: { required: false, type: Boolean },
   },
   data() {
     return {
-      isLocked: this.hasSafetyLock
+      isLocked: this.hasSafetyLock,
     }
   },
   methods: {
-    onChange (value) {
+    onChange(value) {
       this.$emit('onChange', value)
     },
-    toggleLock () {
+    toggleLock() {
       this.isLocked = !this.isLocked
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
 </style>
-

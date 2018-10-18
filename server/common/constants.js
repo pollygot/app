@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 // Apps:
 //  HUMMINGBIRD: a full functional admin interface for PostgREST
@@ -12,29 +12,29 @@
 module.exports = {
   apps: {
     HUMMINGBIRD: {
-      key: "HUMMINGBIRD",
+      key: 'HUMMINGBIRD',
       name: 'Hummingbird',
-      description: 'Admin interface for Postgres'
+      description: 'Admin interface for Postgres',
     },
     PIDGEON: {
-      key: "PIDGEON",
+      key: 'PIDGEON',
       name: 'Pidgeon',
-      description: 'API interface for PostgREST'
+      description: 'API interface for PostgREST',
     },
     SQUIRREL: {
-      key: "SQUIRREL",
+      key: 'SQUIRREL',
       name: 'Squirrel',
-      description: 'For storing files in all the main '
+      description: 'For storing files in all the main ',
     },
     BUMBLEBEE: {
-      key: "BUMBLEBEE",
+      key: 'BUMBLEBEE',
       name: 'BumbleBee',
-      description: 'For regular task using Kue'
+      description: 'For regular task using Kue',
     },
     QUOKKA: {
-      key: "QUOKKA",
+      key: 'QUOKKA',
       name: 'Quokka',
-      description: 'Interface for KueJS '
-    }
-  }
-};
+      description: 'Interface for KueJS ',
+    },
+  },
+}

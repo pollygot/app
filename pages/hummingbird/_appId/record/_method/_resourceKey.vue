@@ -276,33 +276,46 @@
 </template>
 
 <script>
-import * as Helpers             from '~/lib/common/helpers'
-import * as PostgrestHelpers    from '~/lib/common/postgrestHelpers'
-import Datepicker               from '~/components/inputs/Datepicker.vue'
-import Datetimepicker           from '~/components/inputs/Datetimepicker.vue'
-import NumericInput             from '~/components/inputs/Numeric.vue'
-import Timepicker               from '~/components/inputs/Timepicker.vue'
-import ModalConfirm             from '~/components/ModalConfirm.vue'
-import ReadOnlyCard             from '~/components/hummingbird/ReadOnlyCard.vue'
-import RecordHistoryPanel       from '~/components/hummingbird/RecordHistoryPanel.vue'
+import * as Helpers from '~/lib/common/helpers'
+import * as PostgrestHelpers from '~/lib/common/postgrestHelpers'
+import Datepicker from '~/components/inputs/Datepicker.vue'
+import Datetimepicker from '~/components/inputs/Datetimepicker.vue'
+import NumericInput from '~/components/inputs/Numeric.vue'
+import Timepicker from '~/components/inputs/Timepicker.vue'
+import ModalConfirm from '~/components/ModalConfirm.vue'
+import ReadOnlyCard from '~/components/hummingbird/ReadOnlyCard.vue'
+import RecordHistoryPanel from '~/components/hummingbird/RecordHistoryPanel.vue'
 
 const TOAST_ERROR_DURATION = 4000
 
 export default {
-  async asyncData ({ app, params, query, route, store }) {
+  async asyncData({ app, params, query, route, store }) {
     let { appId, resourceKey } = params
-    let isCreated = (params.method === 'edit') ? true : false
+    let isCreated = params.method === 'edit' ? true : false
     let record = {}
     let history = []
     if (isCreated) {
-      let { data:response } = await PostgrestHelpers.getRecord(app, appId, resourceKey, query.q)
+      let { data: response } = await PostgrestHelpers.getRecord(
+        app,
+        appId,
+        resourceKey,
+        query.q
+      )
       let identifier = Helpers.decrypt(query.q)
-      history = await app.$axios.$get(`/api/pollygot/hummingbird/history/${appId}/${resourceKey}/${identifier}`)
+      history = await app.$axios.$get(
+        `/api/pollygot/hummingbird/history/${appId}/${resourceKey}/${identifier}`
+      )
       record = response.data
     }
-    let availableFields = app.store.getters['hummingbird/columnsForResource'](resourceKey)
-    let formattedFields = availableFields.map(x => ({...x, value: record[`${x.key}`], modifiedValue: record[`${x.key}`] })) // add the current value to each field
-    
+    let availableFields = app.store.getters['hummingbird/columnsForResource'](
+      resourceKey
+    )
+    let formattedFields = availableFields.map(x => ({
+      ...x,
+      value: record[`${x.key}`],
+      modifiedValue: record[`${x.key}`],
+    })) // add the current value to each field
+
     return {
       appId: appId,
       availableFields: availableFields,
@@ -312,106 +325,197 @@ export default {
       joins: [], // the user can page through foreign keys
       isCreated: isCreated,
       pageTitle: resourceKey.replace(/_/g, ' '),
-      primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
+      primaryKeys:
+        app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) ||
+        [],
       proxyUrlBase: `/api/postgrest/${appId}/${resourceKey}`,
       record: record,
       recordHistoryVisible: false,
-      resourceKey: resourceKey
+      resourceKey: resourceKey,
     }
   },
   computed: {
-    Helpers: { // expose all Helpers to the page
-      get() { return Helpers }
+    Helpers: {
+      // expose all Helpers to the page
+      get() {
+        return Helpers
+      },
     },
-    activeJoin () {
-      return this.joins[(this.joins.length - 1)]
-    }
+    activeJoin() {
+      return this.joins[this.joins.length - 1]
+    },
   },
   methods: {
-    back () {
-      let resourceKey = (this.fromRoute && this.fromRoute.params) ? this.fromRoute.params.resourceKey : null
+    back() {
+      let resourceKey =
+        this.fromRoute && this.fromRoute.params
+          ? this.fromRoute.params.resourceKey
+          : null
       if (resourceKey && resourceKey === this.resourceKey) this.$router.go(-1)
-      else this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
+      else
+        this.$router.push({
+          path: `/hummingbird/${this.$route.params.appId}/list/${
+            this.resourceKey
+          }`,
+        })
     },
-    createRecord () {
+    createRecord() {
       let data = {} // the object to be sent to the database
       this.formattedFields
         .filter(x => x.modifiedValue) // get fields that have been filled out
-        .forEach(x => { data[x.key] = x.modifiedValue }) // populate the object to be sent to the database
+        .forEach(x => {
+          data[x.key] = x.modifiedValue
+        }) // populate the object to be sent to the database
       let url = `${this.proxyUrlBase}`
       console.log('this.formattedFields', this.formattedFields)
-      return PostgrestHelpers.createRecord(this, this.appId, this.resourceKey, data).catch(this.handleErrorResponse)
+      return PostgrestHelpers.createRecord(
+        this,
+        this.appId,
+        this.resourceKey,
+        data
+      ).catch(this.handleErrorResponse)
     },
-    deleteRecord: async function () {
-      let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, this.record))
+    deleteRecord: async function() {
+      let selector = Helpers.encrypt(
+        PostgrestHelpers.getUniqueSelector(this.primaryKeys, this.record)
+      )
       if (!selector) {
-        this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
+        this.$toast.error("Couldn't find a primary key", {
+          duration: TOAST_ERROR_DURATION,
+        })
         return null
-      } else if (!await PostgrestHelpers.verifySelectorReturnsUnique(this, this.appId, this.resourceKey, selector)) {
-        this.$toast.error('Couldn\'t get a unique selector. This would cause multiple deletions to the database.', { duration: TOAST_ERROR_DURATION })
+      } else if (
+        !(await PostgrestHelpers.verifySelectorReturnsUnique(
+          this,
+          this.appId,
+          this.resourceKey,
+          selector
+        ))
+      ) {
+        this.$toast.error(
+          "Couldn't get a unique selector. This would cause multiple deletions to the database.",
+          { duration: TOAST_ERROR_DURATION }
+        )
         return null
       } else {
-        let { data:deleteResponse } = await PostgrestHelpers.deleteRecord(this, this.appId, this.resourceKey, selector).catch(this.handleErrorResponse)
-        if (deleteResponse) this.$router.push({ path: `/hummingbird/${this.$route.params.appId}/list/${this.resourceKey}` })
+        let { data: deleteResponse } = await PostgrestHelpers.deleteRecord(
+          this,
+          this.appId,
+          this.resourceKey,
+          selector
+        ).catch(this.handleErrorResponse)
+        if (deleteResponse)
+          this.$router.push({
+            path: `/hummingbird/${this.$route.params.appId}/list/${
+              this.resourceKey
+            }`,
+          })
       }
     },
-    handleErrorResponse (e) {
+    handleErrorResponse(e) {
       let { message } = e.response.data
-      this.$toast.error(`Error: ${message}`, { duration: TOAST_ERROR_DURATION })
+      this.$toast.error(`Error: ${message}`, {
+        duration: TOAST_ERROR_DURATION,
+      })
       return { data: null }
     },
-    goToJoinHistory (index) {
+    goToJoinHistory(index) {
       this.joins = this.joins.slice(0, index)
     },
-    joinTable: async function (fieldInfo, resetArray) {
+    joinTable: async function(fieldInfo, resetArray) {
       let joins = resetArray ? [] : this.joins
-      let field = {...fieldInfo}
+      let field = { ...fieldInfo }
       console.log('field', field)
       let selector = `${field['fk_col']}=eq.${field.value}`
       console.log('selector', selector)
       let q = Helpers.encrypt(selector)
-      let { data:response } = await PostgrestHelpers.getRecord(this, this.appId, field['fk_table'], q)
-      let availableFields = this.$store.getters['hummingbird/columnsForResource'](field['fk_table'])
+      let { data: response } = await PostgrestHelpers.getRecord(
+        this,
+        this.appId,
+        field['fk_table'],
+        q
+      )
+      let availableFields = this.$store.getters[
+        'hummingbird/columnsForResource'
+      ](field['fk_table'])
       field.columns = availableFields
       field.data = response.data
       joins.push(field)
       this.joins = joins
     },
-    save: async function () {
-      let { data:proxyResponse } = (this.isCreated) ? await this.updateRecord() : await this.createRecord()
+    save: async function() {
+      let { data: proxyResponse } = this.isCreated
+        ? await this.updateRecord()
+        : await this.createRecord()
       if (proxyResponse && proxyResponse.data) {
         let response = proxyResponse.data
         this.$toast.success('Saved!', { duration: 1000 })
-        let q = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, response))
-        let path = `/hummingbird/${this.appId}/record/edit/${this.resourceKey}?q=` + encodeURIComponent(q) // there is an occasional "+" appearing when not re-encoded. Not sure why..
-        this.$router.replace({path: path})
+        let q = Helpers.encrypt(
+          PostgrestHelpers.getUniqueSelector(this.primaryKeys, response)
+        )
+        let path =
+          `/hummingbird/${this.appId}/record/edit/${this.resourceKey}?q=` +
+          encodeURIComponent(q) // there is an occasional "+" appearing when not re-encoded. Not sure why..
+        this.$router.replace({ path: path })
       }
     },
     // update the database. This uses PATCH so only the data that is passed will be updated
-    updateRecord: async function () {
-      let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, this.record))
+    updateRecord: async function() {
+      let selector = Helpers.encrypt(
+        PostgrestHelpers.getUniqueSelector(this.primaryKeys, this.record)
+      )
       if (!selector) {
-        this.$toast.error('Couldn\'t find a primary key', { duration: TOAST_ERROR_DURATION })
+        this.$toast.error("Couldn't find a primary key", {
+          duration: TOAST_ERROR_DURATION,
+        })
         return null
-      } else if (!await PostgrestHelpers.verifySelectorReturnsUnique(this, this.appId, this.resourceKey, selector)) {
-        this.$toast.error('Couldn\'t get a unique selector. This would cause multiple updates to the database.', { duration: TOAST_ERROR_DURATION })
+      } else if (
+        !(await PostgrestHelpers.verifySelectorReturnsUnique(
+          this,
+          this.appId,
+          this.resourceKey,
+          selector
+        ))
+      ) {
+        this.$toast.error(
+          "Couldn't get a unique selector. This would cause multiple updates to the database.",
+          { duration: TOAST_ERROR_DURATION }
+        )
         return null
       } else {
         let data = {} // the object to be sent to the database
         this.formattedFields
           .filter(x => PostgrestHelpers.hasDataChanged(x)) // get only modified fields
-          .forEach(x => { data[x.key] = x.modifiedValue }) // populate the object to be sent to the database
-        return PostgrestHelpers.updateRecord(this, this.appId, this.resourceKey, selector, data).catch(this.handleErrorResponse)
+          .forEach(x => {
+            data[x.key] = x.modifiedValue
+          }) // populate the object to be sent to the database
+        return PostgrestHelpers.updateRecord(
+          this,
+          this.appId,
+          this.resourceKey,
+          selector,
+          data
+        ).catch(this.handleErrorResponse)
       }
     },
   },
 
   // View handlers
   layout: 'hummingbird',
-  components: { Datepicker, Datetimepicker, Timepicker, ModalConfirm, NumericInput, ReadOnlyCard, RecordHistoryPanel },
+  components: {
+    Datepicker,
+    Datetimepicker,
+    Timepicker,
+    ModalConfirm,
+    NumericInput,
+    ReadOnlyCard,
+    RecordHistoryPanel,
+  },
   watchQuery: ['q'],
-  beforeRouteEnter (to, from, next) {
-    next(vm => { vm.fromRoute = from }) // for the "back" function
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.fromRoute = from
+    }) // for the "back" function
   },
 }
 </script>

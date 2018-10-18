@@ -30,21 +30,23 @@
 export default {
   layout: 'tenant',
   computed: {
-    allPollygotApps () {
+    allPollygotApps() {
       return this.$store.getters['apps']
     },
-    tenant () {
-      return this.$store.getters['tenants'].find(x => (x.key.toString() == this.$route.params.tenant.toString()))
-    }
+    tenant() {
+      return this.$store.getters['tenants'].find(
+        x => x.key.toString() == this.$route.params.tenant.toString()
+      )
+    },
   },
   methods: {
-    appName (appId) {
+    appName(appId) {
       return this.allPollygotApps[`${appId}`].name
     },
-    appDescription (appId) {
+    appDescription(appId) {
       return this.allPollygotApps[`${appId}`].description
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -33,29 +33,29 @@ import draggable from 'vuedraggable'
 export default {
   name: 'HummingbirdColumnsPanel',
   props: {
-    columns: { required: true, type: Array }
+    columns: { required: true, type: Array },
   },
   components: { draggable },
   data() {
     return {
-      newColumns: this.columns.map(x => ({...x}))
+      newColumns: this.columns.map(x => ({ ...x })),
     }
   },
   methods: {
-    apply () {
+    apply() {
       this.$emit('onApply', this.newColumns)
     },
-    cancel () {
+    cancel() {
       this.$emit('onHidePanel')
     },
-    toggleColumnVisibility (column) {
+    toggleColumnVisibility(column) {
       let updated = this.newColumns.map(c => {
         if (c.key === column.key) c.hidden = !c.hidden
         return c
       })
       this.$set(this, 'newColumns', updated)
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
@@ -71,4 +71,3 @@ export default {
   }
 }
 </style>
-

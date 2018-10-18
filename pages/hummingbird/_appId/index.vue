@@ -14,13 +14,10 @@ import config from '@/config/default'
 import { mapActions } from 'vuex'
 export default {
   layout: 'hummingbird',
-  computed: {
-  },
-  methods: {
-  }
+  computed: {},
+  methods: {},
 }
 </script>
 
 <style>
-
 </style>

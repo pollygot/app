@@ -14,18 +14,17 @@ export default {
   props: {
     inputClass: { required: false, type: String },
     placeholder: { required: false, type: String },
-    value: { required: false, type: String }
+    value: { required: false, type: String },
   },
   data() {
     return {}
   },
   methods: {
-    onChange (value) {
+    onChange(value) {
       this.$emit('onChange', value)
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
 </style>
-

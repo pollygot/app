@@ -46,43 +46,41 @@ import * as S3Helpers from '~/lib/common/s3'
 var AWS = require('aws-sdk')
 export default {
   layout: 'squirrel',
-  async asyncData ({ store, params }) {
+  async asyncData({ store, params }) {
     let { appId } = params
     let pollyApp = store.getters['app'](appId)
 
-
-    // Set the region 
+    // Set the region
     AWS.config.update({
       accessKeyId: pollyApp.config.key,
       secretAccessKey: pollyApp.config.secret,
-      region: pollyApp.config.region
-    });
-    let s3 = new AWS.S3({apiVersion: '2006-03-01'});
-    var bucketParams = {Bucket: pollyApp.config.bucket}
+      region: pollyApp.config.region,
+    })
+    let s3 = new AWS.S3({ apiVersion: '2006-03-01' })
+    var bucketParams = { Bucket: pollyApp.config.bucket }
     let contents = await new Promise((resolve, reject) => {
       s3.listObjects(bucketParams, (err, data) => {
         if (err) return reject(err)
         else return resolve(data)
       })
     }).catch(err => console.log('err', err))
-    
+
     let standardizedContents = S3Helpers.standardizeFormat(contents)
 
     return {
       pollyApp: pollyApp,
-      contents: standardizedContents || []
+      contents: standardizedContents || [],
     }
   },
   computed: {
-    folders () {
+    folders() {
       return this.contents.filter(x => x.isFolder)
     },
-    files () {
+    files() {
       return this.contents.filter(x => !x.isFolder)
-    }
+    },
   },
-  methods: {
-  }
+  methods: {},
 }
 </script>
 

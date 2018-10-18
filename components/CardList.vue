@@ -32,44 +32,44 @@
 export default {
   name: 'CardList',
   props: {
-    imageKey: { required: false, type: String }, 
-    columns: { required: true, type: Array }, 
+    imageKey: { required: false, type: String },
+    columns: { required: true, type: Array },
     records: { required: true, type: Array }, // the data to be displayed
   },
-  data () {
-    return { }
+  data() {
+    return {}
   },
   methods: {
     downscaleImage(dataUrl, newWidth, imageType, imageArguments) {
-      "use strict";
-      var image, oldWidth, oldHeight, newHeight, canvas, ctx, newDataUrl;
+      'use strict'
+      var image, oldWidth, oldHeight, newHeight, canvas, ctx, newDataUrl
 
       // Provide default values
-      imageType = imageType || "image/jpeg";
-      imageArguments = imageArguments || 0.7;
+      imageType = imageType || 'image/jpeg'
+      imageArguments = imageArguments || 0.7
 
       // Create a temporary image so that we can compute the height of the downscaled image.
-      image = new Image();
-      image.src = dataUrl;
-      oldWidth = image.width;
-      oldHeight = image.height;
-      newHeight = Math.floor(oldHeight / oldWidth * newWidth)
+      image = new Image()
+      image.src = dataUrl
+      oldWidth = image.width
+      oldHeight = image.height
+      newHeight = Math.floor((oldHeight / oldWidth) * newWidth)
 
       // Create a temporary canvas to draw the downscaled image on.
-      canvas = document.createElement("canvas");
-      canvas.width = newWidth;
-      canvas.height = newHeight;
+      canvas = document.createElement('canvas')
+      canvas.width = newWidth
+      canvas.height = newHeight
 
       // Draw the downscaled image on the canvas and return the new data URL.
-      ctx = canvas.getContext("2d");
-      ctx.drawImage(image, 0, 0, newWidth, newHeight);
-      newDataUrl = canvas.toDataURL(imageType, imageArguments);
-      return newDataUrl;
+      ctx = canvas.getContext('2d')
+      ctx.drawImage(image, 0, 0, newWidth, newHeight)
+      newDataUrl = canvas.toDataURL(imageType, imageArguments)
+      return newDataUrl
     },
-    isUrl (str) {
+    isUrl(str) {
       return str.indexOf('http') >= 0
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
@@ -81,7 +81,7 @@ export default {
     }
   }
   .value {
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }

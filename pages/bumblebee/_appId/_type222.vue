@@ -64,7 +64,7 @@ export default {
   components: { InfiniteLoading, ModalConfirm, MailgunSendMessage },
 
   // Initialise defaults and empty state for page
-  async asyncData ({ app, params, query, store }) {
+  async asyncData({ app, params, query, store }) {
     let { appId, type } = params
     return {
       confirmDeleteModalVisible: false,
@@ -73,17 +73,14 @@ export default {
       limit: DEFAULT_LIMIT,
       list: [],
       offset: 0,
-      pollyAppId: appId
+      pollyAppId: appId,
     }
   },
 
   // initialise component
-  mounted: async function () {
-  },
+  mounted: async function() {},
 
-  methods: {
-  }
-
+  methods: {},
 }
 </script>
 

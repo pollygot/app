@@ -2,22 +2,23 @@
 
 Pollygot provides a single UI/dashboard for your team to perform various tasks. Wherever possible it plugs into existing opensource solutions.
 
-This is a monorepo that includes: 
+This is a monorepo that includes:
 
 - A fully customisable CRUD interface for any Postgres database (using [PostgREST](https://postgrest.org/en/v5.0/api.html))
 - An interface for managing [Kong](https://github.com/Kong/kong)
 - An interface for managing files stored in S3 or GCP Cloud Storage
-- An interface for managing [Kue](https://github.com/Automattic/kue) 
+- An interface for managing [Kue](https://github.com/Automattic/kue)
 - An interface for doing common long running tasks (BumbleBee)
 
 Soon/Maybe:
-- Mailtrain
-- Build ML models on top of Postgres 
-- Headless CMS / Contentful 
-- DKron interface
-- Possible support for Bull / RabbitMQ 
 
-Pollygot allows developers to deploy solutions which are immediately usable for non-tech team members (with little on no additional coding). 
+- Mailtrain
+- Build ML models on top of Postgres
+- Headless CMS / Contentful
+- DKron interface
+- Possible support for Bull / RabbitMQ
+
+Pollygot allows developers to deploy solutions which are immediately usable for non-tech team members (with little on no additional coding).
 
 Product philosophy:̨
 
@@ -26,10 +27,9 @@ Product philosophy:̨
 - Each app should do a specific thing well. Each app should provide core functionality, and each feature should be weighed up as 80/20. If it's outside the 80/20 then the use case is probably too advanced and should be a separate app altogether.
 - Each app should be one instance but may be configured for different providers. Eg: don't connect to S3 and GCP Cloud Storage in the same app (Squirrel). Instead, instantiate two Squirel Apps, one with the S3 config and one with the GCP config.
 
-
 ## Development
 
-``` bash
+```bash
 npm install # install dependencies
 npm run dev # serve with hot reload at localhost:3000
 ```
@@ -43,12 +43,12 @@ Development Philosophy:
   - is this confusing?
   - is this untestable?
   - is this immutable?
-  - am I *currently* using this code in multiple places? Don't prematurely optimize for this
+  - am I _currently_ using this code in multiple places? Don't prematurely optimize for this
 - Boy scout. See a small improvement to clean up the code, or add comments? Make the change, then commit with `boy scout`. No other commit message is required. Small changes are welcomed.
 
 ## Deployment
 
-``` bash
+```bash
 # build for production and launch server
 npm run build
 npm start

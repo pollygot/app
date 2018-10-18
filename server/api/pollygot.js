@@ -27,11 +27,15 @@ app.get('/app/:appId/views', async (req, res) => {
 })
 
 // get all the config for a specific app
-app.get('/hummingbird/history/:appId/:resourceKey/:identifier', async (req, res) => {
-  let { appId, resourceKey, identifier } = req.params
-  let history = getHummingbirdRecordHistory(appId, resourceKey, identifier) || []
-  return res.json(history)
-})
+app.get(
+  '/hummingbird/history/:appId/:resourceKey/:identifier',
+  async (req, res) => {
+    let { appId, resourceKey, identifier } = req.params
+    let history =
+      getHummingbirdRecordHistory(appId, resourceKey, identifier) || []
+    return res.json(history)
+  }
+)
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -42,10 +46,8 @@ app.use((err, req, res, next) => {
 // -- export app --
 module.exports = {
   path: '/api/pollygot',
-  handler: app
+  handler: app,
 }
-
-
 
 //
 // mocking out an API calls to Pollygot Core
@@ -55,25 +57,26 @@ const FileSync = require('lowdb/adapters/FileSync')
 const adapter = new FileSync(process.env.LOCAL_DATA_STORE)
 const db = low(adapter)
 
-const snakeToCamel = (s) => {
-  return s.replace(/(\_\w)/g, (m) => (m[1].toUpperCase()))
+const snakeToCamel = s => {
+  return s.replace(/(\_\w)/g, m => m[1].toUpperCase())
 }
-const objectKeysToCamel = (obj) => {
+const objectKeysToCamel = obj => {
   let result = {}
-  Object.keys(obj).forEach(x => result[`${snakeToCamel(x)}`] = obj[x])
+  Object.keys(obj).forEach(x => (result[`${snakeToCamel(x)}`] = obj[x]))
   return result
 }
-const getApp = (appId) => {
+const getApp = appId => {
   console.log('api/pollygot getApp:', appId)
   let apps = db.get('apps').value()
   return apps.find(x => x.id == appId) || null // string == int
 }
-const getViewsForApp = (app) => {
+const getViewsForApp = app => {
   console.log('api/pollygot getViewsForApp:', app)
   switch (app.app_key) {
     case 'HUMMINGBIRD':
       let views = db
-        .get('hummingbird_views').value()
+        .get('hummingbird_views')
+        .value()
         .filter(x => x.app_id == app.id) // string == int
         .map(x => objectKeysToCamel(x))
       return views || null // string == int
@@ -87,5 +90,10 @@ const getHummingbirdRecordHistory = (appId, resourceKey, identifier) => {
   console.log('appId', appId)
   console.log('resourceKey', resourceKey)
   console.log('identifier', identifier)
-  return history.filter(x => (x['app_id'] == appId && x['resource_key'] == resourceKey && x['identifier'] == identifier))
+  return history.filter(
+    x =>
+      x['app_id'] == appId &&
+      x['resource_key'] == resourceKey &&
+      x['identifier'] == identifier
+  )
 }

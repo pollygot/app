@@ -19,54 +19,64 @@ export default {
   props: {
     config: { type: Object, default: () => ({}) },
     placeholder: { type: String, default: 'Pick date' },
-    inputClass: { type: [Object, Array], default: function() { return {} } },
-    value: { type: String, required: false }
+    inputClass: {
+      type: [Object, Array],
+      default: function() {
+        return {}
+      },
+    },
+    value: { type: String, required: false },
   },
   components: { Datepicker, Timepicker },
-  data () {
+  data() {
     let momentDate = null
     if (this.value) {
       let microseconds = this.value.indexOf('.')
-      let cleansedDateString = (microseconds > 0) ? this.value.substring(0, microseconds) : this.value
+      let cleansedDateString =
+        microseconds > 0 ? this.value.substring(0, microseconds) : this.value
       momentDate = moment(cleansedDateString)
     }
     return {
       datePart: '',
       timePart: '',
-      momentDate: momentDate
+      momentDate: momentDate,
     }
   },
   computed: {
     dateString: {
-      get () {
-        return (this.momentDate) ? this.momentDate.format('YYYY-MM-DD') : this.datePart
+      get() {
+        return this.momentDate
+          ? this.momentDate.format('YYYY-MM-DD')
+          : this.datePart
       },
-      set (value) {
+      set(value) {
         this.datePart = value
         this.trySetDatetime(this.datePart, this.timePart)
-      }
+      },
     },
     timeString: {
-      get () {
-        return  (this.momentDate) ? this.momentDate.format('HH:mm:ss') : this.timePart
+      get() {
+        return this.momentDate
+          ? this.momentDate.format('HH:mm:ss')
+          : this.timePart
       },
-      set (value) {
+      set(value) {
         this.timePart = value
         this.trySetDatetime(this.datePart, this.timePart)
-      }
-    }
+      },
+    },
   },
   methods: {
-    trySetDatetime (datePart, timePart) {
+    trySetDatetime(datePart, timePart) {
       if (!datePart && !datePart.length) this.momentDate = null
       else if (!timePart && !timePart.length) this.momentDate = null
       else {
         this.momentDate = moment(`${this.datePart}T${this.timePart}`)
       }
-      
+
       if (!this.momentDate) this.$emit('onChange', null)
       else this.$emit('onChange', this.momentDate.format('YYYY-MM-DDTHH:mm:ss'))
-    }
+    },
   },
 }
 </script>

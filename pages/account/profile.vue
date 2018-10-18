@@ -10,10 +10,8 @@
 
 <script>
 export default {
-  computed: {
-  },
-  methods: {
-  }
+  computed: {},
+  methods: {},
 }
 </script>
 

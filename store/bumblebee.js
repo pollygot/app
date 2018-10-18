@@ -1,9 +1,9 @@
 export const state = () => ({
-  apps: {}
+  apps: {},
 })
 
 export const mutations = {
-  setApps (state, apps) {
+  setApps(state, apps) {
     state.apps = apps
   },
 }

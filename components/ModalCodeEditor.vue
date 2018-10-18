@@ -39,30 +39,31 @@ export default {
     code: { required: true, type: String },
     type: { required: true, type: String }, // only "JSON" for now
   },
-  data () {
+  data() {
     return {
-      modifiedCode: this.code
+      modifiedCode: this.code,
     }
   },
   computed: {
-    isValid () { 
+    isValid() {
       return Helpers.isValidJsonObject(this.modifiedCode)
-    }
+    },
   },
   methods: {
-    confirm () {
+    confirm() {
       if (this.isValid) this.$emit('onConfirm', this.modifiedCode)
     },
-    revert () {
+    revert() {
       this.modifiedCode = this.code
-    }
-  }
+    },
+  },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.modal-card-head, .modal-card-foot {
+.modal-card-head,
+.modal-card-foot {
   background: #fff;
   border: none;
 }

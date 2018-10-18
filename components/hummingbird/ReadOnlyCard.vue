@@ -22,17 +22,16 @@ export default {
   name: 'HummingbirdReadOnlyCard',
   props: {
     columns: { required: true, type: Array },
-    record: { required: true, type: Object }
+    record: { required: true, type: Object },
   },
   methods: {
-    joinTable (column) {
-    console.log('this.columns', this.columns)
-      let field = {...column, value: this.record[`${column.key}`]}
+    joinTable(column) {
+      console.log('this.columns', this.columns)
+      let field = { ...column, value: this.record[`${column.key}`] }
       this.$emit('onShowJoin', field)
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
 </style>
-

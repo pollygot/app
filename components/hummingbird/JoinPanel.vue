@@ -29,36 +29,38 @@
 
 <script>
 import JoinMenu from './JoinMenu'
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'HummingbirdJoinPanel',
   props: {
     allTables: { required: true, type: Array },
     base: { required: true, type: String },
-    isVisible: { required: true, type: Boolean }
+    isVisible: { required: true, type: Boolean },
   },
-  components: {JoinMenu},
+  components: { JoinMenu },
   computed: {
     ...mapGetters({
-      tree: ['hummingbird/joinTree']
-    })
+      tree: ['hummingbird/joinTree'],
+    }),
   },
   methods: {
-    applySorting () {
+    applySorting() {
       this.$emit('onApply')
     },
-    cancel () {
+    cancel() {
       this.$emit('onHidePanel')
     },
-    joins (resourceKey) { // find all the tables which join to this resource
+    joins(resourceKey) {
+      // find all the tables which join to this resource
       return this.allTables.filter(x => {
-        return x.properties.some(column => (column.fk && column.fk_table === resourceKey))
+        return x.properties.some(
+          column => column.fk && column.fk_table === resourceKey
+        )
       })
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
 </style>
-

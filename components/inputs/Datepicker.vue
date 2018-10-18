@@ -17,17 +17,17 @@ export default {
     config: { type: Object, default: () => ({}) },
     placeholder: { type: String, default: 'Pick date' },
     inputClass: { type: String, default: '' },
-    value: String
+    value: String,
   },
 
-  data () {
+  data() {
     return {
       datepicker: null,
-      selectedDates: null
+      selectedDates: null,
     }
   },
 
-  mounted () {
+  mounted() {
     if (!this.datepicker) {
       this.config.onValueUpdate = this.dateUpdated
       this.datepicker = new Flatpickr(this.$el, this.config)
@@ -37,7 +37,7 @@ export default {
     this.$watch('value', this.setDate)
   },
 
-  beforeDestroy () {
+  beforeDestroy() {
     if (this.datepicker && !this.static) {
       this.datepicker.destroy()
       this.datepicker = null
@@ -45,21 +45,21 @@ export default {
   },
 
   methods: {
-    redraw (newConfig) {
+    redraw(newConfig) {
       this.datepicker.config = Object.assign(this.datepicker.config, newConfig)
       this.datepicker.redraw()
       this.datepicker.jumpToDate()
     },
-    setDate (newDate, oldDate) {
+    setDate(newDate, oldDate) {
       newDate && this.datepicker.setDate(newDate)
     },
-    dateUpdated (selectedDates, dateStr) {
+    dateUpdated(selectedDates, dateStr) {
       this.date = dateStr
-    }
+    },
   },
 
   computed: {
-    static () {
+    static() {
       return !!this.config.static
     },
     date: {
@@ -71,9 +71,9 @@ export default {
           this.selectedDates = newValue
           this.$emit('onChange', newValue)
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 </script>
 

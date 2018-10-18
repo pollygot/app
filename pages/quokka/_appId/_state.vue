@@ -100,7 +100,7 @@ export default {
   components: { InfiniteLoading, ModalConfirm },
 
   // Initialise defaults and empty state for page
-  async asyncData ({ app, params, query, store }) {
+  async asyncData({ app, params, query, store }) {
     let { appId, state } = params
     return {
       confirmDeleteModalVisible: false,
@@ -109,12 +109,12 @@ export default {
       limit: DEFAULT_LIMIT,
       list: [],
       offset: 0,
-      pollyAppId: appId
+      pollyAppId: appId,
     }
   },
 
   // initialise component
-  mounted: async function () {
+  mounted: async function() {
     let stats = await this.getStats()
     let jobs = await this.getJobs(this.jobState, this.limit, this.offset)
     this.totalActive = stats.activeCount
@@ -126,38 +126,41 @@ export default {
   },
 
   methods: {
-    displayJob (job) {
+    displayJob(job) {
       this.job = job
     },
-    deleteRecord () {
+    deleteRecord() {
       console.log('@TODO')
     },
-    getStats: async function () {
+    getStats: async function() {
       return this.$axios.$get(`/api/kue/${this.pollyAppId}/stats`)
     },
-    getJobs: async function (jobState, limit, offset) {
-      return this.$axios.$get(`/api/kue/${this.pollyAppId}/jobs?state=${jobState}&limit=${limit}&offset=${offset}`)
+    getJobs: async function(jobState, limit, offset) {
+      return this.$axios.$get(
+        `/api/kue/${
+          this.pollyAppId
+        }/jobs?state=${jobState}&limit=${limit}&offset=${offset}`
+      )
     },
-    isActiveJob (job) {
+    isActiveJob(job) {
       return job.id === this.job.id
     },
-    infiniteHandler ($state) {
+    infiniteHandler($state) {
       setTimeout(async () => {
         this.offset = this.offset + this.limit // paginate
         let jobs = await this.getJobs(this.jobState, this.limit, this.offset)
         this.list = this.list.concat(jobs)
         if (jobs.length < this.limit) $state.complete()
         else $state.loaded()
-      }, 1000);
+      }, 1000)
     },
-    secondsToString (seconds) {
+    secondsToString(seconds) {
       return moment.duration(seconds, 'seconds').humanize()
     },
-    timeAgo (datetime) {
-      return moment.unix(datetime/1000).fromNow()
-    }
-  }
-
+    timeAgo(datetime) {
+      return moment.unix(datetime / 1000).fromNow()
+    },
+  },
 }
 </script>
 

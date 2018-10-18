@@ -266,64 +266,75 @@
 </template>
 
 <script>
-import axios                    from 'axios'
-import FlattenObject            from 'flat'
-import moment                   from 'moment'
-import json2csv                 from 'json2csv'
-import * as Helpers             from '~/lib/common/helpers'
-import * as PostgrestHelpers    from '~/lib/common/postgrestHelpers'
-import Calendar                 from '~/components/Calendar.vue'
-import CardList                 from '~/components/CardList.vue'
-import CodeModal                from '~/components/ModalCodeEditor.vue'
-import ColumnsPanel             from '~/components/hummingbird/ColumnsPanel.vue'
-import Datepicker               from '~/components/inputs/Datepicker.vue'
-import FilterPanel              from '~/components/hummingbird/FilterPanel.vue'
-import JoinPanel                from '~/components/hummingbird/JoinPanel.vue'
-import Kanban                   from '~/components/Kanban.vue'
-import Pagination               from '~/components/Pagination.vue'
-import SortPanel                from '~/components/hummingbird/SortPanel.vue'
-import Table                    from '~/components/Table.vue'
+import axios from 'axios'
+import FlattenObject from 'flat'
+import moment from 'moment'
+import json2csv from 'json2csv'
+import * as Helpers from '~/lib/common/helpers'
+import * as PostgrestHelpers from '~/lib/common/postgrestHelpers'
+import Calendar from '~/components/Calendar.vue'
+import CardList from '~/components/CardList.vue'
+import CodeModal from '~/components/ModalCodeEditor.vue'
+import ColumnsPanel from '~/components/hummingbird/ColumnsPanel.vue'
+import Datepicker from '~/components/inputs/Datepicker.vue'
+import FilterPanel from '~/components/hummingbird/FilterPanel.vue'
+import JoinPanel from '~/components/hummingbird/JoinPanel.vue'
+import Kanban from '~/components/Kanban.vue'
+import Pagination from '~/components/Pagination.vue'
+import SortPanel from '~/components/hummingbird/SortPanel.vue'
+import Table from '~/components/Table.vue'
 
-const CALENDAR_TYPES                = { WEEK: 'week', MONTH: 'month' }
-const DEFAULT_OFFSET                = 0 // Pagination
-const DEFAULT_PAGINATION_SIZE       = 20 // Pagination
-const DOWNLOAD_FORMATS              = { CSV: 'CSV', JSON: 'JSON' }
-const ERROR_MESSAGE_NO_PK           = 'Couldn\'t find a primary key'
-const ERROR_MESSAGE_NOT_UNIQUE      = 'Couldn\'t get a unique selector. This would cause multiple updates to the database.'
-const NUM_SPACES                    = 2 // for tabsToSpaces in text areas
-const PANELS                        = { COLUMNS: 'COLUMNS', JOINS: 'JOINS', FILTERS: 'FILTERS', SORTING: 'SORTING',  }
-const READ_ONLY_MESSAGE             = 'This resource doesn\'t allow updates'
-const SUCCESS_MESSAGE               = 'Saved!'
-const TOAST_DURATION                = 4000
-const TOAST_ERROR_DURATION          = 4000
-const TOAST_SUCCESS_DURATION        = 1000
-const TODAY                         = moment()
-const VIEW_TYPES                    = { GRID: 'GRID', CALENDAR: 'CALENDAR', CARDS: 'CARDS', KANBAN: 'KANBAN' }
+const CALENDAR_TYPES = { WEEK: 'week', MONTH: 'month' }
+const DEFAULT_OFFSET = 0 // Pagination
+const DEFAULT_PAGINATION_SIZE = 20 // Pagination
+const DOWNLOAD_FORMATS = { CSV: 'CSV', JSON: 'JSON' }
+const ERROR_MESSAGE_NO_PK = "Couldn't find a primary key"
+const ERROR_MESSAGE_NOT_UNIQUE =
+  "Couldn't get a unique selector. This would cause multiple updates to the database."
+const NUM_SPACES = 2 // for tabsToSpaces in text areas
+const PANELS = {
+  COLUMNS: 'COLUMNS',
+  JOINS: 'JOINS',
+  FILTERS: 'FILTERS',
+  SORTING: 'SORTING',
+}
+const READ_ONLY_MESSAGE = "This resource doesn't allow updates"
+const SUCCESS_MESSAGE = 'Saved!'
+const TOAST_DURATION = 4000
+const TOAST_ERROR_DURATION = 4000
+const TOAST_SUCCESS_DURATION = 1000
+const TODAY = moment()
+const VIEW_TYPES = {
+  GRID: 'GRID',
+  CALENDAR: 'CALENDAR',
+  CARDS: 'CARDS',
+  KANBAN: 'KANBAN',
+}
 
 // Dependencies on the constants above
-const DEFAULT_QUERY = { 
-  select: '*', 
-  limit: DEFAULT_PAGINATION_SIZE 
+const DEFAULT_QUERY = {
+  select: '*',
+  limit: DEFAULT_PAGINATION_SIZE,
 }
-const DEFAULT_VIEW_PARAMS = { 
-  view: VIEW_TYPES.GRID, 
-  columns: [] 
-} 
-const DEFAULT_VIEW_PARAMS_CALENDAR  = { 
-  view: VIEW_TYPES.CALENDAR, 
-  type: CALENDAR_TYPES.WEEK, 
-  date: TODAY.format('YYYY-MM-DD'), 
-  pivotKey: null, 
-  columns: [] 
+const DEFAULT_VIEW_PARAMS = {
+  view: VIEW_TYPES.GRID,
+  columns: [],
 }
-const DEFAULT_VIEW_PARAMS_KANBAN  = { 
-  view: VIEW_TYPES.KANBAN, 
-  pivotKey: null, 
-  columns: [] 
+const DEFAULT_VIEW_PARAMS_CALENDAR = {
+  view: VIEW_TYPES.CALENDAR,
+  type: CALENDAR_TYPES.WEEK,
+  date: TODAY.format('YYYY-MM-DD'),
+  pivotKey: null,
+  columns: [],
+}
+const DEFAULT_VIEW_PARAMS_KANBAN = {
+  view: VIEW_TYPES.KANBAN,
+  pivotKey: null,
+  columns: [],
 }
 
 export default {
-  async asyncData ({ app, params, query, store }) {
+  async asyncData({ app, params, query, store }) {
     let { appId, type, resourceKey } = params
     let { q, v } = query
     let queryParams = DEFAULT_QUERY
@@ -334,56 +345,88 @@ export default {
       if (typeof q !== 'undefined') queryParams = JSON.parse(Helpers.decrypt(q))
       if (typeof v !== 'undefined') viewParams = JSON.parse(Helpers.decrypt(v))
       if (!viewParams.columns.length) {
-        let columns = store.getters['hummingbird/columnsForResource'](resourceKey)
-        viewParams = {...viewParams, columns: [...columns]}
+        let columns = store.getters['hummingbird/columnsForResource'](
+          resourceKey
+        )
+        viewParams = { ...viewParams, columns: [...columns] }
       }
-    } else if (type === 'view') { // custom view 
+    } else if (type === 'view') {
+      // custom view
       let customView = store.getters['hummingbird/customView'](resourceKey)
-      queryParams = (typeof q !== 'undefined') ? JSON.parse(Helpers.decrypt(q)) : {...customView.queryParams}
-      viewParams = (typeof v !== 'undefined') ? JSON.parse(Helpers.decrypt(v)) : {...customView.viewParams}
+      queryParams =
+        typeof q !== 'undefined'
+          ? JSON.parse(Helpers.decrypt(q))
+          : { ...customView.queryParams }
+      viewParams =
+        typeof v !== 'undefined'
+          ? JSON.parse(Helpers.decrypt(v))
+          : { ...customView.viewParams }
       resourceKey = customView.resourceKey // transfer ownership of the resource key
     }
 
     // Check if the view overrides any of the query params
     if (viewParams.query) {
       if (viewParams.query.limit) queryParams.limit = viewParams.query.limit
-      if (viewParams.query.criteria) queryParams.criteria = viewParams.query.criteria // Just make this an "AND" instead of overide?
+      if (viewParams.query.criteria)
+        queryParams.criteria = viewParams.query.criteria // Just make this an "AND" instead of overide?
     }
-    
+
     // Convert the newParams into a query string for PostgREST
     let postgrestQueryString = ''
-    let mutatedParams = {...queryParams}
+    let mutatedParams = { ...queryParams }
     if (mutatedParams.criteria) {
       mutatedParams.or = mutatedParams.criteria
       delete mutatedParams.criteria
     }
-    Object.keys(mutatedParams).forEach(key => { postgrestQueryString += `${key}=${mutatedParams[key]}&` })
-    postgrestQueryString = postgrestQueryString.substring(0, postgrestQueryString.length - 1) // remove the trailing &
+    Object.keys(mutatedParams).forEach(key => {
+      postgrestQueryString += `${key}=${mutatedParams[key]}&`
+    })
+    postgrestQueryString = postgrestQueryString.substring(
+      0,
+      postgrestQueryString.length - 1
+    ) // remove the trailing &
 
     // Get the data for the page
-    let { data:response } = await app.$axios.get(`/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(postgrestQueryString)}`, {
-      'headers': { 'range-unit': 'items', 'prefer': 'count=exact' }
-    })
-    let rangeData = PostgrestHelpers.getRangeDataFromResponseHeaders(response.headers)
+    let { data: response } = await app.$axios.get(
+      `/api/postgrest/${appId}/${resourceKey}?q=${Helpers.encrypt(
+        postgrestQueryString
+      )}`,
+      {
+        headers: { 'range-unit': 'items', prefer: 'count=exact' },
+      }
+    )
+    let rangeData = PostgrestHelpers.getRangeDataFromResponseHeaders(
+      response.headers
+    )
     return {
       allTables: allTables,
       appId: appId,
       calendarDateKey: null,
       currentRangeEnd: rangeData.rangeEnd || 0,
-      currentResource: allTables.find(x => (x.key === resourceKey)),
+      currentResource: allTables.find(x => x.key === resourceKey),
       codeBeingModified: '',
       codeEditorVisible: false,
       kanbanPivotKey: null,
       paramBeingModified: '',
       postgrestParams: queryParams,
-      primaryKeys: app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) || [],
+      primaryKeys:
+        app.store.getters['hummingbird/primaryKeysForResource'](resourceKey) ||
+        [],
       queryEditorMode: false,
       records: response.data,
       resourceKey: resourceKey,
       totalRecords: rangeData.totalRecords,
-      userModifiedPostgrestParams: JSON.stringify({...queryParams}, null, NUM_SPACES),
+      userModifiedPostgrestParams: JSON.stringify(
+        { ...queryParams },
+        null,
+        NUM_SPACES
+      ),
       userModifiedPostgrestParamsError: false,
-      userModifiedViewParams: JSON.stringify({...viewParams}, null, NUM_SPACES),
+      userModifiedViewParams: JSON.stringify(
+        { ...viewParams },
+        null,
+        NUM_SPACES
+      ),
       userModifiedViewParamsError: false,
       viewEditorMode: false,
       viewParams: viewParams,
@@ -409,64 +452,80 @@ export default {
       joinComponentMounted: params.resourceKey + 'joins' + Date.now(),
       kanbanComponentMounted: params.resourceKey + 'kanban' + Date.now(),
       sortComponentMounted: params.resourceKey + 'sorts' + Date.now(),
-      tableComponentMounted: params.resourceKey + 'records' + Date.now()
+      tableComponentMounted: params.resourceKey + 'records' + Date.now(),
     }
   },
   computed: {
-    Helpers: { // expose all Helpers to the page
-      get() { return Helpers }
+    Helpers: {
+      // expose all Helpers to the page
+      get() {
+        return Helpers
+      },
     },
-    currentViewType () { // GRID, CALENDAR etc
+    currentViewType() {
+      // GRID, CALENDAR etc
       return this.viewParams.view
     },
-    currentDate () {
+    currentDate() {
       return moment().format('YYYY-MM-DD')
     },
-    dateColumns () {
-      return this.viewParams.columns
-        .filter(x => (x.resource === this.resourceKey)) // only allow the current resource (for now)
-        .filter(x => (x.format === 'DATE' || x.format === 'DATETIME')) || []
+    dateColumns() {
+      return (
+        this.viewParams.columns
+          .filter(x => x.resource === this.resourceKey) // only allow the current resource (for now)
+          .filter(x => x.format === 'DATE' || x.format === 'DATETIME') || []
+      )
     },
-    enumColumns () { // Used for pivoting to a Kanban view. Only let the user pivot on predefined database Enums (for now)
-      return this.viewParams.columns
-      .filter(x => (x.resource === this.resourceKey)) // only allow the current resource (for now)
-      .filter(x => ('enum' in x)) || []
+    enumColumns() {
+      // Used for pivoting to a Kanban view. Only let the user pivot on predefined database Enums (for now)
+      return (
+        this.viewParams.columns
+          .filter(x => x.resource === this.resourceKey) // only allow the current resource (for now)
+          .filter(x => 'enum' in x) || []
+      )
     },
-    filteredColumns () {
+    filteredColumns() {
       if (!this.isFiltered) return []
       let param = this.postgrestParams.criteria
-      return PostgrestHelpers.parseFilterString(param.substring(1, param.length -1))
+      return PostgrestHelpers.parseFilterString(
+        param.substring(1, param.length - 1)
+      )
     },
-    flattenedRecords () {
+    flattenedRecords() {
       return this.records.map(x => FlattenObject(x))
     },
-    isFiltered () {
+    isFiltered() {
       return !!this.postgrestParams.criteria
     },
-    isSorted () {
+    isSorted() {
       return !!this.postgrestParams.order
     },
-    paginationSize () {
+    paginationSize() {
       return this.postgrestParams.limit || DEFAULT_PAGINATION_SIZE
     },
-    potentialImageColumns () {
+    potentialImageColumns() {
       let probableFormat = PostgrestHelpers.VALID_FORMATS.TEXT
-      return this.viewParams.columns.filter(x => (x.format === probableFormat))
+      return this.viewParams.columns.filter(x => x.format === probableFormat)
     },
-    sortedColumns () {
+    sortedColumns() {
       if (!this.isSorted) return []
       let sorting = this.postgrestParams.order.split(',')
-      return sorting.map(x => ({ key: x.split('.')[0], sort: x.split('.')[1] }))
+      return sorting.map(x => ({
+        key: x.split('.')[0],
+        sort: x.split('.')[1],
+      }))
     },
-    visibleColumns () {
+    visibleColumns() {
       return this.viewParams.columns.filter(x => !x.hidden).map(x => {
-        if (x.resource != this.resourceKey) return {...x, key: `${x.resource}.${x.key}`} // this need to have a smarter way of flattening (recursively)
+        if (x.resource != this.resourceKey)
+          return { ...x, key: `${x.resource}.${x.key}` }
+        // this need to have a smarter way of flattening (recursively)
         else return x
       })
-    }
+    },
   },
   methods: {
-    applyManualParams (type, params) {
+    applyManualParams(type, params) {
       this.codeEditorVisible = false
       if (Helpers.isValidJsonObject(params)) {
         let query = {}
@@ -474,71 +533,109 @@ export default {
         this.pushEncodedQuery(query)
       }
     },
-    calendarSettingsChanged (pivot, dateString) {
+    calendarSettingsChanged(pivot, dateString) {
       if (pivot && dateString) {
         const DATE_FORMAT = 'YYYY-MM-DD'
         let baseDate = moment(dateString, DATE_FORMAT)
-        let rangeStart = baseDate.clone().startOf(this.viewParams.type).format(DATE_FORMAT)
-        let rangeEnd = baseDate.clone().endOf(this.viewParams.type).format(DATE_FORMAT)
+        let rangeStart = baseDate
+          .clone()
+          .startOf(this.viewParams.type)
+          .format(DATE_FORMAT)
+        let rangeEnd = baseDate
+          .clone()
+          .endOf(this.viewParams.type)
+          .format(DATE_FORMAT)
         let newCriteria = this.generateFilterString([
-          { andOr: 'and', key: pivot, is: true, criteria: 'gte', filterString: rangeStart },
-          { andOr: 'and', key: pivot, is: true, criteria: 'lt', filterString: rangeEnd },
+          {
+            andOr: 'and',
+            key: pivot,
+            is: true,
+            criteria: 'gte',
+            filterString: rangeStart,
+          },
+          {
+            andOr: 'and',
+            key: pivot,
+            is: true,
+            criteria: 'lt',
+            filterString: rangeEnd,
+          },
         ])
         let queryOveride = { limit: '*', criteria: newCriteria }
         this.pushEncodedQuery({
-          'v': { ...this.viewParams, date: dateString, pivotKey: pivot, query: queryOveride }
+          v: {
+            ...this.viewParams,
+            date: dateString,
+            pivotKey: pivot,
+            query: queryOveride,
+          },
         })
       }
     },
-    changeCalendarDate (dateString) {
+    changeCalendarDate(dateString) {
       this.viewParams.date = dateString
-      this.calendarSettingsChanged(this.viewParams.pivotKey, this.viewParams.date)
+      this.calendarSettingsChanged(
+        this.viewParams.pivotKey,
+        this.viewParams.date
+      )
     },
-    changeCalendarPivot (key) {
+    changeCalendarPivot(key) {
       this.viewParams.pivotKey = key
-      this.calendarSettingsChanged(this.viewParams.pivotKey, this.viewParams.date)
+      this.calendarSettingsChanged(
+        this.viewParams.pivotKey,
+        this.viewParams.date
+      )
     },
-    changeKanbanPivot (key) {
-      this.pushEncodedQuery({'v': { ...this.viewParams, pivotKey: key }})
+    changeKanbanPivot(key) {
+      this.pushEncodedQuery({ v: { ...this.viewParams, pivotKey: key } })
     },
-    changeCardImage (columnKey) {
-      if (columnKey) this.pushEncodedQuery({'v': { ...this.viewParams, image_key: columnKey }}) 
+    changeCardImage(columnKey) {
+      if (columnKey)
+        this.pushEncodedQuery({
+          v: { ...this.viewParams, image_key: columnKey },
+        })
       else {
         let mutatedParams = { ...this.viewParams }
         delete mutatedParams.image_key
-        this.pushEncodedQuery({'v': mutatedParams})
+        this.pushEncodedQuery({ v: mutatedParams })
       }
     },
-    downloadRecords (format) {
-      let fields = this.viewParams.columns.filter(x => (!x.hidden)).map(c => (c.key))
+    downloadRecords(format) {
+      let fields = this.viewParams.columns
+        .filter(x => !x.hidden)
+        .map(c => c.key)
       switch (format) {
         case DOWNLOAD_FORMATS.CSV:
           const json2csvParser = new json2csv.Parser({ fields })
           const csv = json2csvParser.parse(this.records)
-          return window.location.href = "data:text/csv," + encodeURIComponent(csv)
+          return (window.location.href =
+            'data:text/csv,' + encodeURIComponent(csv))
         case DOWNLOAD_FORMATS.JSON:
           return null
       }
     },
-    editCode (paramToModify, codeToModify) {
+    editCode(paramToModify, codeToModify) {
       this.paramBeingModified = paramToModify
       this.codeBeingModified = JSON.stringify(codeToModify, null, 2)
       this.codeEditorVisible = true
     },
-    filterColumns (columns) {
+    filterColumns(columns) {
       this.visiblePanel = null
       if (!columns.length) {
         let mutatedParams = { ...this.postgrestParams }
         delete mutatedParams.criteria
-        this.pushEncodedQuery({'q': mutatedParams})
+        this.pushEncodedQuery({ q: mutatedParams })
       } else {
         let criteria = this.generateFilterString(columns)
         console.log('criteria', criteria)
-        this.pushEncodedQuery({'q': { ...this.postgrestParams, criteria: criteria }})
+        this.pushEncodedQuery({
+          q: { ...this.postgrestParams, criteria: criteria },
+        })
       }
     },
-    generateFilterString (columns) {
-      let ors, ands = []
+    generateFilterString(columns) {
+      let ors,
+        ands = []
       columns.forEach(col => {
         if (col.andOr === 'and') {
           ands.push(col)
@@ -550,93 +647,142 @@ export default {
       ors.push(ands)
       return PostgrestHelpers.generateFilterString(ors)
     },
-    goToRecord (record) {
-      if (this.currentResource.isViewOnly) return this.$toast.show(READ_ONLY_MESSAGE, { duration: TOAST_DURATION })
+    goToRecord(record) {
+      if (this.currentResource.isViewOnly)
+        return this.$toast.show(READ_ONLY_MESSAGE, {
+          duration: TOAST_DURATION,
+        })
       try {
-        let primaryKeys = this.$store.getters['hummingbird/primaryKeysForResource'](this.resourceKey)
+        let primaryKeys = this.$store.getters[
+          'hummingbird/primaryKeysForResource'
+        ](this.resourceKey)
         let selectors = primaryKeys.map(x => {
           let pk = record[`${x}`].toString() || null
-          if (!pk) throw new Error('Can\'t find a Primary Key for this record')
+          if (!pk) throw new Error("Can't find a Primary Key for this record")
           return x + '=eq.' + pk
         })
         let q = encodeURIComponent(Helpers.encrypt(selectors.join('&'))) // an occasional "+" appearing when not re-encoded. Not sure why but best to encode again
-        let path = `/hummingbird/${this.$route.params.appId}/record/edit/${this.resourceKey}?q=${q}`
+        let path = `/hummingbird/${this.$route.params.appId}/record/edit/${
+          this.resourceKey
+        }?q=${q}`
         this.$router.push({ path: path })
       } catch (error) {
         console.log('error', error)
       }
     },
-    goToView (viewType) {
+    goToView(viewType) {
       let query = {}
       if (viewType === VIEW_TYPES.CALENDAR) {
-        let newViewParams = Object.assign({...DEFAULT_VIEW_PARAMS_CALENDAR}, {columns: this.viewParams.columns})
-        query = {'v': newViewParams}
-      }
-      else if (viewType === VIEW_TYPES.KANBAN) {
-        let newViewParams = Object.assign({...DEFAULT_VIEW_PARAMS_KANBAN}, {columns: this.viewParams.columns}) 
-        query = {'v': newViewParams}
-      }
-      else query = {'v': Object.assign({}, {view: viewType}, {columns: this.viewParams.columns})} // only keep the column config
+        let newViewParams = Object.assign(
+          { ...DEFAULT_VIEW_PARAMS_CALENDAR },
+          { columns: this.viewParams.columns }
+        )
+        query = { v: newViewParams }
+      } else if (viewType === VIEW_TYPES.KANBAN) {
+        let newViewParams = Object.assign(
+          { ...DEFAULT_VIEW_PARAMS_KANBAN },
+          { columns: this.viewParams.columns }
+        )
+        query = { v: newViewParams }
+      } else
+        query = {
+          v: Object.assign(
+            {},
+            { view: viewType },
+            { columns: this.viewParams.columns }
+          ),
+        } // only keep the column config
       this.pushEncodedQuery(query)
     },
-    paginate (start) {
-      this.pushEncodedQuery({'q': { ...this.postgrestParams, offset: start }})
+    paginate(start) {
+      this.pushEncodedQuery({ q: { ...this.postgrestParams, offset: start } })
     },
     // stringify, hash and URL encode an object, then assign it to a queryKey, and then update the route
-    // eg: @param newParams = { 'v': {...someViewParams} } OR newParams = { 'v': {...someViewParams}, 'q': {...someQueryParams} } 
-    pushEncodedQuery (newParams) { 
-      let query = {...this.$route.query} || {}
+    // eg: @param newParams = { 'v': {...someViewParams} } OR newParams = { 'v': {...someViewParams}, 'q': {...someQueryParams} }
+    pushEncodedQuery(newParams) {
+      let query = { ...this.$route.query } || {}
       Object.keys(newParams).forEach(queryKey => {
-        if (Object.keys(newParams).length) query[`${queryKey}`] = Helpers.encrypt(JSON.stringify(newParams[`${queryKey}`]))
+        if (Object.keys(newParams).length)
+          query[`${queryKey}`] = Helpers.encrypt(
+            JSON.stringify(newParams[`${queryKey}`])
+          )
         else delete query[`${queryKey}`]
       })
       this.$router.push({ path: this.$route.path, query: query })
     },
-    sortColumns (columns) {
+    sortColumns(columns) {
       this.visiblePanel = null
       if (columns.length) {
-        let ordering = columns.map(x => ( `${x.key}.${x.sort}`)).join(',')
-        this.pushEncodedQuery({'q': { ...this.postgrestParams, order: ordering }})
+        let ordering = columns.map(x => `${x.key}.${x.sort}`).join(',')
+        this.pushEncodedQuery({
+          q: { ...this.postgrestParams, order: ordering },
+        })
       } else {
         let newParams = { ...this.postgrestParams }
         delete newParams.order
-        this.pushEncodedQuery({'q': newParams})
+        this.pushEncodedQuery({ q: newParams })
       }
     },
-    tableHeaderClicked (key) {
-      let alreadySorted = this.sortedColumns.find(x => (x.key === key)) || false
+    tableHeaderClicked(key) {
+      let alreadySorted = this.sortedColumns.find(x => x.key === key) || false
       if (!alreadySorted) {
-        let newSorting = [{key: key, sort: 'asc'}, ...this.sortedColumns] // push to front
+        let newSorting = [{ key: key, sort: 'asc' }, ...this.sortedColumns] // push to front
         this.sortColumns(newSorting)
-      }
-      else {
-        let modified = this.sortedColumns.filter(x => (x.key !== key))
-        let newDirection = (alreadySorted.sort === 'asc') ? 'desc' : 'asc'
-        let newSorting = [{key: alreadySorted.key, sort: newDirection}, ...modified] // push to front
+      } else {
+        let modified = this.sortedColumns.filter(x => x.key !== key)
+        let newDirection = alreadySorted.sort === 'asc' ? 'desc' : 'asc'
+        let newSorting = [
+          { key: alreadySorted.key, sort: newDirection },
+          ...modified,
+        ] // push to front
         this.sortColumns(newSorting)
       }
     },
-    toggleVisiblePanel (panelName) {
-      let visible = (this.visiblePanel === panelName) ? null : panelName
+    toggleVisiblePanel(panelName) {
+      let visible = this.visiblePanel === panelName ? null : panelName
       this.visiblePanel = visible
     },
-    updateColumns (columns) {
+    updateColumns(columns) {
       this.visiblePanel = null
-      this.pushEncodedQuery({'v': { ...this.viewParams, columns: columns }})
+      this.pushEncodedQuery({ v: { ...this.viewParams, columns: columns } })
     },
-    updateLimit (newSize) {
-      this.pushEncodedQuery({'q': { ...this.postgrestParams, limit: newSize }})
+    updateLimit(newSize) {
+      this.pushEncodedQuery({ q: { ...this.postgrestParams, limit: newSize } })
     },
-    updateRecordField: async function (record, column, value) { // updates an individual field
-      let selector = Helpers.encrypt(PostgrestHelpers.getUniqueSelector(this.primaryKeys, record))
-      if (!selector) this.$toast.error(ERROR_MESSAGE_NO_PK, { duration: TOAST_ERROR_DURATION })
-      else if (!await PostgrestHelpers.verifySelectorReturnsUnique(this, this.appId, this.resourceKey, selector)) {
-        this.$toast.error(ERROR_MESSAGE_NOT_UNIQUE, { duration: TOAST_ERROR_DURATION })
+    updateRecordField: async function(record, column, value) {
+      // updates an individual field
+      let selector = Helpers.encrypt(
+        PostgrestHelpers.getUniqueSelector(this.primaryKeys, record)
+      )
+      if (!selector)
+        this.$toast.error(ERROR_MESSAGE_NO_PK, {
+          duration: TOAST_ERROR_DURATION,
+        })
+      else if (
+        !(await PostgrestHelpers.verifySelectorReturnsUnique(
+          this,
+          this.appId,
+          this.resourceKey,
+          selector
+        ))
+      ) {
+        this.$toast.error(ERROR_MESSAGE_NOT_UNIQUE, {
+          duration: TOAST_ERROR_DURATION,
+        })
       } else {
         let data = {}
         data[`${column}`] = value
-        let {data:response} = await PostgrestHelpers.updateRecord(this, this.appId, this.resourceKey, selector, data).catch(this.handleErrorResponse)
-        if (response) this.$toast.success(SUCCESS_MESSAGE, { duration: TOAST_SUCCESS_DURATION })
+        let { data: response } = await PostgrestHelpers.updateRecord(
+          this,
+          this.appId,
+          this.resourceKey,
+          selector,
+          data
+        ).catch(this.handleErrorResponse)
+        if (response)
+          this.$toast.success(SUCCESS_MESSAGE, {
+            duration: TOAST_SUCCESS_DURATION,
+          })
       }
     },
   },
@@ -644,18 +790,18 @@ export default {
   // View handlers
   layout: 'hummingbird',
   watchQuery: ['q', 'v'],
-  components: { 
-    Calendar, 
-    CardList, 
+  components: {
+    Calendar,
+    CardList,
     CodeModal,
-    ColumnsPanel, 
-    Datepicker, 
-    FilterPanel, 
-    JoinPanel, 
-    Kanban, 
-    Pagination, 
-    SortPanel, 
-    Table 
+    ColumnsPanel,
+    Datepicker,
+    FilterPanel,
+    JoinPanel,
+    Kanban,
+    Pagination,
+    SortPanel,
+    Table,
   },
 }
 </script>
@@ -667,7 +813,7 @@ export default {
   overflow-y: auto;
   .top-level {
     background: #fff;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
   .pagination-section {
     position: absolute;
@@ -677,7 +823,7 @@ export default {
     width: 100vw;
     height: 52px;
     padding: 12px 20px 12px 280px;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: row;
     z-index: 6;

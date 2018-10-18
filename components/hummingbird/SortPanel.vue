@@ -54,39 +54,42 @@ export default {
   name: 'HummingbirdSortPanel',
   props: {
     allColumns: { required: true, type: Array },
-    sortedColumns: { required: true, type: Array }
+    sortedColumns: { required: true, type: Array },
   },
   components: { draggable },
-  data () {
+  data() {
     return {
-      newSorting: [...this.sortedColumns]
+      newSorting: [...this.sortedColumns],
     }
   },
   computed: {
-    unsortedColumns () {
+    unsortedColumns() {
       let sorted = this.newSorting.map(x => x.key)
-      return this.allColumns.filter(x => (!sorted.includes(x.key)))
-    }
+      return this.allColumns.filter(x => !sorted.includes(x.key))
+    },
   },
   methods: {
-    applySorting () {
-      let sortArray = this.newSorting.map(x => ({ key: x.key, sort: (x.sort) ? x.sort : 'asc' }))
+    applySorting() {
+      let sortArray = this.newSorting.map(x => ({
+        key: x.key,
+        sort: x.sort ? x.sort : 'asc',
+      }))
       this.$emit('onSort', sortArray)
     },
-    cancel () {
+    cancel() {
       this.newSorting = [...this.sortedColumns]
       this.$emit('onHidePanel')
     },
-    remove (column) {
-      this.newSorting = this.newSorting.filter(x => (x.key !== column.key))
+    remove(column) {
+      this.newSorting = this.newSorting.filter(x => x.key !== column.key)
     },
-    sortBy (column, direction) {
+    sortBy(column, direction) {
       this.newSorting = [...this.newSorting].map(x => {
         if (x.key === column.key) x.sort = direction
         return x
       })
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss">
@@ -96,19 +99,18 @@ export default {
     top: 18px;
     right: 15px;
   }
- .draggable-item.box {
-   position: relative;
-  .delete {
-    position: absolute;
-    top: 0.7rem;
-    right: 0.5rem;
+  .draggable-item.box {
+    position: relative;
+    .delete {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.5rem;
+    }
+    .buttons {
+      position: absolute;
+      top: 0.4rem;
+      right: 2.5rem;
+    }
   }
-  .buttons {
-    position: absolute;
-    top: 0.4rem;
-    right: 2.5rem;
-  }
- }
 }
 </style>
-

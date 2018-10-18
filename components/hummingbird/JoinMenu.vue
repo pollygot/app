@@ -26,10 +26,10 @@
 // Recursive component
 export default {
   name: 'HummingbirdJoinMenu',
-  props: [ 'allTables', 'nodes', 'label', 'depth', 'selected' ],
+  props: ['allTables', 'nodes', 'label', 'depth', 'selected'],
   data() {
     return {
-      showChildren: false
+      showChildren: false,
     }
   },
   computed: {
@@ -37,40 +37,43 @@ export default {
       return { 'has-children': this.nodes }
     },
     indent() {
-      return { 
+      return {
         transform: `translate(${this.depth * 30}px)`,
-        width: `calc(100% - ${this.depth * 30}px)`
+        width: `calc(100% - ${this.depth * 30}px)`,
       }
-    }
+    },
   },
   methods: {
     toggleTable() {
       let payload = {
         resourceKey: this.label,
-        depth: this.depth
+        depth: this.depth,
       }
       if (!this.selected) {
-        let joins = this.allTables.filter(x => {
-          return x.properties.some(column => (column.fk && column.fk_table === this.label))
-        }).map(j => {
-          let o = {...j}
-          delete o.properties
-          return o
-        })
+        let joins = this.allTables
+          .filter(x => {
+            return x.properties.some(
+              column => column.fk && column.fk_table === this.label
+            )
+          })
+          .map(j => {
+            let o = { ...j }
+            delete o.properties
+            return o
+          })
         console.log('joins', joins)
         if (joins && joins.length) payload.nodesToAppend = joins
       }
       this.$store.commit('hummingbird/selectForeignTable', payload)
       console.log('this', this.label)
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
 .HummingbirdJoinMenu {
   .label-wrapper {
-    
     .button {
       justify-content: left;
       padding: 20px 10px;
@@ -78,13 +81,12 @@ export default {
       text-transform: uppercase;
       font-size: 0.9rem;
       border-radius: 5px;
-      border: 1px solid rgba(0,0,0,0);
-      border: 1px solid rgba(0,0,0,0.1);
+      border: 1px solid rgba(0, 0, 0, 0);
+      border: 1px solid rgba(0, 0, 0, 0.1);
 
       &:hover {
-        box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.04);
+        box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.04);
       }
-
     }
   }
 }

@@ -56,26 +56,27 @@ import moment from 'moment'
 export default {
   name: 'BumbleBeeJobCard',
   props: {
-    job: { required: false, type: Object }
+    job: { required: false, type: Object },
   },
-  data () {
+  data() {
     return {
-      tab: 'JOB'
+      tab: 'JOB',
     }
   },
   computed: {
-    jobDate () {
-      return moment(this.job.opts.timestamp).format('ddd DD MMM YYYY · HH:MM:ss')
+    jobDate() {
+      return moment(this.job.opts.timestamp).format(
+        'ddd DD MMM YYYY · HH:MM:ss'
+      )
     },
-    jobProcessed () {
+    jobProcessed() {
       return moment(this.job.processedOn).format('ddd DD MMM YYYY · HH:MM:ss')
     },
-    jobFinished () {
+    jobFinished() {
       return moment(this.job.finishedOn).format('ddd DD MMM YYYY · HH:MM:ss')
     },
   },
-  methods: {
-  }
+  methods: {},
 }
 </script>
 <style lang="scss">
@@ -85,4 +86,3 @@ export default {
   }
 }
 </style>
-
