@@ -19,7 +19,7 @@ module.exports = {
     ]
   },
   // we need to run most the functionality on the server since there are private setting associated with most tenants' apps
-  // also overcomes CORs 
+  // also overcomes CORs
   serverMiddleware: [
     './server/api/auth',
     './server/api/bumblebee',
@@ -59,18 +59,18 @@ module.exports = {
         'process.VERSION': require('./package.json').version
       })
     ],
-    transpile: [ './lib/**/*', './api/**/*' ],
+    transpile: [ './lib/**/*', './server/**/*' ],
+    watch: [ './server/**/*' ],
     vendor: [
-      'axios', 
+      'axios',
       'flat',
-      'flatpickr', 
-      'moment', 
-      'perfect-scrollbar', 
-      'vue-click-outside', 
-      'vue-infinite-loading', 
+      'flatpickr',
+      'moment',
+      'perfect-scrollbar',
+      'vue-click-outside',
+      'vue-infinite-loading',
       'vuedraggable'
     ],
-    watch: [ './api/**/*' ],
     /*
     ** Run ESLint on save
     */

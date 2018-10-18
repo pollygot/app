@@ -21,6 +21,7 @@
     "@nuxtjs/dotenv": "^1.1.1",
     "@nuxtjs/proxy": "^1.2.4",
     "@nuxtjs/toast": "^3.0.1",
+    "@sentry/node": "^4.1.1",
     "aws-sdk": "^2.309.0",
     "body-parser": "^1.18.3",
     "bulma": "^0.7.1",
@@ -51,10 +52,13 @@
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-vue": "^4.0.0",
+    "husky": "^1.1.2",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
     "node-sass": "^4.9.3",
     "nuxt-sass-resources-loader": "^2.0.4",
+    "prettier": "^1.14.3",
+    "pretty-quick": "^1.8.0",
     "sass-loader": "^7.1.0",
     "vue-style-loader": "^4.1.2"
   }
