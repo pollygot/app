@@ -43,7 +43,9 @@ const getUserByUsernameAndPassword = (exports.getUserByUsernameAndPassword = asy
   try {
     const url = `${METAL_URL}/users!A1:C50?key=${METAL_KEY}&user=${METAL_USER}`
     console.log('url', url)
-    let { data: users } = (await axios.get(url)) || []
+    let { data: response } = (await axios.get(url)) || null
+    let users = response ? response.values : []
+    console.log('users', users)
     return (
       users.find(x => x.username === username && x.password === password) ||
       null

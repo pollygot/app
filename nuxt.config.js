@@ -86,7 +86,7 @@ module.exports = {
         'process.VERSION': require('./package.json').version,
       }),
     ],
-    watch: ['server'],
+    watch: ['~/server/**/*'],
     vendor: [
       'axios',
       'flat',

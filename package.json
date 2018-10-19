@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"nuxt\" \"nodemon ./server\"",
-    "dev2": "nodemon ./server",
+    "server": "nodemon ./server",
     "build": "API_URL=https://app.pollygot.com nuxt build",
     "compile:common": "babel ./lib/common --presets stage-3 --plugins transform-es2015-modules-commonjs --out-dir ./server/common",
     "db:init": "node ./data/init.js",
