@@ -87,7 +87,7 @@ export default {
           console.log('e', e)
           this.error = e + '' })
       if (this.response && this.redirect) this.$router.push({ path: this.redirect })
-      else if (this.response) this.$router.push({ path: '/' })
+      else this.$router.push({ path: '/' })
     }
   }
 }

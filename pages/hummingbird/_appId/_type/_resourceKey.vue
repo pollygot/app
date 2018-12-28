@@ -538,7 +538,8 @@ export default {
       }
     },
     generateFilterString (columns) {
-      let ors, ands = []
+      let ors = []
+      let ands = []
       columns.forEach(col => {
         if (col.andOr === 'and') {
           ands.push(col)

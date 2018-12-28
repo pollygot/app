@@ -43,7 +43,7 @@
 import axios from 'axios'
 import config from '~/config/default'
 import * as S3Helpers from '~/lib/common/s3'
-var AWS = require('aws-sdk')
+// var AWS = require('aws-sdk')
 export default {
   layout: 'squirrel',
   async asyncData ({ store, params }) {
@@ -51,26 +51,26 @@ export default {
     let pollyApp = store.getters['app'](appId)
 
 
-    // Set the region 
-    AWS.config.update({
-      accessKeyId: pollyApp.config.key,
-      secretAccessKey: pollyApp.config.secret,
-      region: pollyApp.config.region
-    });
-    let s3 = new AWS.S3({apiVersion: '2006-03-01'});
-    var bucketParams = {Bucket: pollyApp.config.bucket}
-    let contents = await new Promise((resolve, reject) => {
-      s3.listObjects(bucketParams, (err, data) => {
-        if (err) return reject(err)
-        else return resolve(data)
-      })
-    }).catch(err => console.log('err', err))
+    // // Set the region 
+    // AWS.config.update({
+    //   accessKeyId: pollyApp.config.key,
+    //   secretAccessKey: pollyApp.config.secret,
+    //   region: pollyApp.config.region
+    // });
+    // let s3 = new AWS.S3({apiVersion: '2006-03-01'});
+    // var bucketParams = {Bucket: pollyApp.config.bucket}
+    // let contents = await new Promise((resolve, reject) => {
+    //   s3.listObjects(bucketParams, (err, data) => {
+    //     if (err) return reject(err)
+    //     else return resolve(data)
+    //   })
+    // }).catch(err => console.log('err', err))
     
-    let standardizedContents = S3Helpers.standardizeFormat(contents)
+    // let standardizedContents = S3Helpers.standardizeFormat(contents)
 
     return {
-      pollyApp: pollyApp,
-      contents: standardizedContents || []
+      // pollyApp: pollyApp,
+      // contents: standardizedContents || []
     }
   },
   computed: {
