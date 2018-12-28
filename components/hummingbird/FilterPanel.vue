@@ -33,8 +33,8 @@
 
         <draggable v-model="newFilters" :options="{handle:'.handle'}">
           <div class="m-b-sm p-sm drag-container" v-for="(filter, index) in newFilters" :key="'sort'+filter.key+index">
-            <button class="handle button is-small is-white"><span class="icon is-small"><i class="fas fa-arrows-alt"></i></span></button>
-            <button class="remove button is-small is-white"><span class="icon is-small" @click="remove(index)"><i class="fas fa-times"></i></span></button>
+            <div class="handle button is-small is-white"><span class="icon is-small"><i class="fas fa-arrows-alt"></i></span></div>
+            <button class="remove button is-small is-white" @click="remove(index)"><span class="icon is-small" ><i class="fas fa-times"></i></span></button>
             <div class="and-or-criteria buttons has-addons is-centered m-b-sm" :class="{'hidden': !index}">
               <button class="button is-small is-rounded" @click="changeAndOr(filter, 'and')" :class="{'is-dark': filter.andOr === 'and'}" onClick="">AND</button>
               <button class="button is-small is-rounded" @click="changeAndOr(filter, 'or')" :class="{'is-primary': filter.andOr === 'or'}">OR</button>
@@ -125,6 +125,7 @@ export default {
       this.$emit('onFilter', this.newFilters)
     },
     clear () {
+      console.log('clear')
       this.newFilters = []
     },
     cancel () {
