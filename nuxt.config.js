@@ -35,10 +35,15 @@ module.exports = {
   */
   modules: [
     '@nuxtjs/auth',
-    '@nuxtjs/axios',
+    ['@nuxtjs/axios', {
+      baseURL: process.env.API_URL || 'http://localhost:3000',
+    }],
     '@nuxtjs/dotenv',
     '@nuxtjs/proxy',
-    '@nuxtjs/toast',
+    ['@nuxtjs/toast', {
+      duration: 3000,
+      position: 'bottom-right'
+    }],
   ],
   /*
   ** Global CSS
@@ -60,16 +65,6 @@ module.exports = {
       })
     ],
     transpile: [ './lib/**/*', './api/**/*' ],
-    vendor: [
-      'axios', 
-      'flat',
-      'flatpickr', 
-      'moment', 
-      'perfect-scrollbar', 
-      'vue-click-outside', 
-      'vue-infinite-loading', 
-      'vuedraggable'
-    ],
     watch: [ './api/**/*' ],
     /*
     ** Run ESLint on save
@@ -99,19 +94,7 @@ module.exports = {
         endpoints: {
           login: { propertyName: 'token.accessToken' }
         }
-      },
-      auth0: {
-        domain: process.env.AUTH0_DOMAIN,
-        client_id: process.env.AUTH0_CLIENT_ID
       }
     }
-  },
-  axios: {
-    baseURL: process.env.API_URL || 'http://localhost:3000',
-    proxy: false,
-    proxyHeaders: false
-  },
-  toast: {
-    position: 'bottom-right'
   }
 }

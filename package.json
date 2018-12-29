@@ -16,7 +16,7 @@
     "start": "nuxt start"
   },
   "dependencies": {
-    "@nuxtjs/auth": "^4.5.1",
+    "@nuxtjs/auth": "git://github.com/nuxt-community/auth-module.git#dev",
     "@nuxtjs/axios": "^5.3.1",
     "@nuxtjs/dotenv": "^1.1.1",
     "@nuxtjs/proxy": "^1.2.4",
@@ -26,6 +26,7 @@
     "bulma": "^0.7.1",
     "bulma-extensions": "^2.2.2",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
     "crypto-js": "^3.1.9-1",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
@@ -36,7 +37,7 @@
     "jsonwebtoken": "^8.3.0",
     "lowdb": "^1.0.0",
     "moment": "^2.22.2",
-    "nuxt": "^1.0.0",
+    "nuxt": "^2.3.4",
     "perfect-scrollbar": "^1.4.0",
     "shortid": "^2.2.13",
     "vue-click-outside": "^1.0.7",

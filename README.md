@@ -48,8 +48,12 @@ Development Philosophy:
 
 ## Deployment
 
+You need to make sure that `API_URL` and `API_URL_BROWSER` environment vars are set on your instance! If you are deploying to GAE (using the app.yaml file included in this repo), you will have to set them in the `env_variables` section, on beanstalk you can do this in Configuration > Software.
+
 ``` bash
 # build for production and launch server
 npm run build
 npm start
+
+gcloud app deploy app.yaml --project your-project-id # Change `your-project-id` to be your own 
 ```

@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const jwt = require('express-jwt')
 const jsonwebtoken = require('jsonwebtoken')
+const cors = require('cors')
+
 
 const JWT_SECRET = process.env.JWT_SECRET
 const STORE = process.env.DATA_STORE 
@@ -21,6 +23,7 @@ const app = express()
 // Install middleware
 app.use(cookieParser())
 app.use(bodyParser.json())
+app.use(cors())
 
 // JWT middleware
 app.use(
